@@ -2,7 +2,7 @@
   "name": "nested-list",
   "version": "1.0.0",
   "description": "Nested list Tool for EditorJS",
-  "main": "src/index.ts",
+  "main": "src/index.js",
   "repository": "https://github.com/editor-js/nested-list.git",
   "author": "CodeX <team@codex.so>",
   "license": "MIT",
@@ -13,6 +13,7 @@
     "postcss-nested": "^5.0.3",
     "postcss-nested-ancestors": "^2.0.0",
     "style-loader": "^2.0.0",
-    "ts-loader": "^8.0.17"
+    "webpack": "^5.24.1",
+    "webpack-cli": "^4.5.0"
   }
 }
