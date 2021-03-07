@@ -1,11 +1,15 @@
 {
   "name": "nested-list",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Nested list Tool for EditorJS",
-  "main": "src/index.js",
+  "main": "dist/bundle.js",
   "repository": "https://github.com/editor-js/nested-list.git",
   "author": "CodeX <team@codex.so>",
   "license": "MIT",
+  "scripts": {
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development --watch"
+  },
   "devDependencies": {
     "css-loader": "^5.0.2",
     "postcss": "^8.2.6",
