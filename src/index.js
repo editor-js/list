@@ -180,10 +180,7 @@ export default class NestedList {
    * @returns {HTMLOListElement|HTMLUListElement}
    */
   makeMainTag(style){
-    const styleClass = style === 'ordered' ? this.CSS.wrapperOrdered : this.CSS.wrapperUnordered;
-    // const tag = style === 'ordered' ? 'ol' : 'ul';
-
-    return DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.wrapper, styleClass], {
+    return DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.wrapper], {
       contentEditable: !this.readOnly,
     });
   }
@@ -279,8 +276,6 @@ export default class NestedList {
     return this._data;
   }
 
-
-
   /**
    * Returns current List item by the caret position
    *
@@ -360,22 +355,30 @@ export default class NestedList {
   }
 
   addTab(event){
-    if (this.currentItem === this.currentItem.parentNode.childNodes[0]) {
-      return
-    }
+    /** if the first item in a list then do nothing */
+    if (this.currentItem === this.currentItem.parentNode.childNodes[0]) return;
 
-    const style = this._data.style === 'ordered' ? this.CSS.wrapperOrdered : this.CSS.wrapperUnordered;
-    let ol = DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.wrapper, style], {
+
+    // @todo append item to the sublist at the end of previous item
+    const prevItemLastChild = this.currentItem.previousSibling.lastChild;
+
+    const item = DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.item], {
       contentEditable: true,
     });
 
-    if (this.currentItem.nextSibling != null) {
-      this.currentItem.parentNode.insertBefore(ol, this.currentItem.nextSibling)
+    item.innerHTML = this.currentItem.innerHTML;
+
+    if (prevItemLastChild.classList && prevItemLastChild.classList.contains(this.CSS.wrapper)) {
+      prevItemLastChild.appendChild(item)
     } else {
-      this.currentItem.parentNode.appendChild(ol)
+      const sublist = DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.wrapper]);
+
+      this.currentItem.previousSibling.appendChild(sublist);
+
+      sublist.appendChild(item);
     }
 
-    ol.appendChild(this.currentItem)
+    this.currentItem.parentNode.removeChild(this.currentItem);
 
     event.preventDefault();
     event.stopPropagation();
