@@ -340,6 +340,9 @@ export default class NestedList {
   }
 
   addTab(event){
+    event.preventDefault();
+    event.stopPropagation();
+
     if (this.currentItem === this.currentItem.parentNode.childNodes[0]) return;
 
     const prevItemLastChild = this.currentItem.previousSibling.lastChild;
@@ -361,13 +364,13 @@ export default class NestedList {
 
     this.currentItem.parentNode.removeChild(this.currentItem);
 
-    // @todo set focus to item
-
-    event.preventDefault();
-    event.stopPropagation();
+    DomUtil.focus(item);
   }
 
   shiftTab(event){
+    event.preventDefault();
+    event.stopPropagation();
+
     if (this.currentItem.parentNode === this._elements.wrapper) return;
 
     const item = DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.item], {
@@ -383,9 +386,8 @@ export default class NestedList {
       this.currentItem.parentNode.parentNode.removeChild(this.currentItem.parentNode);
     }
 
-    // @todo set focus to item
+    DomUtil.focus(item);
 
-    event.preventDefault();
-    event.stopPropagation();
+    // @todo set focus to item
   }
 }
