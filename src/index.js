@@ -289,7 +289,7 @@ export default class NestedList {
    * @param {KeyboardEvent} event
    */
   getOutOfList(event) {
-    const items = this._elements.wrapper.querySelectorAll('.' + this.CSS.item);
+    const items = this.currentItem.parentNode.querySelectorAll('.' + this.CSS.item);
 
     /**
      * Save the last one.
@@ -303,7 +303,7 @@ export default class NestedList {
 
     const isNestedList = currentItem.parentElement !== this._elements.wrapper;
 
-    if (isNestedList && !currentItem.textContent.trim().length && currentItem !== lastItem) {
+    if (isNestedList && !currentItem.textContent.trim().length && currentItem === lastItem) {
       this.shiftTab(event);
       return;
     }
@@ -387,6 +387,6 @@ export default class NestedList {
       this.currentItem.parentNode.parentNode.removeChild(this.currentItem.parentNode);
     }
 
-    DomUtil.focus(item, caretPosition);
+    DomUtil.focus(item);
   }
 }
