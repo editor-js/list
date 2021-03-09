@@ -142,7 +142,11 @@ export default class NestedList {
             this.backspace(event);
             break;
           case TAB:
-            this.addTab(event);
+            if (event.shiftKey) {
+              this.shiftTab(event);
+            } else {
+              this.addTab(event);
+            }
             break;
         }
       }, false);
@@ -158,20 +162,6 @@ export default class NestedList {
   save() {
     return this.data;
   }
-
-  // /**
-  //  * Sanitizer rules
-  //  *
-  //  * @returns {object}
-  //  */
-  // static get sanitize() {
-  //   return {
-  //     style: {},
-  //     items: {
-  //       br: true,
-  //     },
-  //   };
-  // }
 
   /**
    * Creates main <ul> or <ol> tag depended on style
@@ -312,13 +302,8 @@ export default class NestedList {
 
     const isNestedList = currentItem.parentElement !== this._elements.wrapper;
 
-    console.log('currentItem.parentElement !== this._elements.wrapper', currentItem.parentElement !== this._elements.wrapper);
-
     if (isNestedList && !currentItem.textContent.trim().length && currentItem !== lastItem) {
-      console.info('IS IN NESTED LIST');
-
-      // event.preventDefault();
-      // event.stopPropagation();
+      this.shiftTab(event);
       return;
     }
 
@@ -355,13 +340,9 @@ export default class NestedList {
   }
 
   addTab(event){
-    /** if the first item in a list then do nothing */
     if (this.currentItem === this.currentItem.parentNode.childNodes[0]) return;
 
-
-    // @todo append item to the sublist at the end of previous item
     const prevItemLastChild = this.currentItem.previousSibling.lastChild;
-
     const item = DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.item], {
       contentEditable: true,
     });
@@ -379,6 +360,30 @@ export default class NestedList {
     }
 
     this.currentItem.parentNode.removeChild(this.currentItem);
+
+    // @todo set focus to item
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  shiftTab(event){
+    if (this.currentItem.parentNode === this._elements.wrapper) return;
+
+    const item = DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.item], {
+      contentEditable: true,
+    });
+
+    item.innerHTML = this.currentItem.innerHTML;
+
+    this.currentItem.parentNode.parentNode.after(item);
+    this.currentItem.parentNode.removeChild(this.currentItem);
+
+    if (!this.currentItem.parentNode.childElementCount) {
+      this.currentItem.parentNode.parentNode.removeChild(this.currentItem.parentNode);
+    }
+
+    // @todo set focus to item
 
     event.preventDefault();
     event.stopPropagation();
