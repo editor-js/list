@@ -23,16 +23,15 @@ export default class DomUtil {
         return el;
     }
 
-
     /**
      * Set focus to contenteditable or native input element
      *
-     * @param element - element where to set focus
-     * @param offset - offset of cursor
+     * @param {HTMLElement} element - element where to set focus
+     * @param {number} offset - offset of cursor
      *
      * @returns {DOMRect} of range
      */
-    static focus(element, offset = 0) {
+    static focus(element, offset= 0) {
         const range = document.createRange();
         const selection = window.getSelection();
 
@@ -41,7 +40,5 @@ export default class DomUtil {
 
         selection.removeAllRanges();
         selection.addRange(range);
-
-        return range.getBoundingClientRect();
     }
 }

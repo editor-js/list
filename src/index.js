@@ -111,7 +111,8 @@ export default class NestedList {
         })
 
         if (item.items && item.items.length > 0) {
-          const sublistWrapper = this.makeMainTag(this._data.style);
+          const sublistWrapper = DomUtil.make('DIV', this.CSS.wrapper, {
+          })
 
           renderList(item.items, sublistWrapper);
 
@@ -346,7 +347,7 @@ export default class NestedList {
     if (this.currentItem === this.currentItem.parentNode.childNodes[0]) return;
 
     const prevItemLastChild = this.currentItem.previousSibling.lastChild;
-    const item = DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.item], {
+    const item = DomUtil.make('DIV', this.CSS.item, {
       contentEditable: true,
     });
 
@@ -355,7 +356,7 @@ export default class NestedList {
     if (prevItemLastChild.classList && prevItemLastChild.classList.contains(this.CSS.wrapper)) {
       prevItemLastChild.appendChild(item)
     } else {
-      const sublist = DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.wrapper]);
+      const sublist = DomUtil.make('DIV', this.CSS.wrapper);
 
       this.currentItem.previousSibling.appendChild(sublist);
 
@@ -373,7 +374,7 @@ export default class NestedList {
 
     if (this.currentItem.parentNode === this._elements.wrapper) return;
 
-    const item = DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.item], {
+    const item = DomUtil.make('DIV', this.CSS.item, {
       contentEditable: true,
     });
 
@@ -386,8 +387,6 @@ export default class NestedList {
       this.currentItem.parentNode.parentNode.removeChild(this.currentItem.parentNode);
     }
 
-    DomUtil.focus(item);
-
-    // @todo set focus to item
+    DomUtil.focus(item, caretPosition);
   }
 }
