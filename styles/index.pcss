@@ -8,6 +8,11 @@
         padding: 5.5px 0 5.5px 3px;
         line-height: 1.6em;
 
+        &-text {
+            display: inline-block;
+            outline: none;
+        }
+
         &:first-of-type {
             padding-top: 11px;
         }
@@ -20,6 +25,7 @@
             content: counters(item, ".") ". ";
             counter-increment: item;
             opacity: 0.3;
+            vertical-align: top;
         }
     }
 
