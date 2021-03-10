@@ -105,13 +105,10 @@ export default class NestedList {
 
     const renderList = (items, element) => {
       items.forEach((item) => {
-        const itemWrapper = DomUtil.make('DIV', this.CSS.item, )
-        const itemText = DomUtil.make('DIV', [this.CSS.itemText], {
+        const itemWrapper = DomUtil.make('DIV', this.CSS.item, {
           innerHTML: item.content,
           contentEditable: !this.readOnly,
         })
-
-        itemWrapper.appendChild(itemText);
 
         if (item.items && item.items.length > 0) {
           const sublistWrapper = DomUtil.make('DIV', this.CSS.wrapper, {
@@ -175,7 +172,7 @@ export default class NestedList {
    */
   makeMainTag(style){
     return DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.wrapper], {
-      // contentEditable: !this.readOnly,
+      contentEditable: !this.readOnly,
     });
   }
 
@@ -203,7 +200,6 @@ export default class NestedList {
       wrapperOrdered: 'cdx-nested-list--ordered',
       wrapperUnordered: 'cdx-nested-list--unordered',
       item: 'cdx-nested-list__item',
-      itemText: 'cdx-nested-list__item-text',
       settingsWrapper: 'cdx-nested-list__settings',
       settingsButton: this.api.styles.settingsButton,
       settingsButtonActive: this.api.styles.settingsButtonActive,
@@ -352,16 +348,10 @@ export default class NestedList {
 
     const prevItemLastChild = this.currentItem.previousSibling.lastChild;
     const item = DomUtil.make('DIV', this.CSS.item, {
-      // contentEditable: true,
+      contentEditable: true,
     });
-    const itemText = DomUtil.make('DIV', [this.CSS.itemText], {
-      innerHTML: this.currentItem.innerHTML,
-      contentEditable: !this.readOnly,
-    })
 
-    item.appendChild(itemText);
-
-    // item.innerHTML = this.currentItem.innerHTML;
+    item.innerHTML = this.currentItem.innerHTML;
 
     if (prevItemLastChild.classList && prevItemLastChild.classList.contains(this.CSS.wrapper)) {
       prevItemLastChild.appendChild(item)
@@ -385,14 +375,10 @@ export default class NestedList {
     if (this.currentItem.parentNode === this._elements.wrapper) return;
 
     const item = DomUtil.make('DIV', this.CSS.item, {
-      // contentEditable: true,
+      contentEditable: true,
     });
-    const itemText = DomUtil.make('DIV', [this.CSS.itemText], {
-      innerHTML: this.currentItem.innerHTML,
-      contentEditable: !this.readOnly,
-    })
 
-    item.appendChild(itemText);
+    item.innerHTML = this.currentItem.innerHTML;
 
     this.currentItem.parentNode.parentNode.after(item);
     this.currentItem.parentNode.removeChild(this.currentItem);
@@ -404,9 +390,3 @@ export default class NestedList {
     DomUtil.focus(item);
   }
 }
-
-
-/**
- * @todo ce-div for content text in item
- * @todo remove parentNode. (closest or querySelectorAll)
- */
