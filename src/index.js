@@ -236,22 +236,18 @@ export default class NestedList {
 
     const itemSelector = `${this.CSS.item}`;
 
-    function serialize(parent) {
+    const serialize = (parent) => {
       const serialized = [];
       const children = [].slice.call(parent.children);
 
       for (let i = 0; i < children.length; i++) {
-        if (!children[i].classList.contains(itemSelector)) continue;
-
         let items = [];
 
-        try {
-          const isNextNested = !children[i + 1].classList.contains(itemSelector);
+        const nestedList = children[i].querySelectorAll('.' + this.CSS.wrapper);
 
-          if (isNextNested) {
-            items = serialize(children[i + 1]);
-          }
-        } catch (e) {}
+        if (nestedList.length > 0) {
+          items = serialize(nestedList[0]);
+        }
 
         serialized.push({
           content: children[i].innerHTML,
