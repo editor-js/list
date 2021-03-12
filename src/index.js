@@ -155,18 +155,25 @@ export default class NestedList {
    *
    */
   renderItem(content, items = [], parentItem = this.nodes.wrapper){
-    const itemWrapper = Dom.make('DIV', this.CSS.item, {
+    const itemWrapper = Dom.make('li', this.CSS.item);
+    const itemBody = Dom.make('div', this.CSS.itemBody);
+    const itemContent = Dom.make('div', this.CSS.itemContent, {
       innerHTML: content,
-      // contentEditable: !this.readOnly,
+      contentEditable: true,
     });
 
+    itemBody.appendChild(itemContent);
+    itemWrapper.appendChild(itemBody);
+
+
+    /**
+     * Append children if we have some
+     */
     if (items && items.length > 0) {
-      const sublistWrapper = this.makeListWrapper();
-
-      this.renderItems(items, sublistWrapper);
-
-      itemWrapper.appendChild(sublistWrapper);
+      this.addChildrenList(itemWrapper, items);
     }
+
+
 
     parentItem.appendChild(itemWrapper);
   }
@@ -177,6 +184,21 @@ export default class NestedList {
    */
   save() {
     return this.data;
+  }
+
+  /**
+   * Append children list to passed item
+   *
+   * @param {Element} parentItem - item that should contain passed sub-items
+   * @param {ListItem[]} items - sub items to append
+   */
+  addChildrenList(parentItem, items) {
+    const itemBody = parentItem.querySelector(`.${this.CSS.itemBody}`);
+    const sublistWrapper = this.makeListWrapper(undefined, [ this.CSS.itemChildren ]);
+
+    this.renderItems(items, sublistWrapper);
+
+    itemBody.appendChild(sublistWrapper);
   }
 
   /**
@@ -216,6 +238,9 @@ export default class NestedList {
       wrapperOrdered: 'cdx-nested-list--ordered',
       wrapperUnordered: 'cdx-nested-list--unordered',
       item: 'cdx-nested-list__item',
+      itemBody: 'cdx-nested-list__item-body',
+      itemContent: 'cdx-nested-list__item-content',
+      itemChildren: 'cdx-nested-list__item-children',
       settingsWrapper: 'cdx-nested-list__settings',
       settingsButton: this.api.styles.settingsButton,
       settingsButtonActive: this.api.styles.settingsButtonActive,
@@ -352,32 +377,55 @@ export default class NestedList {
     }
   }
 
-  addTab(event){
-    event.preventDefault();
+
+  /**
+   * Add indentation to current item
+   *
+   * @param {KeyboardEvent} event - keydown
+   */
+  addTab(event) {
+    /**
+     * Prevent editor.js behaviour
+     */
     event.stopPropagation();
 
-    if (this.currentItem === this.currentItem.parentNode.childNodes[0]) return;
+    /**
+     * Prevent browser tab behaviour
+     */
+    event.preventDefault();
 
-    const prevItemLastChild = this.currentItem.previousSibling.lastChild;
-    const item = Dom.make('DIV', this.CSS.item, {
-      contentEditable: true,
-    });
+    const currentItem = this.currentItem;
+    const prevItem = currentItem.previousSibling;
+    const isFirstChild = !prevItem;
 
-    item.innerHTML = this.currentItem.innerHTML;
-
-    if (prevItemLastChild.classList && prevItemLastChild.classList.contains(this.CSS.wrapper)) {
-      prevItemLastChild.appendChild(item)
-    } else {
-      const sublist = Dom.make('DIV', this.CSS.wrapper);
-
-      this.currentItem.previousSibling.appendChild(sublist);
-
-      sublist.appendChild(item);
+    /**
+     * In the first item we should not handle Tabs (because there is no parent item above)
+     */
+    if (isFirstChild) {
+      return;
     }
 
-    this.currentItem.parentNode.removeChild(this.currentItem);
+    const prevItemChildrenList = prevItem.querySelector(`.${this.CSS.itemChildren}`);
 
-    Dom.focus(item);
+    if (prevItemChildrenList) {
+      const itemToAppend = this.renderItem(currentItem.innerHTML);
+
+      prevItemChildrenList.appendChild(itemToAppend);
+
+      Dom.focus(itemToAppend); // @todo focus in both statements
+    } else {
+      this.addChildrenList(prevItem, [
+        {
+          content: currentItem.innerHTML,
+        },
+      ]);
+    }
+
+    /**
+     * Remove current item
+     * @todo make Dom util
+     */
+    currentItem.parentNode.removeChild(currentItem);
   }
 
   shiftTab(event){

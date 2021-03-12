@@ -1,41 +1,54 @@
 .cdx-nested-list {
-    margin: 0;
-    padding-left: 20px;
-    outline: none;
-    counter-reset: item;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  counter-reset: item;
+  list-style: none;
 
-    &__item {
-        padding: 5.5px 0 5.5px 3px;
-        line-height: 1.6em;
+  &__item {
+    line-height: 1.6em;
+    display: flex;
+    flex-wrap: wrap;
 
-        &:first-of-type {
-            padding-top: 11px;
-        }
-
-        &:last-of-type {
-            padding-bottom: 0;
-        }
-
-        &:before {
-            content: counters(item, ".") ". ";
-            counter-increment: item;
-            opacity: 0.3;
-        }
+    [contenteditable]{
+      background: #cfebfc;
     }
 
-    &--unordered {
-        list-style: disc;
+    &::before {
+      content: counters(item, ".") ". ";
+      counter-increment: item;
+      opacity: 0.3;
+      margin-right: 5px;
     }
 
-    &--ordered {
-        list-style: decimal;
+    &-content,
+    &-children {
+      flex-basis: 100%;
     }
 
-    &__settings {
-        display: flex;
+    &-content {
 
-        .cdx-settings-button {
-            width: 50%;
-        }
     }
+
+    &-children {
+
+    }
+
+  }
+
+  &--unordered {
+    list-style: disc;
+  }
+
+  &--ordered {
+    list-style: decimal;
+  }
+
+  &__settings {
+    display: flex;
+
+    .cdx-settings-button {
+      width: 50%;
+    }
+  }
 }
