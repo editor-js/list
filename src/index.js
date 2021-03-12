@@ -165,15 +165,12 @@ export default class NestedList {
     itemBody.appendChild(itemContent);
     itemWrapper.appendChild(itemBody);
 
-
     /**
      * Append children if we have some
      */
     if (items && items.length > 0) {
       this.addChildrenList(itemWrapper, items);
     }
-
-
 
     parentItem.appendChild(itemWrapper);
   }
@@ -407,25 +404,24 @@ export default class NestedList {
 
     const prevItemChildrenList = prevItem.querySelector(`.${this.CSS.itemChildren}`);
 
+    /**
+     * If prev item has child items, just append current to them
+     */
     if (prevItemChildrenList) {
-      const itemToAppend = this.renderItem(currentItem.innerHTML);
+      prevItemChildrenList.appendChild(currentItem);
 
-      prevItemChildrenList.appendChild(itemToAppend);
-
-      Dom.focus(itemToAppend); // @todo focus in both statements
-    } else {
-      this.addChildrenList(prevItem, [
-        {
-          content: currentItem.innerHTML,
-        },
-      ]);
+      return;
     }
 
     /**
-     * Remove current item
-     * @todo make Dom util
+     * - Create and append children wrapper to the previous item
+     * - Append current item to it
      */
-    currentItem.parentNode.removeChild(currentItem);
+    const sublistWrapper = this.makeListWrapper(undefined, [ this.CSS.itemChildren ]);
+    const prevItemBody = prevItem.querySelector(`.${this.CSS.itemBody}`);
+
+    sublistWrapper.appendChild(currentItem);
+    prevItemBody.appendChild(sublistWrapper);
   }
 
   shiftTab(event){
