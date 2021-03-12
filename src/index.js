@@ -1,9 +1,10 @@
+import * as Dom from './utils/dom';
+
 /**
  * Build styles
  */
-require('./../styles/index.pcss');
+import './../styles/index.pcss';
 
-import DomUtil from "./utils/dom";
 
 /**
  * @typedef {Object} BlockToolData
@@ -70,28 +71,22 @@ export default class NestedList {
    */
   constructor({ data, config, api, readOnly }) {
     /**
-     * HTML nodes
-     *
-     * @private
+     * HTML nodes used in tool
      */
-    this._elements = {
+    this.nodes = {
       wrapper: null,
     };
 
     this.api = api;
     this.readOnly = readOnly;
+    this.config = config;
 
-    /**
-     * Tool's data
-     *
-     * @type {ListData}
-     */
-    this._data = {
-      style: 'ordered', //this.settings.find((tune) => tune.default === true).name,
+    const initialData = {
+      style: 'ordered',
       items: [],
     };
 
-    this.data = data;
+    this.data = data || initialData;
   }
 
   /**
@@ -101,38 +96,20 @@ export default class NestedList {
    * @public
    */
   render() {
-    this._elements.wrapper = this.makeMainTag(this._data.style);
+    this.nodes.wrapper = this.makeMainTag(this.data.style);
 
-    const renderList = (items, element) => {
-      items.forEach((item) => {
-        const itemWrapper = DomUtil.make('DIV', this.CSS.item, {
-          innerHTML: item.content,
-          contentEditable: !this.readOnly,
-        })
 
-        if (item.items && item.items.length > 0) {
-          const sublistWrapper = DomUtil.make('DIV', this.CSS.wrapper, {
-          })
-
-          renderList(item.items, sublistWrapper);
-
-          itemWrapper.appendChild(sublistWrapper);
-        }
-
-        element.appendChild(itemWrapper);
-      });
-    }
 
     // fill with data
-    if (this._data.items.length) {
-      renderList(this._data.items, this._elements.wrapper);
+    if (this.data.items.length) {
+      this.renderItems(this.data.items);
     } else {
-      this._elements.wrapper.appendChild(DomUtil.make('li', this.CSS.item));
+      this.nodes.wrapper.appendChild(Dom.make('li', this.CSS.item));
     }
 
     if (!this.readOnly) {
       // detect keydown on the last item to escape List
-      this._elements.wrapper.addEventListener('keydown', (event) => {
+      this.nodes.wrapper.addEventListener('keydown', (event) => {
         const [ENTER, BACKSPACE, TAB] = [13, 8, 9]; // key codes
 
         switch (event.keyCode) {
@@ -153,7 +130,36 @@ export default class NestedList {
       }, false);
     }
 
-    return this._elements.wrapper;
+    return this.nodes.wrapper;
+  }
+
+  /**
+   * Renders children list
+   */
+  renderItems(items, parentItem) {
+    items.forEach((item) => {
+      this.renderItem(item, parentItem);
+    });
+  };
+
+  /**
+   * Renders the single item
+   */
+  renderItem(item, parentItem = this.nodes.wrapper){
+    const itemWrapper = Dom.make('DIV', this.CSS.item, {
+      innerHTML: item.content,
+      contentEditable: !this.readOnly,
+    })
+
+    if (item.items && item.items.length > 0) {
+      const sublistWrapper = Dom.make('DIV', this.CSS.wrapper)
+
+      this.renderItems(item.items, sublistWrapper);
+
+      itemWrapper.appendChild(sublistWrapper);
+    }
+
+    parentItem.appendChild(itemWrapper);
   }
 
   /**
@@ -171,7 +177,7 @@ export default class NestedList {
    * @returns {HTMLOListElement|HTMLUListElement}
    */
   makeMainTag(style){
-    return DomUtil.make('DIV', [this.CSS.baseBlock, this.CSS.wrapper], {
+    return Dom.make('DIV', [this.CSS.baseBlock, this.CSS.wrapper], {
       contentEditable: !this.readOnly,
     });
   }
@@ -181,12 +187,12 @@ export default class NestedList {
    *
    * @param {string} style - 'ordered'|'unordered'
    */
-  toggleTune(style) {
-    this._data = this.data;
-    this._data.style = style;
-
-    this._elements.wrapper.replaceWith(this.render());
-  }
+  // toggleTune(style) {
+  //   this.data = this.data;
+  //   this.data.style = style;
+  //
+  //   this.nodes.wrapper.replaceWith(this.render());
+  // }
 
   /**
    * Styles
@@ -206,62 +212,62 @@ export default class NestedList {
     };
   }
 
-  /**
-   * List data setter
-   *
-   * @param {ListData} listData
-   */
-  set data(listData) {
-    if (!listData) {
-      listData = {};
-    }
-
-    this._data.style = listData.style || 'ordered'
-    this._data.items = listData.items || [];
-
-    const oldView = this._elements.wrapper;
-
-    if (oldView) {
-      oldView.parentNode.replaceChild(this.render(), oldView);
-    }
-  }
-
-  /**
-   * Return List data
-   *
-   * @returns {ListData}
-   */
-  get data() {
-    this._data.items = [];
-
-    const itemSelector = `${this.CSS.item}`;
-
-    const serialize = (parent) => {
-      const serialized = [];
-      const children = [].slice.call(parent.children);
-
-      for (let i = 0; i < children.length; i++) {
-        let items = [];
-
-        const nestedList = children[i].querySelectorAll('.' + this.CSS.wrapper);
-
-        if (nestedList.length > 0) {
-          items = serialize(nestedList[0]);
-        }
-
-        serialized.push({
-          content: children[i].innerHTML,
-          items: items
-        });
-      }
-
-      return serialized;
-    }
-
-    this._data.items = serialize(this._elements.wrapper);
-
-    return this._data;
-  }
+  // /**
+  //  * List data setter
+  //  *
+  //  * @param {ListData} listData
+  //  */
+  // set data(listData) {
+  //   if (!listData) {
+  //     listData = {};
+  //   }
+  //
+  //   this.data.style = listData.style || 'ordered'
+  //   this.data.items = listData.items || [];
+  //
+  //   const oldView = this.nodes.wrapper;
+  //
+  //   if (oldView) {
+  //     oldView.parentNode.replaceChild(this.render(), oldView);
+  //   }
+  // }
+  //
+  // /**
+  //  * Return List data
+  //  *
+  //  * @returns {ListData}
+  //  */
+  // get data() {
+  //   this.data.items = [];
+  //
+  //   const itemSelector = `${this.CSS.item}`;
+  //
+  //   const serialize = (parent) => {
+  //     const serialized = [];
+  //     const children = [].slice.call(parent.children);
+  //
+  //     for (let i = 0; i < children.length; i++) {
+  //       let items = [];
+  //
+  //       const nestedList = children[i].querySelectorAll('.' + this.CSS.wrapper);
+  //
+  //       if (nestedList.length > 0) {
+  //         items = serialize(nestedList[0]);
+  //       }
+  //
+  //       serialized.push({
+  //         content: children[i].innerHTML,
+  //         items: items
+  //       });
+  //     }
+  //
+  //     return serialized;
+  //   }
+  //
+  //   this.data.items = serialize(this.nodes.wrapper);
+  //
+  //   return this.data;
+  // }
 
   /**
    * Returns current List item by the caret position
@@ -297,7 +303,7 @@ export default class NestedList {
     const lastItem = items[items.length - 1];
     const currentItem = this.currentItem;
 
-    const isNestedList = currentItem.parentElement !== this._elements.wrapper;
+    const isNestedList = currentItem.parentElement !== this.nodes.wrapper;
 
     if (isNestedList && !currentItem.textContent.trim().length && currentItem === lastItem) {
       this.shiftTab(event);
@@ -321,7 +327,7 @@ export default class NestedList {
    * @param {KeyboardEvent} event
    */
   backspace(event) {
-    const items = this._elements.wrapper.querySelectorAll('.' + this.CSS.item),
+    const items = this.nodes.wrapper.querySelectorAll('.' + this.CSS.item),
         firstItem = items[0];
 
     if (!firstItem) {
@@ -343,7 +349,7 @@ export default class NestedList {
     if (this.currentItem === this.currentItem.parentNode.childNodes[0]) return;
 
     const prevItemLastChild = this.currentItem.previousSibling.lastChild;
-    const item = DomUtil.make('DIV', this.CSS.item, {
+    const item = Dom.make('DIV', this.CSS.item, {
       contentEditable: true,
     });
 
@@ -352,7 +358,7 @@ export default class NestedList {
     if (prevItemLastChild.classList && prevItemLastChild.classList.contains(this.CSS.wrapper)) {
       prevItemLastChild.appendChild(item)
     } else {
-      const sublist = DomUtil.make('DIV', this.CSS.wrapper);
+      const sublist = Dom.make('DIV', this.CSS.wrapper);
 
       this.currentItem.previousSibling.appendChild(sublist);
 
@@ -361,16 +367,16 @@ export default class NestedList {
 
     this.currentItem.parentNode.removeChild(this.currentItem);
 
-    DomUtil.focus(item);
+    Dom.focus(item);
   }
 
   shiftTab(event){
     event.preventDefault();
     event.stopPropagation();
 
-    if (this.currentItem.parentNode === this._elements.wrapper) return;
+    if (this.currentItem.parentNode === this.nodes.wrapper) return;
 
-    const item = DomUtil.make('DIV', this.CSS.item, {
+    const item = Dom.make('DIV', this.CSS.item, {
       contentEditable: true,
     });
 
@@ -383,6 +389,6 @@ export default class NestedList {
       this.currentItem.parentNode.parentNode.removeChild(this.currentItem.parentNode);
     }
 
-    DomUtil.focus(item);
+    Dom.focus(item);
   }
 }
