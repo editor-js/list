@@ -81,12 +81,17 @@ export default class NestedList {
     this.readOnly = readOnly;
     this.config = config;
 
+    /**
+     * This list-style will be used by default
+     */
+    this.defaultListStyle = 'ordered';
+
     const initialData = {
-      style: 'ordered',
+      style: this.defaultListStyle,
       items: [],
     };
 
-    this.data = data || initialData;
+    this.data = data && Object.keys(data).length ? data : initialData;
   }
 
   /**
@@ -96,15 +101,13 @@ export default class NestedList {
    * @public
    */
   render() {
-    this.nodes.wrapper = this.makeMainTag(this.data.style);
-
-
+    this.nodes.wrapper = this.makeListWrapper(this.data.style, [ this.CSS.baseBlock ]);
 
     // fill with data
     if (this.data.items.length) {
       this.renderItems(this.data.items);
     } else {
-      this.nodes.wrapper.appendChild(Dom.make('li', this.CSS.item));
+      this.renderItem('');
     }
 
     if (!this.readOnly) {
@@ -138,23 +141,29 @@ export default class NestedList {
    */
   renderItems(items, parentItem) {
     items.forEach((item) => {
-      this.renderItem(item, parentItem);
+      this.renderItem(item.content, item.items, parentItem);
     });
   };
 
   /**
    * Renders the single item
+   *
+   * @param {string} content - item content to render
+   * @param {ListItem[]} [items] - children
+   * @param {Element} [parentItem] - parent item wrapper. Omitted for the first-level item
+   *                                 that should be appended to the main wrapper.
+   *
    */
-  renderItem(item, parentItem = this.nodes.wrapper){
+  renderItem(content, items = [], parentItem = this.nodes.wrapper){
     const itemWrapper = Dom.make('DIV', this.CSS.item, {
-      innerHTML: item.content,
-      contentEditable: !this.readOnly,
-    })
+      innerHTML: content,
+      // contentEditable: !this.readOnly,
+    });
 
-    if (item.items && item.items.length > 0) {
-      const sublistWrapper = Dom.make('DIV', this.CSS.wrapper)
+    if (items && items.length > 0) {
+      const sublistWrapper = this.makeListWrapper();
 
-      this.renderItems(item.items, sublistWrapper);
+      this.renderItems(items, sublistWrapper);
 
       itemWrapper.appendChild(sublistWrapper);
     }
@@ -173,13 +182,14 @@ export default class NestedList {
   /**
    * Creates main <ul> or <ol> tag depended on style
    *
-   * @param {string} style - 'ordered' or 'unordered'
+   * @param {string} [style] - 'ordered' or 'unordered'
+   * @param {string[]} [classes] - additional classes to append
    * @returns {HTMLOListElement|HTMLUListElement}
    */
-  makeMainTag(style){
-    return Dom.make('DIV', [this.CSS.baseBlock, this.CSS.wrapper], {
-      contentEditable: !this.readOnly,
-    });
+  makeListWrapper(style = this.defaultListStyle, classes = []) {
+    const tag = style === 'ordered' ? 'ol' : 'ul';
+
+    return Dom.make(tag, [this.CSS.wrapper, ...classes]);
   }
 
   /**
