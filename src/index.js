@@ -374,7 +374,6 @@ export default class NestedList {
     }
   }
 
-
   /**
    * Add indentation to current item
    *
@@ -414,6 +413,7 @@ export default class NestedList {
     }
 
     /**
+     * If prev item has no child items
      * - Create and append children wrapper to the previous item
      * - Append current item to it
      */
