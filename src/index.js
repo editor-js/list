@@ -1,4 +1,5 @@
 import * as Dom from './utils/dom';
+import Caret from './utils/caret';
 
 /**
  * Build styles
@@ -92,6 +93,11 @@ export default class NestedList {
     };
 
     this.data = data && Object.keys(data).length ? data : initialData;
+
+    /**
+     * Instantiate caret helper
+     */
+    this.caret = new Caret();
   }
 
   /**
@@ -403,33 +409,36 @@ export default class NestedList {
 
     const prevItemChildrenList = prevItem.querySelector(`.${this.CSS.itemChildren}`);
 
+    this.caret.save();
+
     /**
      * If prev item has child items, just append current to them
      */
     if (prevItemChildrenList) {
       prevItemChildrenList.appendChild(currentItem);
+    } else {
+      /**
+       * If prev item has no child items
+       * - Create and append children wrapper to the previous item
+       * - Append current item to it
+       */
+      const sublistWrapper = this.makeListWrapper(undefined, [ this.CSS.itemChildren ]);
+      const prevItemBody = prevItem.querySelector(`.${this.CSS.itemBody}`);
 
-      return;
+      sublistWrapper.appendChild(currentItem);
+      prevItemBody.appendChild(sublistWrapper);
     }
 
-    /**
-     * If prev item has no child items
-     * - Create and append children wrapper to the previous item
-     * - Append current item to it
-     */
-    const sublistWrapper = this.makeListWrapper(undefined, [ this.CSS.itemChildren ]);
-    const prevItemBody = prevItem.querySelector(`.${this.CSS.itemBody}`);
-
-    sublistWrapper.appendChild(currentItem);
-    prevItemBody.appendChild(sublistWrapper);
+    this.caret.restore();
   }
 
   /**
    * Reduce indentation for current item
    *
    * @param {KeyboardEvent} event - keydown
+   * @returns {void}
    */
-  shiftTab(event){
+  shiftTab(event) {
     /**
      * Prevent editor.js behaviour
      */
@@ -450,9 +459,13 @@ export default class NestedList {
       return;
     }
 
+    this.caret.save();
+
     /**
      * Move item from current list to parent list
      */
     parentItem.after(currentItem);
+
+    this.caret.restore();
   }
 }

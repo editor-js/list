@@ -28,7 +28,7 @@ export function make(tagName, classNames = null, attributes = {}) {
  * @param {HTMLElement} element - element where to set focus
  * @param {number} offset - offset of cursor
  *
- * @returns {DOMRect} of range
+ * @returns {void}
  */
 export function focus(element, offset = 0) {
   const range = document.createRange();
