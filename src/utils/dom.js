@@ -23,20 +23,15 @@ export function make(tagName, classNames = null, attributes = {}) {
 }
 
 /**
- * Set focus to contenteditable or native input element
+ * Returns the HTML content of passed Document Fragment
  *
- * @param {HTMLElement} element - element where to set focus
- * @param {number} offset - offset of cursor
- *
- * @returns {void}
+ * @param {DocumentFragment} fragment - document fragment to process
+ * @returns {string}
  */
-export function focus(element, offset = 0) {
-  const range = document.createRange();
-  const selection = window.getSelection();
+export function fragmentToString(fragment) {
+  const div = make('div');
 
-  range.setStart(element, offset);
-  range.setEnd(element, offset);
+  div.appendChild(fragment);
 
-  selection.removeAllRanges();
-  selection.addRange(range);
+  return div.innerHTML;
 }

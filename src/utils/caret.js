@@ -67,4 +67,57 @@ export default class Caret {
 
     return selection && selection.rangeCount ? selection.getRangeAt(0) : null;
   }
+
+  /**
+   * Extract content fragment from Caret position to the end of contenteditable element
+   *
+   * @returns {DocumentFragment|void}
+   */
+  static extractFragmentFromCaretPositionTillTheEnd() {
+    const selection = window.getSelection();
+
+    if (!selection.rangeCount) {
+      return;
+    }
+
+    const selectRange = selection.getRangeAt(0);
+    let startNode = selectRange.startContainer;
+
+    /**
+     * selectRange.startContainer can point to the Text node which has no .closest() method
+     */
+    if (startNode.nodeType !== Node.ELEMENT_NODE) {
+      startNode = startNode.parentNode;
+    }
+
+    const currentBlockInput = startNode.closest('[contenteditable]');
+
+    selectRange.deleteContents();
+
+    const range = selectRange.cloneRange();
+
+    range.selectNodeContents(currentBlockInput);
+    range.setStart(selectRange.endContainer, selectRange.endOffset);
+
+    return range.extractContents();
+  }
+
+  /**
+   * Set focus to contenteditable or native input element
+   *
+   * @param {HTMLElement} element - element where to set focus
+   * @param {boolean} atStart - where to set focus: at the start or at the end
+   *
+   * @returns {void}
+   */
+  static focus(element, atStart = true) {
+    const range = document.createRange();
+    const selection = window.getSelection();
+
+    range.selectNodeContents(element);
+    range.collapse(atStart);
+
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
 }

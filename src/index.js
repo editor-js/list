@@ -111,24 +111,24 @@ export default class NestedList {
 
     // fill with data
     if (this.data.items.length) {
-      this.renderItems(this.data.items);
+      this.appendItems(this.data.items, this.nodes.wrapper);
     } else {
-      this.renderItem('');
+      this.appendItems([{
+        content: '',
+      }], this.nodes.wrapper);
     }
 
     if (!this.readOnly) {
       // detect keydown on the last item to escape List
       this.nodes.wrapper.addEventListener('keydown', (event) => {
-        const [ENTER, BACKSPACE, TAB] = [13, 8, 9]; // key codes
-
-        switch (event.keyCode) {
-          case ENTER:
-            this.getOutOfList(event);
+        switch (event.key) {
+          case 'Enter':
+            this.enterPressed(event);
             break;
-          case BACKSPACE:
+          case 'Backspace':
             this.backspace(event);
             break;
-          case TAB:
+          case 'Tab':
             if (event.shiftKey) {
               this.shiftTab(event);
             } else {
@@ -144,10 +144,16 @@ export default class NestedList {
 
   /**
    * Renders children list
+   *
+   * @param {ListItem[]} items - items data to append
+   * @param {Element} parentItem - where to append
+   * @returns {void}
    */
-  renderItems(items, parentItem) {
+  appendItems(items, parentItem) {
     items.forEach((item) => {
-      this.renderItem(item.content, item.items, parentItem);
+      const itemEl = this.createItem(item.content, item.items);
+
+      parentItem.appendChild(itemEl);
     });
   };
 
@@ -156,11 +162,9 @@ export default class NestedList {
    *
    * @param {string} content - item content to render
    * @param {ListItem[]} [items] - children
-   * @param {Element} [parentItem] - parent item wrapper. Omitted for the first-level item
-   *                                 that should be appended to the main wrapper.
-   *
+   * @returns {Element}
    */
-  renderItem(content, items = [], parentItem = this.nodes.wrapper){
+  createItem(content, items = []) {
     const itemWrapper = Dom.make('li', this.CSS.item);
     const itemBody = Dom.make('div', this.CSS.itemBody);
     const itemContent = Dom.make('div', this.CSS.itemContent, {
@@ -178,7 +182,7 @@ export default class NestedList {
       this.addChildrenList(itemWrapper, items);
     }
 
-    parentItem.appendChild(itemWrapper);
+    return itemWrapper;
   }
 
   /**
@@ -199,7 +203,7 @@ export default class NestedList {
     const itemBody = parentItem.querySelector(`.${this.CSS.itemBody}`);
     const sublistWrapper = this.makeListWrapper(undefined, [ this.CSS.itemChildren ]);
 
-    this.renderItems(items, sublistWrapper);
+    this.appendItems(items, sublistWrapper);
 
     itemBody.appendChild(sublistWrapper);
   }
@@ -323,40 +327,97 @@ export default class NestedList {
   }
 
   /**
-   * Get out from List Tool
-   * by Enter on the empty last item
+   * Handles Enter keypress
    *
-   * @param {KeyboardEvent} event
+   * @param {KeyboardEvent} event - keydown
+   * @returns {void}
    */
-  getOutOfList(event) {
-    const items = this.currentItem.parentNode.querySelectorAll('.' + this.CSS.item);
-
-    /**
-     * Save the last one.
-     */
-    if (items.length < 2) {
-      return;
-    }
-
-    const lastItem = items[items.length - 1];
+  enterPressed(event) {
     const currentItem = this.currentItem;
 
-    const isNestedList = currentItem.parentElement !== this.nodes.wrapper;
+    /**
+     * Prevent editor.js behaviour
+     */
+    event.stopPropagation();
 
-    if (isNestedList && !currentItem.textContent.trim().length && currentItem === lastItem) {
-      this.shiftTab(event);
+    /**
+     * Prevent browser behaviour
+     */
+    event.preventDefault();
+
+    /**
+     * On Enter in the last empty item, get out of list
+     */
+    const isEmpty = this.getItemContent(currentItem).trim().length === 0;
+    const isLastItem = currentItem.parentNode === this.nodes.wrapper && currentItem.nextElementSibling === null;
+
+    if (isLastItem && isEmpty) {
+      this.getOutOfList();
+
       return;
     }
 
-    /** Prevent Default li generation if item is empty */
-    if (currentItem === lastItem && !lastItem.textContent.trim().length) {
-      /** Insert New Block and set caret */
-      currentItem.parentElement.removeChild(currentItem);
-      this.api.blocks.insert();
-      this.api.caret.setToBlock(this.api.blocks.getCurrentBlockIndex());
-      event.preventDefault();
-      event.stopPropagation();
+    /**
+     * On other Enters, get content from caret till the end of the block
+     * And move it to the new item
+     */
+    const endingFragment = Caret.extractFragmentFromCaretPositionTillTheEnd();
+    const endingHTML = Dom.fragmentToString(endingFragment);
+    const itemChildren = currentItem.querySelector(`.${this.CSS.itemChildren}`);
+
+    /**
+     * Create the new list item
+     */
+    const itemEl = this.createItem(endingHTML, undefined);
+
+    /**
+     * If item has children, prepend to them
+     * Otherwise, insert the new item after current
+     */
+    if (itemChildren) {
+      itemChildren.prepend(itemEl);
+    } else {
+      currentItem.after(itemEl);
     }
+
+    this.focusItem(itemEl);
+  }
+
+  /**
+   * Return the item content
+   *
+   * @param {Element} item - item wrapper (<li>)
+   * @returns {string}
+   */
+  getItemContent(item) {
+    const contentNode = item.querySelector(`.${this.CSS.itemContent}`);
+
+    return contentNode.innerHTML;
+  }
+
+  /**
+   * Sets focus to the item's content
+   *
+   * @param {Element} item - item (<li>) to select
+   * @param {boolean} atStart - where to set focus: at the start or at the end
+   * @returns {void}
+   */
+  focusItem(item, atStart = true) {
+    const itemContent = item.querySelector(`.${this.CSS.itemContent}`);
+
+    Caret.focus(itemContent, atStart);
+  }
+
+  /**
+   * Get out from List Tool by Enter on the empty last item
+   *
+   * @returns {void}
+   */
+  getOutOfList() {
+    this.currentItem.remove();
+
+    this.api.blocks.insert();
+    this.api.caret.setToBlock(this.api.blocks.getCurrentBlockIndex());
   }
 
   /**
