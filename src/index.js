@@ -424,25 +424,35 @@ export default class NestedList {
     prevItemBody.appendChild(sublistWrapper);
   }
 
+  /**
+   * Reduce indentation for current item
+   *
+   * @param {KeyboardEvent} event - keydown
+   */
   shiftTab(event){
-    event.preventDefault();
+    /**
+     * Prevent editor.js behaviour
+     */
     event.stopPropagation();
 
-    if (this.currentItem.parentNode === this.nodes.wrapper) return;
+    /**
+     * Prevent browser tab behaviour
+     */
+    event.preventDefault();
 
-    const item = Dom.make('DIV', this.CSS.item, {
-      contentEditable: true,
-    });
+    const currentItem = this.currentItem;
+    const parentItem = currentItem.parentNode.closest(`.${this.CSS.item}`);
 
-    item.innerHTML = this.currentItem.innerHTML;
-
-    this.currentItem.parentNode.parentNode.after(item);
-    this.currentItem.parentNode.removeChild(this.currentItem);
-
-    if (!this.currentItem.parentNode.childElementCount) {
-      this.currentItem.parentNode.parentNode.removeChild(this.currentItem.parentNode);
+    /**
+     * If item in the first-level list then no need to do anything
+     */
+    if (!parentItem) {
+      return;
     }
 
-    Dom.focus(item);
+    /**
+     * Move item from current list to parent list
+     */
+    parentItem.after(currentItem);
   }
 }
