@@ -337,7 +337,7 @@ export default class NestedList {
      *
      * @type {boolean}
      */
-    const childsExist = Array.from(itemChildren.querySelectorAll(`.${this.CSS.item}`)).length > 0;
+    const childsExist = itemChildren && Array.from(itemChildren.querySelectorAll(`.${this.CSS.item}`)).length > 0;
 
     /**
      * Create the new list item
