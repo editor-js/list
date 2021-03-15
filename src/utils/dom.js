@@ -35,3 +35,24 @@ export function fragmentToString(fragment) {
 
   return div.innerHTML;
 }
+
+/**
+ * breadth-first search (BFS)
+ * {@link https://en.wikipedia.org/wiki/Breadth-first_search}
+ *
+ * @description Pushes to stack all DOM leafs and checks for emptiness
+ *
+ * @param {Node} node - node to check
+ * @returns {boolean}
+ */
+export function isEmpty(node) {
+  let content;
+
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    content = node.textContent;
+  } else {
+    content = node.innerHTML;
+  }
+
+  return content.trim().length === 0;
+}

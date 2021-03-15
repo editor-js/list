@@ -390,22 +390,175 @@ export default class NestedList {
   /**
    * Handle backspace
    *
-   * @param {KeyboardEvent} event
+   * @param {KeyboardEvent} event - keydown
    */
   backspace(event) {
-    const items = this.nodes.wrapper.querySelectorAll('.' + this.CSS.item),
-        firstItem = items[0];
-
-    if (!firstItem) {
+    /**
+     * Caret is not at start of the item
+     * Then backspace button should remove letter as usual
+     */
+    if (!Caret.isAtStart()) {
       return;
     }
 
     /**
-     * Save the last one.
+     * Prevent default backspace behaviour
      */
-    if (items.length < 2 && !firstItem.innerHTML.replace('<br>', ' ').trim()) {
-      event.preventDefault();
+    event.preventDefault();
+
+    const currentItem = this.currentItem;
+    const previousItem = currentItem.previousSibling;
+    const parentItem = currentItem.parentNode.closest(`.${this.CSS.item}`);
+
+    /**
+     * Do nothing with the first item in the first-level list.
+     * No previous sibling means that this is the first item in the list.
+     * No parent item means that this is a first-level list.
+     *
+     * Before:
+     * 1. |Hello
+     * 2. World!
+     *
+     * After:
+     * 1. |Hello
+     * 2. World!
+     *
+     * If it this item and the while list is empty then editor.js should
+     * process this behaviour and remove the block completely
+     *
+     * Before:
+     * 1. |
+     *
+     * After: block has been removed
+     *
+     */
+    if (!previousItem && !parentItem) {
+      return;
     }
+
+    /**
+     * Prevent editor.js behaviour
+     */
+    event.stopPropagation();
+
+    /**
+     * Lets compute the item which will be merged with current item text
+     */
+    let targetItem;
+
+    /**
+     * If there is a previous item then we get a deepest item in its sublists
+     *
+     * Otherwise we will use the parent item
+     */
+    if (previousItem) {
+      const childrenOfPreviousItem = previousItem.querySelectorAll(`.${this.CSS.item}`);
+
+      targetItem = Array.from(childrenOfPreviousItem).pop() || previousItem;
+    } else {
+      targetItem = parentItem;
+    }
+
+    /**
+     * Get content from caret till the end of the block to move it to the new item
+     */
+    const endingFragment = Caret.extractFragmentFromCaretPositionTillTheEnd();
+    const endingHTML = Dom.fragmentToString(endingFragment);
+
+    /**
+     * Get the target item content element
+     */
+    const targetItemContent = targetItem.querySelector(`.${this.CSS.itemContent}`);
+
+    /**
+     * Set a new place for caret
+     */
+    Caret.focus(targetItemContent, false);
+
+    /**
+     * Save the caret position
+     */
+    this.caret.save();
+
+    /**
+     * Update target item content by merging with current item html content
+     */
+    targetItemContent.insertAdjacentHTML('beforeend', endingHTML);
+
+    /**
+     * Get the sublist first-level items for current item
+     */
+    let currentItemSublistItems = currentItem.querySelectorAll(`.${this.CSS.itemChildren} > .${this.CSS.item}`)
+
+    /**
+     * Create an array from current item sublist items
+     */
+    currentItemSublistItems = Array.from(currentItemSublistItems);
+
+    /**
+     * Filter items for sublist first-level
+     * No need to move deeper items
+     */
+    currentItemSublistItems = currentItemSublistItems.filter(node => node.parentNode.closest(`.${this.CSS.item}`) === currentItem);
+
+    /**
+     * Reverse the array to insert items
+     */
+    currentItemSublistItems.reverse().forEach(item => {
+      /**
+       * Check if we need to save the indent for current item children
+       *
+       * If this is the first item in the list then place its children to the same level as currentItem.
+       * Same as shift+tab for all of these children.
+       *
+       * If there is a previous sibling then place children right after target item
+       */
+      if (!previousItem) {
+        /**
+         * The first item in the list
+         *
+         * Before:
+         * 1. Hello
+         *   1.1. |My
+         *     1.1.1. Wonderful
+         *     1.1.2. World
+         *
+         * After:
+         * 1. Hello|My
+         *   1.1. Wonderful
+         *   1.2. World
+         */
+        currentItem.after(item);
+      } else {
+        /**
+         * Not the first item
+         *
+         * Before:
+         * 1. Hello
+         *   1.1. My
+         *   1.2. |Dear
+         *     1.2.1. Wonderful
+         *     1.2.2. World
+         *
+         * After:
+         * 1. Hello
+         *   1.1. My|Dear
+         *   1.2. Wonderful
+         *   1.3. World
+         */
+        targetItem.after(item);
+      }
+    });
+
+    /**
+     * Remove current item element
+     */
+    currentItem.remove();
+
+    /**
+     * Restore the caret position
+     */
+    this.caret.restore();
   }
 
   /**

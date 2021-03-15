@@ -120,4 +120,79 @@ export default class Caret {
     selection.removeAllRanges();
     selection.addRange(range);
   }
+
+  /**
+   * Check if the caret placed at the start of the contenteditable element
+   *
+   * @returns {void}
+   */
+  static isAtStart() {
+    const selection = window.getSelection();
+
+    if (selection.focusOffset > 0) {
+      return false;
+    }
+
+    const focusNode = selection.focusNode;
+
+    /**
+     * In case of
+     * <div contenteditable>
+     *     <p><b></b></p>   <-- first (and deepest) node is <b></b>
+     *     |adaddad         <-- focus node
+     * </div>
+     */
+    const leftSiblings = Caret.getHigherLevelSiblings(focusNode, 'left');
+
+    const nothingAtLeft = leftSiblings.every((node) => {
+      return dom.isEmpty(node);
+    });
+
+    return nothingAtLeft;
+  }
+
+  /**
+   * Get all first-level (first child of [contenteditabel]) siblings from passed node
+   * Then you can check it for emptiness
+   *
+   * @example
+   * <div contenteditable>
+   * <p></p>                            |
+   * <p></p>                            | left first-level siblings
+   * <p></p>                            |
+   * <blockquote><a><b>adaddad</b><a><blockquote>       <-- passed node for example <b>
+   * <p></p>                            |
+   * <p></p>                            | right first-level siblings
+   * <p></p>                            |
+   * </div>
+   *
+   * @param {HTMLElement} from - element from which siblings should be searched
+   * @param {'left' | 'right'} direction - direction of search
+   *
+   * @returns {HTMLElement[]}
+   */
+  static getHigherLevelSiblings(from, direction= 'left') {
+    let current = from;
+    const siblings = [];
+
+    /**
+     * Find passed node's firs-level parent (in example - blockquote)
+     */
+    while (current.parentNode && (current.parentNode).contentEditable !== 'true') {
+      current = current.parentNode;
+    }
+
+    const sibling = direction === 'left' ? 'previousSibling' : 'nextSibling';
+
+    /**
+     * Find all left/right siblings
+     */
+    while (current[sibling]) {
+      current = current[sibling];
+      siblings.push(current);
+    }
+
+    return siblings;
+  }
+
 }
