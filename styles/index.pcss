@@ -8,17 +8,16 @@
   &__item {
     line-height: 1.6em;
     display: flex;
-    flex-wrap: wrap;
 
     [contenteditable]{
-      background: #cfebfc;
+      outline: none;
     }
 
     &::before {
       content: counters(item, ".") ". ";
       counter-increment: item;
-      opacity: 0.3;
       margin-right: 5px;
+      white-space: nowrap;
     }
 
     &-body {
@@ -31,7 +30,8 @@
     }
 
     &-content {
-
+      word-break: break-word;
+      white-space: pre-wrap;
     }
 
     &-children {
