@@ -6,19 +6,19 @@ import Caret from './utils/caret';
  */
 import './../styles/index.pcss';
 
-
 /**
- * @typedef {Object} BlockToolData
+ * @typedef {object} BlockToolData
+ * @property
  */
 
 /**
- * @typedef {Object} ListData
+ * @typedef {object} ListData
  * @property {string} style - list type 'ordered' or 'unordered'
  * @property {ListItem[]} items
  */
 
 /**
- * @typedef {Object} ListItem
+ * @typedef {object} ListItem
  * @property {string} content
  * @property {ListItem[]} items
  */
@@ -27,7 +27,6 @@ import './../styles/index.pcss';
  * NestedList Tool for EditorJS
  */
 export default class NestedList {
-
   /**
    * Notify core that read-only mode is supported
    *
@@ -113,9 +112,9 @@ export default class NestedList {
     if (this.data.items.length) {
       this.appendItems(this.data.items, this.nodes.wrapper);
     } else {
-      this.appendItems([{
+      this.appendItems([ {
         content: '',
-      }], this.nodes.wrapper);
+      } ], this.nodes.wrapper);
     }
 
     if (!this.readOnly) {
@@ -186,11 +185,36 @@ export default class NestedList {
   }
 
   /**
+   * Extracts tool's data from the DOM
+   *
    * @returns {ListData}
-   * @public
    */
   save() {
-    return this.data;
+    /**
+     * The method for recursive collecting of the child items
+     *
+     * @param {Element} parent - where to find items
+     * @returns {ListItem[]}
+     */
+    const getItems = (parent) => {
+      const children = Array.from(parent.querySelectorAll(`:scope > .${this.CSS.item}`));
+
+      return children.map(el => {
+        const subItemsWrapper = el.querySelector(`.${this.CSS.itemChildren}`);
+        const content = this.getItemContent(el);
+        const subItems = subItemsWrapper ? getItems(subItemsWrapper) : [];
+
+        return {
+          content,
+          items: subItems,
+        };
+      });
+    };
+
+    return {
+      style: 'ordered',
+      items: getItems(this.nodes.wrapper),
+    };
   }
 
   /**
@@ -253,63 +277,6 @@ export default class NestedList {
       settingsButtonActive: this.api.styles.settingsButtonActive,
     };
   }
-
-  // /**
-  //  * List data setter
-  //  *
-  //  * @param {ListData} listData
-  //  */
-  // set data(listData) {
-  //   if (!listData) {
-  //     listData = {};
-  //   }
-  //
-  //   this.data.style = listData.style || 'ordered'
-  //   this.data.items = listData.items || [];
-  //
-  //   const oldView = this.nodes.wrapper;
-  //
-  //   if (oldView) {
-  //     oldView.parentNode.replaceChild(this.render(), oldView);
-  //   }
-  // }
-  //
-  // /**
-  //  * Return List data
-  //  *
-  //  * @returns {ListData}
-  //  */
-  // get data() {
-  //   this.data.items = [];
-  //
-  //   const itemSelector = `${this.CSS.item}`;
-  //
-  //   const serialize = (parent) => {
-  //     const serialized = [];
-  //     const children = [].slice.call(parent.children);
-  //
-  //     for (let i = 0; i < children.length; i++) {
-  //       let items = [];
-  //
-  //       const nestedList = children[i].querySelectorAll('.' + this.CSS.wrapper);
-  //
-  //       if (nestedList.length > 0) {
-  //         items = serialize(nestedList[0]);
-  //       }
-  //
-  //       serialized.push({
-  //         content: children[i].innerHTML,
-  //         items: items
-  //       });
-  //     }
-  //
-  //     return serialized;
-  //   }
-  //
-  //   this.data.items = serialize(this.nodes.wrapper);
-  //
-  //   return this.data;
-  // }
 
   /**
    * Returns current List item by the caret position
