@@ -121,6 +121,11 @@ export default class Caret {
     selection.addRange(range);
   }
 
+  /**
+   * Check if the caret placed at the start of the contenteditable element
+   *
+   * @returns {void}
+   */
   static isAtStart() {
     const selection = window.getSelection();
 

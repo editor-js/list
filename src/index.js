@@ -390,7 +390,7 @@ export default class NestedList {
   /**
    * Handle backspace
    *
-   * @param {KeyboardEvent} event
+   * @param {KeyboardEvent} event - keydown
    */
   backspace(event) {
     /**
@@ -407,7 +407,7 @@ export default class NestedList {
     event.preventDefault();
 
     const currentItem = this.currentItem;
-    const previousSibling = currentItem.previousSibling;
+    const previousItem = currentItem.previousSibling;
     const parentItem = currentItem.parentNode.closest(`.${this.CSS.item}`);
 
     /**
@@ -431,9 +431,8 @@ export default class NestedList {
      *
      * After: block has been removed
      *
-
      */
-    if (!previousSibling && !parentItem) {
+    if (!previousItem && !parentItem) {
       return;
     }
 
@@ -448,14 +447,14 @@ export default class NestedList {
     let targetItem;
 
     /**
-     * If there is a previous sibling then we get a deepest item in its sublists
+     * If there is a previous item then we get a deepest item in its sublists
      *
      * Otherwise we will use the parent item
      */
-    if (previousSibling) {
-      const items = previousSibling.querySelectorAll(`.${this.CSS.item}`);
+    if (previousItem) {
+      const childrenOfPreviousItem = previousItem.querySelectorAll(`.${this.CSS.item}`);
 
-      targetItem = Array.from(items).pop() || previousSibling;
+      targetItem = Array.from(childrenOfPreviousItem).pop() || previousItem;
     } else {
       targetItem = parentItem;
     }
@@ -514,11 +513,11 @@ export default class NestedList {
        *
        * If there is a previous sibling then place children right after target item
        */
-      if (!previousSibling) {
+      if (!previousItem) {
         /**
          * The first item in the list
          *
-         * Berore:
+         * Before:
          * 1. Hello
          *   1.1. |My
          *     1.1.1. Wonderful
@@ -534,7 +533,7 @@ export default class NestedList {
         /**
          * Not the first item
          *
-         * Berore:
+         * Before:
          * 1. Hello
          *   1.1. My
          *   1.2. |Dear
