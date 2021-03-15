@@ -333,6 +333,11 @@ export default class NestedList {
     const itemChildren = currentItem.querySelector(`.${this.CSS.itemChildren}`);
 
     /**
+     * Create the new list item
+     */
+    const itemEl = this.createItem(endingHTML, undefined);
+
+    /**
      * Check if child items exist
      *
      * @type {boolean}
@@ -340,15 +345,10 @@ export default class NestedList {
     const childsExist = itemChildren && Array.from(itemChildren.querySelectorAll(`.${this.CSS.item}`)).length > 0;
 
     /**
-     * Create the new list item
-     */
-    const itemEl = this.createItem(endingHTML, undefined);
-
-    /**
      * If item has children, prepend to them
      * Otherwise, insert the new item after current
      */
-    if (itemChildren && childsExist) {
+    if (childsExist) {
       itemChildren.prepend(itemEl);
     } else {
       currentItem.after(itemEl);
