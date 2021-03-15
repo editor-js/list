@@ -168,7 +168,7 @@ export default class NestedList {
     const itemBody = Dom.make('div', this.CSS.itemBody);
     const itemContent = Dom.make('div', this.CSS.itemContent, {
       innerHTML: content,
-      contentEditable: true,
+      contentEditable: !this.readOnly,
     });
 
     itemBody.appendChild(itemContent);
