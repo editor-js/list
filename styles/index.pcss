@@ -13,13 +13,6 @@
       outline: none;
     }
 
-    &::before {
-      content: counters(item, ".") ". ";
-      counter-increment: item;
-      margin-right: 5px;
-      white-space: nowrap;
-    }
-
     &-body {
       flex-grow: 2;
     }
@@ -34,18 +27,21 @@
       white-space: pre-wrap;
     }
 
-    &-children {
+    &-children {}
 
+    &::before {
+      counter-increment: item;
+      margin-right: 5px;
+      white-space: nowrap;
     }
-
   }
 
-  &--unordered {
-    list-style: disc;
+  &--ordered > &__item::before {
+    content: counters(item, ".") ". ";
   }
 
-  &--ordered {
-    list-style: decimal;
+  &--unordered > &__item::before {
+    content: "•";
   }
 
   &__settings {
