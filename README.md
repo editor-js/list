@@ -6,7 +6,7 @@ Multi-leveled lists for the [Editor.js](https://editorjs.io).
 
 Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 
-![](assets/example.mp4)
+![](assets/example.gif)
 
 ## Installation
 
