@@ -1,5 +1,5 @@
 {
-  "name": "nested-list",
+  "name": "@editorjs/nested-list",
   "version": "0.0.0",
   "description": "Nested list Tool for EditorJS",
   "main": "dist/bundle.js",
