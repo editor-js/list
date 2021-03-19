@@ -496,6 +496,10 @@ export default class NestedList {
   getItemContent(item) {
     const contentNode = item.querySelector(`.${this.CSS.itemContent}`);
 
+    if (Dom.isEmpty(contentNode)) {
+      return '';
+    }
+
     return contentNode.innerHTML;
   }
 
