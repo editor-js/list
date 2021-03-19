@@ -59,7 +59,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script><!-- Image -->
   <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script><!-- Delimiter -->
 <!--  <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>&lt;!&ndash; List &ndash;&gt;-->
-  <script src="../dist/bundle.js"></script><!-- Nested List -->
+  <script src="../dist/nested-list.js"></script><!-- Nested List -->
   <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script><!-- Checklist -->
   <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script><!-- Quote -->
   <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script><!-- Code -->
@@ -192,66 +192,73 @@
           {
             type : 'nestedList',
             data : {
-              // items : [
-              //   'It is a block-styled editor',
-              //   'It returns clean data output in JSON',
-              //   'Designed to be extendable and pluggable with a simple API',
-              // ],
-
               items : [
                 {
-                  "content": "It is a block-styled editor",
-                  "items": []
-                },
-                {
-                  "content": "It returns clean data output in JSON",
+                  "content": "Canon",
                   "items": [
                     {
-                      "content": "It is a block-styled editor",
-                      "items": []
-                    },
-                    {
-                      "content": "It returns clean data output in JSON",
+                      "content": "Fisheye",
                       "items": [
                         {
-                          "content": "It is a block-styled editor",
-                          "items": [
-                            {
-                              "content": "It is a block-styled editor",
-                              "items": []
-                            },
-                            {
-                              "content": "It returns clean data output in JSON",
-                              "items": []
-                            },
-                            {
-                              "content": "Designed to be extendable and pluggable with a simple API",
-                              "items": []
-                            },
-                          ]
-                        },
-                        {
-                          "content": "It returns clean data output in JSON",
-                          "items": []
-                        },
-                        {
-                          "content": "Designed to be extendable and pluggable with a simple API",
+                          "content": "Canon 15mm f/2.8",
                           "items": []
                         },
                       ]
                     },
                     {
-                      "content": "Designed to be extendable and pluggable with a simple API",
-                      "items": []
+                      "content": "Normal",
+                      "items": [
+                        {
+                          "content": "Canon 40mm f/2.8",
+                          "items": []
+                        },
+                        {
+                          "content": "Canon 50mm f/1.8",
+                          "items": []
+                        },
+                      ]
+                    },
+                    {
+                      "content": "Zoom",
+                      "items": [
+                        {
+                          "content": "Canon 75-300mm f/4-5.6",
+                          "items": []
+                        },
+                      ]
                     },
                   ]
                 },
                 {
-                  "content": "Designed to be extendable and pluggable with a simple API",
-                  "items": []
+                  "content": "Tamron",
+                  "items": [
+                    {
+                      "content": "Zoom",
+                      "items": [
+                        {
+                          "content": "Tamron 28-75mm f/2.8",
+                          "items": []
+                        },
+                      ]
+                    },
+                  ]
+                },
+                {
+                  "content": "Samyang",
+                  "items": [
+                    {
+                      "content": "Wide",
+                      "items": [
+                        {
+                          "content": "Samyang 14mm f/2.8",
+                          "items": []
+                        },
+                      ]
+                    },
+                  ]
                 },
               ],
-              style: 'unordered'
+              style: 'ordered'
             }
           },
           {
