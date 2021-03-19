@@ -7,20 +7,15 @@ import Caret from './utils/caret';
 import './../styles/index.pcss';
 
 /**
- * @typedef {object} BlockToolData
- * @property
- */
-
-/**
  * @typedef {object} ListData
  * @property {string} style - list type 'ordered' or 'unordered'
- * @property {ListItem[]} items
+ * @property {ListItem[]} items - list of first-level elements
  */
 
 /**
  * @typedef {object} ListItem
- * @property {string} content
- * @property {ListItem[]} items
+ * @property {string} content - list item text content
+ * @property {ListItem[]} items - sublist items
  */
 
 /**
@@ -129,6 +124,7 @@ export default class NestedList {
     } else {
       this.appendItems([ {
         content: '',
+        items: [],
       } ], this.nodes.wrapper);
     }
 
@@ -157,7 +153,7 @@ export default class NestedList {
   }
 
   /**
-   * Settings
+   * Creates Block Tune allowing to change the list style
    *
    * @public
    * @returns {Element}
@@ -179,7 +175,7 @@ export default class NestedList {
         const buttons = itemEl.parentNode.querySelectorAll('.' + this.CSS.settingsButton);
 
         Array.from(buttons).forEach((button) =>
-            button.classList.remove(this.CSS.settingsButtonActive)
+          button.classList.remove(this.CSS.settingsButtonActive)
         );
 
         /**
@@ -343,11 +339,12 @@ export default class NestedList {
   /**
    * Set list style
    *
-   * @param {string} name
+   * @param {string} style - new style to set
    */
-  set listStyle(name) {
+  set listStyle(style) {
     /**
      * Get lists elements
+     *
      * @type {any[]}
      */
     const lists = Array.from(this.nodes.wrapper.querySelectorAll(`.${this.CSS.wrapper}`));
@@ -361,15 +358,16 @@ export default class NestedList {
      * For each list we need to update classes
      */
     lists.forEach(list => {
-      list.classList.remove(name !== 'unordered' ? this.CSS.wrapperUnordered : this.CSS.wrapperOrdered);
-      list.classList.add(name === 'unordered' ? this.CSS.wrapperUnordered : this.CSS.wrapperOrdered);
-    })
+      list.classList.toggle(this.CSS.wrapperUnordered, style === 'unordered');
+      list.classList.toggle(this.CSS.wrapperOrdered, style === 'ordered');
+    });
 
     /**
-     * Update style in data
+     * Update the style in data
+     *
      * @type {string}
      */
-    this.data.style = name;
+    this.data.style = style;
   }
 
   /**
@@ -410,10 +408,15 @@ export default class NestedList {
      * On Enter in the last empty item, get out of list
      */
     const isEmpty = this.getItemContent(currentItem).trim().length === 0;
-    const isLastItem = currentItem.parentNode === this.nodes.wrapper && currentItem.nextElementSibling === null;
+    const isFirstLevelItem = currentItem.parentNode === this.nodes.wrapper;
+    const isLastItem = currentItem.nextElementSibling === null;
 
-    if (isLastItem && isEmpty) {
+    if (isFirstLevelItem && isLastItem && isEmpty) {
       this.getOutOfList();
+
+      return;
+    } else if (isLastItem && isEmpty) {
+      this.unshiftItem();
 
       return;
     }
@@ -436,19 +439,52 @@ export default class NestedList {
      *
      * @type {boolean}
      */
-    const childsExist = itemChildren && Array.from(itemChildren.querySelectorAll(`.${this.CSS.item}`)).length > 0;
+    const childrenExist = itemChildren && Array.from(itemChildren.querySelectorAll(`.${this.CSS.item}`)).length > 0;
 
     /**
      * If item has children, prepend to them
      * Otherwise, insert the new item after current
      */
-    if (childsExist) {
+    if (childrenExist) {
       itemChildren.prepend(itemEl);
     } else {
       currentItem.after(itemEl);
     }
 
     this.focusItem(itemEl);
+  }
+
+  /**
+   * Decrease indentation of the current item
+   *
+   * @returns {void}
+   */
+  unshiftItem() {
+    const currentItem = this.currentItem;
+    const parentItem = currentItem.parentNode.closest(`.${this.CSS.item}`);
+
+    /**
+     * If item in the first-level list then no need to do anything
+     */
+    if (!parentItem) {
+      return;
+    }
+
+    this.caret.save();
+
+    parentItem.after(currentItem);
+
+    this.caret.restore();
+
+    /**
+     * If previous parent's children list is now empty, remove it.
+     */
+    const prevParentChildrenList = parentItem.querySelector(`.${this.CSS.itemChildren}`);
+    const isPrevParentChildrenEmpty = prevParentChildrenList.children.length === 0;
+
+    if (isPrevParentChildrenEmpty) {
+      prevParentChildrenList.remove();
+    }
   }
 
   /**
@@ -459,6 +495,10 @@ export default class NestedList {
    */
   getItemContent(item) {
     const contentNode = item.querySelector(`.${this.CSS.itemContent}`);
+
+    if (Dom.isEmpty(contentNode)) {
+      return '';
+    }
 
     return contentNode.innerHTML;
   }
@@ -589,7 +629,7 @@ export default class NestedList {
     /**
      * Get the sublist first-level items for current item
      */
-    let currentItemSublistItems = currentItem.querySelectorAll(`.${this.CSS.itemChildren} > .${this.CSS.item}`)
+    let currentItemSublistItems = currentItem.querySelectorAll(`.${this.CSS.itemChildren} > .${this.CSS.item}`);
 
     /**
      * Create an array from current item sublist items
@@ -731,23 +771,9 @@ export default class NestedList {
      */
     event.preventDefault();
 
-    const currentItem = this.currentItem;
-    const parentItem = currentItem.parentNode.closest(`.${this.CSS.item}`);
-
-    /**
-     * If item in the first-level list then no need to do anything
-     */
-    if (!parentItem) {
-      return;
-    }
-
-    this.caret.save();
-
     /**
      * Move item from current list to parent list
      */
-    parentItem.after(currentItem);
-
-    this.caret.restore();
+    this.unshiftItem();
   }
 }

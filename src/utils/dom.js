@@ -52,6 +52,11 @@ export function isEmpty(node) {
     content = node.textContent;
   } else {
     content = node.innerHTML;
+
+    /**
+     * Don't count <br>s as content
+     */
+    content = content.replaceAll('<br>', '');
   }
 
   return content.trim().length === 0;
