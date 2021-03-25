@@ -1,0 +1,6 @@
+{
+  "globals": {
+    "HTMLOListElement": true,
+    "HTMLUListElement": true
+  }
+}

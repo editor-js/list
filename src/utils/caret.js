@@ -171,7 +171,7 @@ export default class Caret {
    *
    * @returns {HTMLElement[]}
    */
-  static getHigherLevelSiblings(from, direction= 'left') {
+  static getHigherLevelSiblings(from, direction = 'left') {
     let current = from;
     const siblings = [];
 
@@ -194,5 +194,4 @@ export default class Caret {
 
     return siblings;
   }
-
 }
