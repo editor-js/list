@@ -2,5 +2,8 @@
   "globals": {
     "HTMLOListElement": true,
     "HTMLUListElement": true
+  },
+  "parserOptions": {
+    "sourceType": "module"
   }
 }
