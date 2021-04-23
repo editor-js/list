@@ -309,6 +309,8 @@ export default class NestedList {
   /**
    * Styles
    *
+   * @returns {object} - CSS classes names by keys
+   *
    * @private
    */
   get CSS() {

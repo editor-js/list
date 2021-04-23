@@ -8,10 +8,15 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack --mode production",
-    "build:dev": "webpack --mode development --watch"
+    "build:dev": "webpack --mode development --watch",
+    "lint": "eslint src/ --quiet",
+    "lint:errors": "eslint src/ --quiet",
+    "lint:fix": "eslint src/ --fix"
   },
   "devDependencies": {
     "css-loader": "^5.0.2",
+    "eslint": "^7.22.0",
+    "eslint-loader": "^4.0.2",
     "postcss": "^8.2.6",
     "postcss-loader": "^4.2.0",
     "postcss-nested": "^5.0.3",
