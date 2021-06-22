@@ -831,17 +831,19 @@ export default class NestedList {
     };
 
     if (tag === "LI") {
-      // LI should not be the outer item, it's only returned to the recursive call below
-      // If it is the outer item, we should make a data as above, with style and items
-      return { content: element.innerHTML, items: [] };
+      data.content = element.innerHTML
     } else if (tag === "UL" || tag === "OL") {
       let dataItems = [];
       Array.from(element.children).forEach((item) => {
         let thing = this.pasteHandler(item);
         // NOTE: item.tag doesn't exist
         if (item.constructor.name === "HTMLLIElement" || dataItems.length == 0) {
+          // New node for every LI (or the first node)
+          // The LI has nested elements in its items
           dataItems.push(thing);
         } else {
+          // For a non-LI element don't create an extra empty node,
+          // just grab the items for an existing dataItems entry.
           dataItems[dataItems.length-1].items.push(...thing.items);
         }
       });
