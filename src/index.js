@@ -838,6 +838,7 @@ export default class NestedList {
       let dataItems = [];
       Array.from(element.children).forEach((item) => {
         let thing = this.pasteHandler(item);
+        // NOTE: item.tag doesn't exist
         if (item.constructor.name === "HTMLLIElement" || dataItems.length == 0) {
           dataItems.push(thing);
         } else {
