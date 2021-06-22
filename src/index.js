@@ -807,7 +807,7 @@ export default class NestedList {
   }
 
   /**
-   * Handle UL, OL and LI tags paste and returns List data
+   * Handle UL, OL and LI tags paste and returns List data with nested elements.
    *
    * @param {HTMLUListElement|HTMLOListElement|HTMLLIElement} element
    * @returns {ListData}
@@ -831,20 +831,23 @@ export default class NestedList {
     };
 
     if (tag === "LI") {
-      data.items.push({ content: element.innerHTML, items: [] });
-    } else {
-      const items = Array.from(element.querySelectorAll("LI"));
-
-      const listItems = items
-        .map((li) => li.innerHTML)
-        .filter((item) => !!item.trim());
-
-      const that = this;
-
-      listItems.forEach(function (item) {
-        data.items.push({ content: item, items: [] });
-        that.createItem(item, []);
+      // LI should not be the outer item, it's only returned to the recursive call below
+      // If it is the outer item, we should make a data as above, with style and items
+      return { content: element.innerHTML, items: [] };
+    } else if (tag === "UL" || tag === "OL") {
+      let dataItems = [];
+      Array.from(element.children).forEach((item) => {
+        let thing = this.pasteHandler(item);
+        if (item.constructor.name === "HTMLLIElement" || dataItems.length == 0) {
+          dataItems.push(thing);
+        } else {
+          dataItems[dataItems.length-1].items.push(...thing.items);
+        }
       });
+      data.items = dataItems;
+      data.content = '';
+    } else {
+      // Ignore non-list items
     }
 
     return data;
