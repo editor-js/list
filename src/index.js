@@ -790,6 +790,7 @@ export default class NestedList {
     this.data = this.getDataFromPaste(list);
 
     const oldView = this.nodes.wrapper;
+
     if (oldView) {
       oldView.parentNode.replaceChild(this.render(), oldView);
     }
