@@ -787,7 +787,7 @@ export default class NestedList {
   onPaste(event) {
     const list = event.detail.data;
 
-    this.data = this.pasteHandler(list);
+    this.data = this.getDataFromPaste(list);
 
     const oldView = this.nodes.wrapper;
     if (oldView) {
@@ -812,7 +812,7 @@ export default class NestedList {
    * @param {HTMLUListElement|HTMLOListElement|HTMLLIElement} element
    * @returns {ListData}
    */
-  pasteHandler(element) {
+  getDataFromPaste(element) {
     const { tagName: tag } = element;
     let style;
 
@@ -835,7 +835,7 @@ export default class NestedList {
     } else if (tag === "UL" || tag === "OL") {
       let dataItems = [];
       Array.from(element.children).forEach((item) => {
-        let thing = this.pasteHandler(item);
+        let thing = this.getDataFromPaste(item);
         // NOTE: item.tag doesn't exist
         if (item.constructor.name === "HTMLLIElement" || dataItems.length == 0) {
           // New node for every LI (or the first node)
