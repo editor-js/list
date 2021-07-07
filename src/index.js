@@ -778,4 +778,35 @@ export default class NestedList {
      */
     this.unshiftItem();
   }
+
+  /**
+   * Convert from list to text for conversionConfig
+   * @param {ListData} data
+   * @returns {string}
+  */
+  static joinRecursive(data) {
+    return data.items
+      .map((item) => `${item.content} ${NestedList.joinRecursive(item)}`)
+      .join('');
+  }
+
+  /**
+   * Convert from text to list with import and export list to text
+   */
+  static get conversionConfig() {
+    return {
+      export: (data) => {
+        return NestedList.joinRecursive(data);
+      },
+      import: (content) => {
+        return {
+          items: [{
+            content,
+            items: []
+          }],
+          style: 'unordered'
+        };
+      }
+    };
+  }
 }
