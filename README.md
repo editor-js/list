@@ -60,7 +60,9 @@ var editor = EditorJS({
 
 ## Config Params
 
-This Tool has no config params
+| Field            | Type      | Description                                    |
+| ---------------- | --------- | ---------------------------------------------- |
+| defaultListStyle | `string`  | type of default list: `ordered` or `unordered` |
 
 ## Tool's settings
 
