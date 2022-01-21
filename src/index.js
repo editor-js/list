@@ -634,14 +634,31 @@ export default class NestedList {
    * @param {ListData} data
    */
   merge(data) {
-    const childs = this.nodes.wrapper.querySelectorAll(`.${this.CSS.item}`);
-    const lastChild = childs[childs.length - 1];
-    const lastChildContent = lastChild.querySelector(`.${this.CSS.itemContent}`);
+    /**
+     * Get childs number for the first list
+     */
+    const childsNumber = this.nodes.wrapper.querySelectorAll(`.${this.CSS.item}`).length;
 
+    /**
+     * Concat lists
+     */
     this.appendItems(data.items, this.nodes.wrapper);
 
+    /**
+     * Get childs list again
+     */
+    const newChildsList = this.nodes.wrapper.querySelectorAll(`.${this.CSS.item}`);
+
+    /**
+     * Find the "first" item from the second list
+     */
+    const childContentToBeFocused = newChildsList[childsNumber].querySelector(`.${this.CSS.itemContent}`);
+
+    /**
+     * Wait for a moment and focus the item
+     */
     window.requestAnimationFrame(() => {
-      Caret.focus(lastChildContent, false);
+      Caret.focus(childContentToBeFocused, true);
     })
   }
 
