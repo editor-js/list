@@ -628,6 +628,23 @@ export default class NestedList {
   }
 
   /**
+   * Method that specified how to merge two blocks.
+   * Called by Editor.js by backspace at the beginning of the Block
+   *
+   * @param {ListData} data
+   */
+  merge(data) {
+    // const childs = this.nodes.wrapper.querySelectorAll(`.${this.CSS.item}`);
+    // const lastChild = childs[childs.length - 1];
+    // const lastChildContent = lastChild.querySelector(`.${this.CSS.itemContent}`);
+    //
+    // Caret.focus(lastChildContent, false);
+    // @todo: why caret is missing???
+
+    this.appendItems(data.items, this.nodes.wrapper);
+  }
+
+  /**
    * Handle backspace
    *
    * @param {KeyboardEvent} event - keydown
