@@ -62,9 +62,10 @@ export default class NestedList {
    * @param {ListData} params.data - previously saved data
    * @param {object} params.config - user config for Tool
    * @param {object} params.api - Editor.js API
+   * @param {object} params.block - Editor.js Block API
    * @param {boolean} params.readOnly - read-only mode flag
    */
-  constructor({ data, config, api, readOnly }) {
+  constructor({ data, config, api, readOnly , block}) {
     /**
      * HTML nodes used in tool
      */
@@ -73,6 +74,7 @@ export default class NestedList {
     };
 
     this.api = api;
+    this.block = block;
     this.readOnly = readOnly;
     this.config = config;
 
@@ -622,7 +624,7 @@ export default class NestedList {
     /**
      * Create a new list with saved data
      */
-    this.api.blocks.insert('nestedList', rawData); // @todo: get tool name from variable
+    this.api.blocks.insert(this.block.name, rawData);
   }
 
   /**
