@@ -634,14 +634,15 @@ export default class NestedList {
    * @param {ListData} data
    */
   merge(data) {
-    // const childs = this.nodes.wrapper.querySelectorAll(`.${this.CSS.item}`);
-    // const lastChild = childs[childs.length - 1];
-    // const lastChildContent = lastChild.querySelector(`.${this.CSS.itemContent}`);
-    //
-    // Caret.focus(lastChildContent, false);
-    // @todo: why caret is missing???
+    const childs = this.nodes.wrapper.querySelectorAll(`.${this.CSS.item}`);
+    const lastChild = childs[childs.length - 1];
+    const lastChildContent = lastChild.querySelector(`.${this.CSS.itemContent}`);
 
     this.appendItems(data.items, this.nodes.wrapper);
+
+    window.requestAnimationFrame(() => {
+      Caret.focus(lastChildContent, false);
+    })
   }
 
   /**
