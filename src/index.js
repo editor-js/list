@@ -133,7 +133,9 @@ export default class NestedList {
       this.nodes.wrapper.addEventListener('keydown', (event) => {
         switch (event.key) {
           case 'Enter':
-            this.enterPressed(event);
+            if (!event.shiftKey) {
+              this.enterPressed(event);
+            }
             break;
           case 'Backspace':
             this.backspace(event);
