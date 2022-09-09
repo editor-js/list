@@ -53,6 +53,9 @@ var editor = EditorJS({
     list: {
       class: NestedList,
       inlineToolbar: true,
+      config: {
+        defaultStyle: 'unordered'
+      },
     },
   },
 });
@@ -60,7 +63,9 @@ var editor = EditorJS({
 
 ## Config Params
 
-This Tool has no config params
+| Field        | Type     | Description                                                    |
+|--------------|----------|----------------------------------------------------------------|
+| defaultStyle | `string` | type of a list: `ordered` or `unordered`, default is `ordered` |
 
 ## Tool's settings
 
