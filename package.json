@@ -1,6 +1,6 @@
 {
   "name": "@editorjs/nested-list",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Nested list Tool for EditorJS",
   "main": "dist/nested-list.js",
   "repository": "https://github.com/editor-js/nested-list.git",
@@ -25,5 +25,8 @@
     "style-loader": "^2.0.0",
     "webpack": "^5.24.1",
     "webpack-cli": "^4.5.0"
+  },
+  "dependencies": {
+    "@codexteam/icons": "^0.0.2"
   }
 }
