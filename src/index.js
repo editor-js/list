@@ -181,6 +181,23 @@ export default class NestedList {
   }
 
   /**
+   * On paste callback that is fired from Editor.
+   *
+   * @param {PasteEvent} event - event with pasted data
+   */
+  onPaste(event) {
+    const list = event.detail.data;
+
+    this.data = this.pasteHandler(list);
+
+    const oldView = this.nodes.wrapper;
+
+    if (oldView) {
+      oldView.parentNode.replaceChild(this.render(), oldView);
+    }
+  }
+
+  /**
    * Handle UL, OL and LI tags paste and returns List data
    *
    * @param {HTMLUListElement|HTMLOListElement|HTMLLIElement} element
