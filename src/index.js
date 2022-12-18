@@ -181,6 +181,53 @@ export default class NestedList {
   }
 
   /**
+   * Handle UL, OL and LI tags paste and returns List data
+   *
+   * @param {HTMLUListElement|HTMLOListElement|HTMLLIElement} element
+   * @returns {ListData}
+   */
+  pasteHandler(element) {
+    const { tagName: tag } = element;
+    let style;
+    let tagToSearch;
+
+    switch (tag) {
+      case 'OL':
+        style = 'ordered';
+        tagToSearch = 'ol';
+        break;
+      case 'UL':
+      case 'LI':
+        style = 'unordered';
+        tagToSearch = 'ul';
+    }
+
+    const data = {
+      style,
+      items: [],
+    };
+
+    const getPastedItems = (parent) =>{
+      const children = Array.from(parent.querySelectorAll(`:scope > li`));
+
+      return children.map((child) => {
+        const subItemsWrapper = child.querySelector(`:scope > ${tagToSearch}`);
+        const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
+        const content = child?.firstChild?.textContent || '';
+
+        return {
+          content,
+          items: subItems,
+        };
+      });
+    };
+
+    data.items = getPastedItems(element);
+
+    return data;
+  }
+
+  /**
    * Renders children list
    *
    * @param {ListItem[]} items - items data to append
