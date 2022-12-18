@@ -190,6 +190,7 @@ export default class NestedList {
 
     this.data = this.pasteHandler(list);
 
+    // render new list
     const oldView = this.nodes.wrapper;
 
     if (oldView) {
@@ -208,6 +209,7 @@ export default class NestedList {
     let style;
     let tagToSearch;
 
+    // set list style and tag to search.
     switch (tag) {
       case 'OL':
         style = 'ordered';
@@ -224,12 +226,17 @@ export default class NestedList {
       items: [],
     };
 
-    const getPastedItems = (parent) =>{
+    // get pasted items from the html.
+    const getPastedItems = (parent) => {
+      // get first level li elements.
       const children = Array.from(parent.querySelectorAll(`:scope > li`));
 
       return children.map((child) => {
+        // get subitems if they exist.
         const subItemsWrapper = child.querySelector(`:scope > ${tagToSearch}`);
+        // get subitems.
         const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
+        // get text content of the li element.
         const content = child?.firstChild?.textContent || '';
 
         return {
@@ -239,6 +246,7 @@ export default class NestedList {
       });
     };
 
+    // get pasted items.
     data.items = getPastedItems(element);
 
     return data;
