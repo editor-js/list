@@ -172,6 +172,7 @@ export default class NestedList {
 
   /**
    * On paste sanitzation config. Allow only tags that are allowed in the Tool.
+   *
    * @returns {PasteConfig} - paste config.
    */
   static get pasteConfig() {
@@ -265,7 +266,7 @@ export default class NestedList {
 
       parentItem.appendChild(itemEl);
     });
-  };
+  }
 
   /**
    * Renders the single item
@@ -363,7 +364,6 @@ export default class NestedList {
    * Styles
    *
    * @returns {object} - CSS classes names by keys
-   *
    * @private
    */
   get CSS() {

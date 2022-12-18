@@ -107,7 +107,6 @@ export default class Caret {
    *
    * @param {HTMLElement} element - element where to set focus
    * @param {boolean} atStart - where to set focus: at the start or at the end
-   *
    * @returns {void}
    */
   static focus(element, atStart = true) {
@@ -165,10 +164,8 @@ export default class Caret {
    * <p></p>                            | right first-level siblings
    * <p></p>                            |
    * </div>
-   *
    * @param {HTMLElement} from - element from which siblings should be searched
    * @param {'left' | 'right'} direction - direction of search
-   *
    * @returns {HTMLElement[]}
    */
   static getHigherLevelSiblings(from, direction = 'left') {
