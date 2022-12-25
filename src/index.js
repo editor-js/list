@@ -171,6 +171,89 @@ export default class NestedList {
   }
 
   /**
+   * On paste sanitzation config. Allow only tags that are allowed in the Tool.
+   *
+   * @returns {PasteConfig} - paste config.
+   */
+  static get pasteConfig() {
+    return {
+      tags: ['OL', 'UL', 'LI'],
+    };
+  }
+
+  /**
+   * On paste callback that is fired from Editor.
+   *
+   * @param {PasteEvent} event - event with pasted data
+   */
+  onPaste(event) {
+    const list = event.detail.data;
+
+    this.data = this.pasteHandler(list);
+
+    // render new list
+    const oldView = this.nodes.wrapper;
+
+    if (oldView) {
+      oldView.parentNode.replaceChild(this.render(), oldView);
+    }
+  }
+
+  /**
+   * Handle UL, OL and LI tags paste and returns List data
+   *
+   * @param {HTMLUListElement|HTMLOListElement|HTMLLIElement} element
+   * @returns {ListData}
+   */
+  pasteHandler(element) {
+    const { tagName: tag } = element;
+    let style;
+    let tagToSearch;
+
+    // set list style and tag to search.
+    switch (tag) {
+      case 'OL':
+        style = 'ordered';
+        tagToSearch = 'ol';
+        break;
+      case 'UL':
+      case 'LI':
+        style = 'unordered';
+        tagToSearch = 'ul';
+    }
+
+    const data = {
+      style,
+      items: [],
+    };
+
+    // get pasted items from the html.
+    const getPastedItems = (parent) => {
+      // get first level li elements.
+      const children = Array.from(parent.querySelectorAll(`:scope > li`));
+
+      return children.map((child) => {
+        // get subitems if they exist.
+        const subItemsWrapper = child.querySelector(`:scope > ${tagToSearch}`);
+        // get subitems.
+        const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
+        // get text content of the li element.
+        const content = child?.firstChild?.textContent || '';
+
+        return {
+          content,
+          items: subItems,
+        };
+      });
+    };
+
+    // get pasted items.
+    data.items = getPastedItems(element);
+
+    return data;
+  }
+
+  /**
    * Renders children list
    *
    * @param {ListItem[]} items - items data to append
@@ -183,7 +266,7 @@ export default class NestedList {
 
       parentItem.appendChild(itemEl);
     });
-  };
+  }
 
   /**
    * Renders the single item
@@ -281,7 +364,6 @@ export default class NestedList {
    * Styles
    *
    * @returns {object} - CSS classes names by keys
-   *
    * @private
    */
   get CSS() {

@@ -41,7 +41,6 @@ export function fragmentToString(fragment) {
  * {@link https://en.wikipedia.org/wiki/Breadth-first_search}
  *
  * @description Pushes to stack all DOM leafs and checks for emptiness
- *
  * @param {Node} node - node to check
  * @returns {boolean}
  */
