@@ -50,7 +50,7 @@ var editor = EditorJS({
   // ...
   tools: {
     ...
-    list: {
+    nestedList: {
       class: NestedList,
       inlineToolbar: true,
     },
