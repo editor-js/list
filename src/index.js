@@ -577,7 +577,9 @@ export default class NestedList {
    * @returns {void}
    */
   getOutOfList() {
-    this.currentItem.remove();
+    setTimeout(function() {
+      this.currentItem.remove();
+    }, 0)
 
     this.api.blocks.insert();
     this.api.caret.setToBlock(this.api.blocks.getCurrentBlockIndex());
