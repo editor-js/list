@@ -65,7 +65,7 @@ var editor = EditorJS({
 
 | Field        | Type     | Description                                                    |
 |--------------|----------|----------------------------------------------------------------|
-| defaultStyle | `string` | default list style: `ordered` or `unordered`, default is `ordered` |
+| defaultStyle | `string` | default list style: `ordered` or `unordered`, default is `unordered` |
 
 ## Tool's settings
 
