@@ -78,15 +78,16 @@ export default class NestedList {
     this.config = config;
 
     /**
-     * This list-style will be used by default
+     * Set the default list style from the config.
      */
-    this.defaultListStyle = 'ordered';
+    this.defaultListStyle = this.config.defaultStyle === 'unordered'  ? 'unordered' : 'ordered';
+
 
     const initialData = {
       style: this.defaultListStyle,
       items: [],
     };
-
+    
     this.data = data && Object.keys(data).length ? data : initialData;
 
     /**
