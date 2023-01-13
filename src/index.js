@@ -87,7 +87,6 @@ export default class NestedList {
       style: this.defaultListStyle,
       items: [],
     };
-    
     this.data = data && Object.keys(data).length ? data : initialData;
 
     /**
