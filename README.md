@@ -69,7 +69,7 @@ var editor = EditorJS({
 
 ## Tool's settings
 
-![](https://capella.pics/bf5a42e4-1350-499d-a728-493b0fcaeda4.jpg)
+![](assets/bf5a42e4-1350-499d-a728-493b0fcaeda4.jpg)
 
 You can choose list`s type.
 
