@@ -10,15 +10,7 @@ Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 
 ## Installation
 
-### Install via NPM
-
 Get the package
-
-```shell
-npm i --save @editorjs/nested-list
-```
-
-Or
 
 ```shell
 yarn add @editorjs/nested-list
@@ -30,13 +22,7 @@ Include module at your application
 import NestedList from '@editorjs/nested-list';
 ```
 
-### Load from CDN
-
-Load the script from [jsDelivr CDN](https://www.jsdelivr.com/package/npm/@editorjs/nested-list) and connect to your page.
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/@editorjs/nested-list@latest"></script>
-```
+Optionally, you can load this tool from CDN [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/nested-list@latest)
 
 ## Usage
 
