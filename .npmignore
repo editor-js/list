@@ -1,5 +1,6 @@
 .idea/
 assets/
 src/
-webpack.config.js
+vite.config.js
+postcss.config.js
 yarn.lock
