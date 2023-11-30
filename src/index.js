@@ -227,25 +227,54 @@ export default class NestedList {
       items: [],
     };
 
+    // Pasted Case 1.
+    // <ul>
+    //   <li>editor</li>
+    //   <ul>
+    //     <li>nested-list</li>
+    //   </ul>
+    // </ul>
+    // Pasted Case 2
+    // <ul>
+    //   <li>
+    //     editor
+    //     <ul>
+    //       <li>nested-list</li>
+    //     </ul>
+    //   </li>
+    // </ul>
     // get pasted items from the html.
     const getPastedItems = (parent) => {
+      let responseData = [];
       // get first level li elements.
       const children = Array.from(parent.querySelectorAll(`:scope > li`));
 
-      return children.map((child) => {
-        // get subitems if they exist.
-        const subItemsWrapper = child.querySelector(`:scope > ${tagToSearch}`);
-        // get subitems.
-        const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
-        // get text content of the li element.
-        const content = child?.firstChild?.textContent || '';
-
-        return {
-          content,
-          items: subItems,
-        };
+      children.map((child) => {
+        const listItem = getListItem(child);
+        responseData = responseData.concat(listItem);
       });
+
+      return responseData;
     };
+
+    const getListItem = (list) => {
+      const nestedItems = getNestedListContainers(list);
+      return {
+        content: list?.firstChild?.textContent || '',
+        items: nestedItems
+      };
+    }
+
+    const getNestedListContainers = (parent) => {
+      let responseData = [];
+      const nestedListContainers = Array.from(parent.querySelectorAll(`:scope > ${tagToSearch}`))
+
+      nestedListContainers.map((nestedListContainer) => {
+        responseData = responseData.concat(getPastedItems(nestedListContainer));
+      });
+
+      return responseData;
+    }
 
     // get pasted items.
     data.items = getPastedItems(element);
