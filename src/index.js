@@ -247,11 +247,18 @@ export default class NestedList {
     const getPastedItems = (parent) => {
       let responseData = [];
       // get first level li elements.
-      const children = Array.from(parent.querySelectorAll(`:scope > li`));
+      const children = Array.from(parent.querySelectorAll(`:scope > li, :scope > ${tagToSearch}`));
 
       children.map((child) => {
-        const listItem = getListItem(child);
-        responseData = responseData.concat(listItem);
+        if (child.tagName === tag) {
+          const nestedListContainers = getNestedListContainers(parent);
+          const previousListItem = responseData.pop();
+          previousListItem.items = nestedListContainers;
+          responseData = responseData.concat(previousListItem);
+        } else {
+          const listItem = getListItem(child);
+          responseData = responseData.concat(listItem);
+        }
       });
 
       return responseData;
