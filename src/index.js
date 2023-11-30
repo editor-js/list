@@ -251,9 +251,9 @@ export default class NestedList {
 
       children.map((child) => {
         if (child.tagName === tag) {
-          const nestedListContainers = getNestedListContainers(parent);
+          const nestedListGroup = getNestedListGroup(parent);
           const previousListItem = responseData.pop();
-          previousListItem.items = nestedListContainers;
+          previousListItem.items = nestedListGroup;
           responseData = responseData.concat(previousListItem);
         } else {
           const listItem = getListItem(child);
@@ -265,19 +265,19 @@ export default class NestedList {
     };
 
     const getListItem = (list) => {
-      const nestedItems = getNestedListContainers(list);
+      const nestedItems = getNestedListGroup(list);
       return {
         content: list?.firstChild?.textContent || '',
         items: nestedItems
       };
     }
 
-    const getNestedListContainers = (parent) => {
+    const getNestedListGroup = (parent) => {
       let responseData = [];
-      const nestedListContainers = Array.from(parent.querySelectorAll(`:scope > ${tagToSearch}`))
+      const nestedListGroups = Array.from(parent.querySelectorAll(`:scope > ${tagToSearch}`))
 
-      nestedListContainers.map((nestedListContainer) => {
-        responseData = responseData.concat(getPastedItems(nestedListContainer));
+      nestedListGroups.map((nestedListGroup) => {
+        responseData = responseData.concat(getPastedItems(nestedListGroup));
       });
 
       return responseData;
