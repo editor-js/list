@@ -460,6 +460,13 @@ export default class NestedList {
     event.preventDefault();
 
     /**
+     * Prevent duplicated event in Chinese, Japanese and Korean languages
+     */
+    if (event.isComposing) {
+      return;
+    }
+
+    /**
      * On Enter in the last empty item, get out of list
      */
     const isEmpty = this.getItemContent(currentItem).trim().length === 0;
