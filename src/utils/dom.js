@@ -33,6 +33,10 @@ export function fragmentToString(fragment) {
 
   div.appendChild(fragment);
 
+  if (!div.innerText.trim()) {
+    return '';
+  }
+
   return div.innerHTML;
 }
 
