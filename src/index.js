@@ -227,25 +227,61 @@ export default class NestedList {
       items: [],
     };
 
+    // Pasted Case 1.
+    // <ul>
+    //   <li>editor</li>
+    //   <ul>
+    //     <li>nested-list</li>
+    //   </ul>
+    // </ul>
+    // Pasted Case 2
+    // <ul>
+    //   <li>
+    //     editor
+    //     <ul>
+    //       <li>nested-list</li>
+    //     </ul>
+    //   </li>
+    // </ul>
     // get pasted items from the html.
     const getPastedItems = (parent) => {
+      let responseData = [];
       // get first level li elements.
-      const children = Array.from(parent.querySelectorAll(`:scope > li`));
+      const children = Array.from(parent.querySelectorAll(`:scope > li, :scope > ${tagToSearch}`));
 
-      return children.map((child) => {
-        // get subitems if they exist.
-        const subItemsWrapper = child.querySelector(`:scope > ${tagToSearch}`);
-        // get subitems.
-        const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
-        // get text content of the li element.
-        const content = child?.firstChild?.textContent || '';
-
-        return {
-          content,
-          items: subItems,
-        };
+      children.map((child) => {
+        if (child.tagName === tag) {
+          const nestedListGroup = getNestedListGroup(parent);
+          const previousListItem = responseData.pop();
+          previousListItem.items = nestedListGroup;
+          responseData = responseData.concat(previousListItem);
+        } else {
+          const listItem = getListItem(child);
+          responseData = responseData.concat(listItem);
+        }
       });
+
+      return responseData;
     };
+
+    const getListItem = (list) => {
+      const nestedItems = getNestedListGroup(list);
+      return {
+        content: list?.firstChild?.textContent || '',
+        items: nestedItems
+      };
+    }
+
+    const getNestedListGroup = (parent) => {
+      let responseData = [];
+      const nestedListGroups = Array.from(parent.querySelectorAll(`:scope > ${tagToSearch}`))
+
+      nestedListGroups.map((nestedListGroup) => {
+        responseData = responseData.concat(getPastedItems(nestedListGroup));
+      });
+
+      return responseData;
+    }
 
     // get pasted items.
     data.items = getPastedItems(element);
