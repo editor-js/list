@@ -139,7 +139,6 @@ export default class List {
         }
       }, false);
     }
-
     return this._elements.wrapper;
   }
 
@@ -175,7 +174,7 @@ export default class List {
        */
       import: (string) => {
         return {
-          items: [ string ],
+          items: [string],
           style: 'unordered',
         };
       },
@@ -397,7 +396,14 @@ export default class List {
    */
   backspace(event) {
     const items = this._elements.wrapper.querySelectorAll('.' + this.CSS.item),
-        firstItem = items[0];
+      firstItem = items[0];
+
+    if (this.currentItem.textContent.trim() === '') {
+      const target = this.currentItem;
+      window.requestIdleCallback(() => {
+        target.parentElement.removeChild(target);
+      })
+    }
 
     if (!firstItem) {
       return;
@@ -420,9 +426,9 @@ export default class List {
     event.preventDefault();
 
     const selection = window.getSelection(),
-        currentNode = selection.anchorNode.parentNode,
-        currentItem = currentNode.closest('.' + this.CSS.item),
-        range = new Range();
+      currentNode = selection.anchorNode.parentNode,
+      currentItem = currentNode.closest('.' + this.CSS.item),
+      range = new Range();
 
     range.selectNodeContents(currentItem);
 
@@ -455,7 +461,7 @@ export default class List {
     };
 
     if (tag === 'LI') {
-      data.items = [ element.innerHTML ];
+      data.items = [element.innerHTML];
     } else {
       const items = Array.from(element.querySelectorAll('LI'));
 
