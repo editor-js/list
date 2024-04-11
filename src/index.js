@@ -189,7 +189,9 @@ export default class NestedList {
   onPaste(event) {
     const list = event.detail.data;
 
-    this.data = this.pasteHandler(list);
+    const formattedList = this.formatNestedListOnPaste(list);
+
+    this.data = this.pasteHandler(formattedList);
 
     // render new list
     const oldView = this.nodes.wrapper;
@@ -251,6 +253,74 @@ export default class NestedList {
     data.items = getPastedItems(element);
 
     return data;
+  }
+
+  /**
+   * Method to fix some pasted nested list
+   * If the nested list is not well formatted, it will fix it. This can happens when copy paste form word
+   * Input :
+   * <ul>
+   *   <li>Coffee</li>
+   *   <li>Tea</li>
+   *   <ul>
+   *     <li>Black tea</li>
+   *   </ul>
+   * </ul>
+   * Output :
+   * <ul>
+   *   <li>Coffee</li>
+   *   <li>Tea
+   *     <ul>
+   *       <li>Black tea</li>
+   *     </ul>
+   *   </li>
+   * </ul>
+   * @param {HTMLUListElement|HTMLOListElement|HTMLLIElement} ulElement
+   * @returns {HTMLUListElement|HTMLOListElement|HTMLLIElement}
+   */
+  formatNestedListOnPaste(ulElement) {
+    // set list style and tag to search.
+    let tagToSearch;
+    let tagName;
+
+    switch (ulElement?.tagName) {
+      case 'OL':
+        tagToSearch = 'ol';
+        tagName = 'OL';
+        break;
+      case 'UL':
+      case 'LI':
+        tagToSearch = 'ul';
+        tagName = 'UL';
+    }
+
+
+    for (let i = 0; i < ulElement.children.length; i++) {
+      const child = ulElement.children[i];
+
+      if (child.tagName === tagName) {
+        // call recursively the function to fix the nested list
+        this.formatNestedListOnPaste(child);
+        // move the ul inside the previous li
+        const li = ulElement.children[i - 1];
+
+        li.appendChild(child);
+        continue;
+      }
+
+      if (child.tagName === 'LI') {
+        const ul = child.querySelector(tagToSearch);
+
+        if (ul) {
+          // call recursively the function to fix the nested list
+          const fixedUl = this.formatNestedListOnPaste(ul);
+
+          child.appendChild(fixedUl);
+        }
+      }
+    }
+
+    return ulElement;
   }
 
   /**
