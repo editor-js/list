@@ -651,9 +651,15 @@ export default class NestedList {
         window.getSelection().anchorOffset === 0
       ) {
         const text = currentItem.textContent;
+        const currentIndex = this.api.blocks.getCurrentBlockIndex();
         currentItem.remove();
-        const block = this.api.blocks.insert('paragraph', { text });
-        Caret.focus(block.holder.querySelector('.cdx-block'), true);
+        this.api.blocks.insert(
+          'paragraph',
+          { text },
+          undefined,
+          currentIndex,
+          true,
+        );
       }
 
       return;
