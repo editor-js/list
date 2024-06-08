@@ -646,6 +646,14 @@ export default class NestedList {
           nextSibling.querySelector(`.${this.CSS.itemContent}`),
           true,
         );
+      } else if (
+        currentItem.textContent.length > 0 &&
+        window.getSelection().anchorOffset === 0
+      ) {
+        const text = currentItem.textContent;
+        currentItem.remove();
+        const block = this.api.blocks.insert('paragraph', { text });
+        Caret.focus(block.holder.querySelector('.cdx-block'), true);
       }
 
       return;
