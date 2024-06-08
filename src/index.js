@@ -636,12 +636,12 @@ export default class NestedList {
      *
      */
     if (!previousItem && !parentItem) {
-      const nextSibling = currentItem.nextSibling.querySelector(
-        `.${this.CSS.itemContent}`,
-      );
+      const nextSibling = currentItem.nextSibling;
       if (currentItem.textContent.length === 0 && nextSibling) {
         currentItem.remove();
-        Caret.focus(nextSibling, true);
+        Caret.focus(nextSibling.querySelector(
+          `.${this.CSS.itemContent}`,
+        ), true);
       }
 
       return;
