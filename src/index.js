@@ -637,11 +637,15 @@ export default class NestedList {
      */
     if (!previousItem && !parentItem) {
       const nextSibling = currentItem.nextSibling;
-      if (currentItem.textContent.length === 0 && nextSibling) {
+      if (
+        currentItem.textContent.length === window.getSelection().anchorOffset &&
+        nextSibling
+      ) {
         currentItem.remove();
-        Caret.focus(nextSibling.querySelector(
-          `.${this.CSS.itemContent}`,
-        ), true);
+        Caret.focus(
+          nextSibling.querySelector(`.${this.CSS.itemContent}`),
+          true,
+        );
       }
 
       return;
