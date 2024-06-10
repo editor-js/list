@@ -653,13 +653,13 @@ export default class NestedList {
         const text = currentItem.textContent;
         const currentIndex = this.api.blocks.getCurrentBlockIndex();
         currentItem.remove();
-        this.api.blocks.insert(
+        const block = this.api.blocks.insert(
           'paragraph',
           { text },
           undefined,
           currentIndex,
-          true,
         );
+        Caret.focus(block.holder.querySelector('.ce-paragraph'), true);
       }
 
       return;
