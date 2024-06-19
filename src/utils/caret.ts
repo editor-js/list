@@ -1,5 +1,5 @@
-import * as dom from "./dom";
-import { isHtmlElement } from "./type-guards";
+import * as dom from './dom';
+import { isHtmlElement } from './type-guards';
 
 /**
  * Helper for working with caret
@@ -24,7 +24,7 @@ export default class Caret {
    */
   save(): void {
     const range = Caret.range;
-    const cursor = dom.make("span");
+    const cursor = dom.make('span');
 
     cursor.hidden = true;
 
@@ -112,7 +112,7 @@ export default class Caret {
       return;
     }
 
-    const currentBlockInput = startNode.closest("[contenteditable]");
+    const currentBlockInput = startNode.closest('[contenteditable]');
 
     if (!currentBlockInput) {
       return;
@@ -183,7 +183,7 @@ export default class Caret {
      *     |adaddad         <-- focus node
      * </div>
      */
-    const leftSiblings = Caret.getHigherLevelSiblings(focusNode, "left");
+    const leftSiblings = Caret.getHigherLevelSiblings(focusNode, 'left');
 
     const nothingAtLeft = leftSiblings.every((node) => {
       return dom.isEmpty(node);
@@ -212,7 +212,7 @@ export default class Caret {
    */
   static getHigherLevelSiblings(
     from: HTMLElement,
-    direction: "left" | "right" = "left"
+    direction: 'left' | 'right' = 'left'
   ): HTMLElement[] {
     let current = from;
     const siblings: HTMLElement[] = [];
@@ -227,11 +227,11 @@ export default class Caret {
     /**
      * Find passed node's firs-level parent (in example - blockquote)
      */
-    while (currentParentNode && currentParentNode.contentEditable !== "true") {
+    while (currentParentNode && currentParentNode.contentEditable !== 'true') {
       current = currentParentNode;
     }
 
-    const sibling = direction === "left" ? "previousSibling" : "nextSibling";
+    const sibling = direction === 'left' ? 'previousSibling' : 'nextSibling';
 
     /**
      * Find all left/right siblings

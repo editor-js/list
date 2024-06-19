@@ -1,17 +1,17 @@
-import type { API, PasteConfig, ToolboxConfig } from "@editorjs/editorjs";
-import type { PasteEvent } from "./types";
-import type { TunesMenuConfig } from "@editorjs/editorjs/types/tools";
+import type { API, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
+import type { PasteEvent } from './types';
+import type { TunesMenuConfig } from '@editorjs/editorjs/types/tools';
 
-import { isHtmlElement } from "./utils/type-guards";
+import { isHtmlElement } from './utils/type-guards';
 
-import * as Dom from "./utils/dom";
-import Caret from "./utils/caret";
-import { IconListBulleted, IconListNumbered } from "@codexteam/icons";
+import * as Dom from './utils/dom';
+import Caret from './utils/caret';
+import { IconListBulleted, IconListNumbered } from '@codexteam/icons';
 
 /**
  * Build styles
  */
-import "./../styles/index.pcss";
+import './../styles/index.pcss';
 
 /**
  * Output data
@@ -124,7 +124,7 @@ export default class NestedList {
   static get toolbox(): ToolboxConfig {
     return {
       icon: IconListNumbered,
-      title: "List",
+      title: 'List',
     };
   }
 
@@ -146,7 +146,7 @@ export default class NestedList {
   /**
    * Default list style
    */
-  defaultListStyle: NestedListConfig["defaultStyle"];
+  defaultListStyle: NestedListConfig['defaultStyle'];
 
   /**
    * Corresponds to UiNodes type from Editor.js but with wrapper being nullable
@@ -188,7 +188,7 @@ export default class NestedList {
      * Set the default list style from the config.
      */
     this.defaultListStyle =
-      this.config.defaultStyle === "ordered" ? "ordered" : "unordered";
+      this.config.defaultStyle === 'ordered' ? 'ordered' : 'unordered';
 
     const initialData = {
       style: this.defaultListStyle,
@@ -220,7 +220,7 @@ export default class NestedList {
       this.appendItems(
         [
           {
-            content: "",
+            content: '',
             items: [],
           },
         ],
@@ -231,16 +231,16 @@ export default class NestedList {
     if (!this.readOnly) {
       // detect keydown on the last item to escape List
       this.nodes.wrapper.addEventListener(
-        "keydown",
+        'keydown',
         (event) => {
           switch (event.key) {
-            case "Enter":
+            case 'Enter':
               this.enterPressed(event);
               break;
-            case "Backspace":
+            case 'Backspace':
               this.backspace(event);
               break;
-            case "Tab":
+            case 'Tab':
               if (event.shiftKey) {
                 this.shiftTab(event);
               } else {
@@ -265,13 +265,13 @@ export default class NestedList {
   renderSettings(): TunesMenuConfig {
     const tunes = [
       {
-        name: "unordered",
-        label: this.api.i18n.t("Unordered"),
+        name: 'unordered',
+        label: this.api.i18n.t('Unordered'),
         icon: IconListBulleted,
       },
       {
-        name: "ordered",
-        label: this.api.i18n.t("Ordered"),
+        name: 'ordered',
+        label: this.api.i18n.t('Ordered'),
         icon: IconListNumbered,
       },
     ];
@@ -295,7 +295,7 @@ export default class NestedList {
    */
   static get pasteConfig(): PasteConfig {
     return {
-      tags: ["OL", "UL", "LI"],
+      tags: ['OL', 'UL', 'LI'],
     };
   }
 
@@ -323,21 +323,21 @@ export default class NestedList {
    * @param {HTMLUListElement|HTMLOListElement|HTMLLIElement} element
    * @returns {ListData}
    */
-  pasteHandler(element: PasteEvent["detail"]["data"]): ListData {
+  pasteHandler(element: PasteEvent['detail']['data']): ListData {
     const { tagName: tag } = element;
-    let style: string = "";
+    let style: string = '';
     let tagToSearch: string;
 
     // set list style and tag to search.
     switch (tag) {
-      case "OL":
-        style = "ordered";
-        tagToSearch = "ol";
+      case 'OL':
+        style = 'ordered';
+        tagToSearch = 'ol';
         break;
-      case "UL":
-      case "LI":
-        style = "unordered";
-        tagToSearch = "ul";
+      case 'UL':
+      case 'LI':
+        style = 'unordered';
+        tagToSearch = 'ul';
     }
 
     const data: ListData = {
@@ -356,7 +356,7 @@ export default class NestedList {
         // get subitems.
         const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
         // get text content of the li element.
-        const content = child?.firstChild?.textContent || "";
+        const content = child?.firstChild?.textContent || '';
 
         return {
           content,
@@ -394,9 +394,9 @@ export default class NestedList {
    * @returns {Element}
    */
   createItem(content: string, items: ListItem[] = []): Element {
-    const itemWrapper = Dom.make("li", this.CSS.item);
-    const itemBody = Dom.make("div", this.CSS.itemBody);
-    const itemContent = Dom.make("div", this.CSS.itemContent, {
+    const itemWrapper = Dom.make('li', this.CSS.item);
+    const itemBody = Dom.make('div', this.CSS.itemBody);
+    const itemContent = Dom.make('div', this.CSS.itemContent, {
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
@@ -481,9 +481,9 @@ export default class NestedList {
     style: string = this.listStyle,
     classes: string[] = []
   ): HTMLOListElement | HTMLUListElement {
-    const tag = style === "ordered" ? "ol" : "ul";
+    const tag = style === 'ordered' ? 'ol' : 'ul';
     const styleClass =
-      style === "ordered" ? this.CSS.wrapperOrdered : this.CSS.wrapperUnordered;
+      style === 'ordered' ? this.CSS.wrapperOrdered : this.CSS.wrapperUnordered;
 
     classes.push(styleClass);
 
@@ -502,14 +502,14 @@ export default class NestedList {
   get CSS(): NestedListCssClasses {
     return {
       baseBlock: this.api.styles.block,
-      wrapper: "cdx-nested-list",
-      wrapperOrdered: "cdx-nested-list--ordered",
-      wrapperUnordered: "cdx-nested-list--unordered",
-      item: "cdx-nested-list__item",
-      itemBody: "cdx-nested-list__item-body",
-      itemContent: "cdx-nested-list__item-content",
-      itemChildren: "cdx-nested-list__item-children",
-      settingsWrapper: "cdx-nested-list__settings",
+      wrapper: 'cdx-nested-list',
+      wrapperOrdered: 'cdx-nested-list--ordered',
+      wrapperUnordered: 'cdx-nested-list--unordered',
+      item: 'cdx-nested-list__item',
+      itemBody: 'cdx-nested-list__item-body',
+      itemContent: 'cdx-nested-list__item-content',
+      itemChildren: 'cdx-nested-list__item-children',
+      settingsWrapper: 'cdx-nested-list__settings',
       settingsButton: this.api.styles.settingsButton,
       settingsButtonActive: this.api.styles.settingsButtonActive,
     };
@@ -554,8 +554,8 @@ export default class NestedList {
      * For each list we need to update classes
      */
     lists.forEach((list) => {
-      list.classList.toggle(this.CSS.wrapperUnordered, style === "unordered");
-      list.classList.toggle(this.CSS.wrapperOrdered, style === "ordered");
+      list.classList.toggle(this.CSS.wrapperUnordered, style === 'unordered');
+      list.classList.toggle(this.CSS.wrapperOrdered, style === 'ordered');
     });
 
     /**
@@ -732,11 +732,11 @@ export default class NestedList {
   getItemContent(item: Element): string {
     const contentNode = item.querySelector(`.${this.CSS.itemContent}`);
     if (!contentNode) {
-      return "";
+      return '';
     }
 
     if (Dom.isEmpty(contentNode)) {
-      return "";
+      return '';
     }
 
     return contentNode.innerHTML;
@@ -895,7 +895,7 @@ export default class NestedList {
     /**
      * Update target item content by merging with current item html content
      */
-    targetItemContent.insertAdjacentHTML("beforeend", endingHTML);
+    targetItemContent.insertAdjacentHTML('beforeend', endingHTML);
 
     /**
      * Get the sublist first-level items for current item
@@ -1082,7 +1082,7 @@ export default class NestedList {
   static joinRecursive(data: ListData | ListItem): string {
     return data.items
       .map((item) => `${item.content} ${NestedList.joinRecursive(item)}`)
-      .join("");
+      .join('');
   }
 
   /**
@@ -1104,7 +1104,7 @@ export default class NestedList {
               items: [],
             },
           ],
-          style: "unordered",
+          style: 'unordered',
         };
       },
     };

@@ -1,7 +1,7 @@
 /**
  * HtmlElement's attribute that can be set
  */
-type HtmlElementAttributes = Pick<HTMLElement, "contentEditable" | "innerHTML">;
+type HtmlElementAttributes = Pick<HTMLElement, 'contentEditable' | 'innerHTML'>;
 
 /**
  * Helper for making Elements with attributes
@@ -39,7 +39,7 @@ export function make(
  * @returns {string}
  */
 export function fragmentToString(fragment: DocumentFragment): string {
-  const div = make("div");
+  const div = make('div');
 
   div.appendChild(fragment);
 
@@ -65,7 +65,7 @@ export function isEmpty(node: Element): boolean {
     /**
      * Don't count <br>s as content
      */
-    content = content.replaceAll("<br>", "");
+    content = content.replaceAll('<br>', '');
   }
 
   return content?.trim().length === 0;
