@@ -19,10 +19,10 @@
   "exports": {
     ".": {
       "import": "./dist/nested-list.mjs",
-      "require": "./dist/nested-list.umd.js"
+      "require": "./dist/nested-list.umd.js",
+      "types": "./dist/index.d.ts"
     }
   },
-  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
