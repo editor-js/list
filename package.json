@@ -22,6 +22,7 @@
       "require": "./dist/nested-list.umd.js"
     }
   },
+  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -30,12 +31,15 @@
     "lint:fix": "eslint src/ --fix"
   },
   "devDependencies": {
+    "@editorjs/editorjs": "^2.29.1",
     "eslint": "^7.22.0",
     "eslint-loader": "^4.0.2",
     "postcss-nested": "^5.0.3",
     "postcss-nested-ancestors": "^2.0.0",
+    "typescript": "^5.4.5",
     "vite": "^4.5.0",
-    "vite-plugin-css-injected-by-js": "^3.3.0"
+    "vite-plugin-css-injected-by-js": "^3.3.0",
+    "vite-plugin-dts": "^3.9.1"
   },
   "dependencies": {
     "@codexteam/icons": "^0.0.2"

@@ -1,4 +1,9 @@
 /**
+ * HtmlElement's attribute that can be set
+ */
+type HtmlElementAttributes = Pick<HTMLElement, "contentEditable" | "innerHTML">;
+
+/**
  * Helper for making Elements with attributes
  *
  * @param  {string} tagName           - new Element tag name
@@ -6,7 +11,11 @@
  * @param  {object} attributes        - any attributes
  * @returns {Element}
  */
-export function make(tagName, classNames = null, attributes = {}) {
+export function make(
+  tagName: string,
+  classNames: string[] | string | null = null,
+  attributes?: HtmlElementAttributes
+): HTMLElement {
   const el = document.createElement(tagName);
 
   if (Array.isArray(classNames)) {
@@ -16,7 +25,8 @@ export function make(tagName, classNames = null, attributes = {}) {
   }
 
   for (const attrName in attributes) {
-    el[attrName] = attributes[attrName];
+    el[attrName as keyof HtmlElementAttributes] =
+      attributes[attrName as keyof HtmlElementAttributes];
   }
 
   return el;
@@ -28,8 +38,8 @@ export function make(tagName, classNames = null, attributes = {}) {
  * @param {DocumentFragment} fragment - document fragment to process
  * @returns {string}
  */
-export function fragmentToString(fragment) {
-  const div = make('div');
+export function fragmentToString(fragment: DocumentFragment): string {
+  const div = make("div");
 
   div.appendChild(fragment);
 
@@ -44,8 +54,8 @@ export function fragmentToString(fragment) {
  * @param {Node} node - node to check
  * @returns {boolean}
  */
-export function isEmpty(node) {
-  let content;
+export function isEmpty(node: Element): boolean {
+  let content: string | null;
 
   if (node.nodeType !== Node.ELEMENT_NODE) {
     content = node.textContent;
@@ -55,8 +65,8 @@ export function isEmpty(node) {
     /**
      * Don't count <br>s as content
      */
-    content = content.replaceAll('<br>', '');
+    content = content.replaceAll("<br>", "");
   }
 
-  return content.trim().length === 0;
+  return content?.trim().length === 0;
 }

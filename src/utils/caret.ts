@@ -1,9 +1,12 @@
-import * as dom from './dom';
+import * as dom from "./dom";
+import { isHtmlElement } from "./type-guards";
 
 /**
  * Helper for working with caret
  */
 export default class Caret {
+  savedFakeCaret: HTMLElement | undefined;
+
   /**
    * Store internal properties
    */
@@ -19,12 +22,15 @@ export default class Caret {
    *
    * @returns {void}
    */
-  save() {
+  save(): void {
     const range = Caret.range;
-    const cursor = dom.make('span');
+    const cursor = dom.make("span");
 
     cursor.hidden = true;
 
+    if (!range) {
+      return;
+    }
     range.insertNode(cursor);
 
     this.savedFakeCaret = cursor;
@@ -35,12 +41,16 @@ export default class Caret {
    *
    * @returns {void}
    */
-  restore() {
+  restore(): void {
     if (!this.savedFakeCaret) {
       return;
     }
 
     const sel = window.getSelection();
+    if (!sel) {
+      return;
+    }
+
     const range = new Range();
 
     range.setStartAfter(this.savedFakeCaret);
@@ -53,7 +63,7 @@ export default class Caret {
      * A little timeout uses to allow browser to set caret after element before we remove it.
      */
     setTimeout(() => {
-      this.savedFakeCaret.remove();
+      this.savedFakeCaret?.remove();
     }, 150);
   }
 
@@ -62,7 +72,7 @@ export default class Caret {
    *
    * @returns {Range|null}
    */
-  static get range() {
+  static get range(): Range | null {
     const selection = window.getSelection();
 
     return selection && selection.rangeCount ? selection.getRangeAt(0) : null;
@@ -73,8 +83,12 @@ export default class Caret {
    *
    * @returns {DocumentFragment|void}
    */
-  static extractFragmentFromCaretPositionTillTheEnd() {
+  static extractFragmentFromCaretPositionTillTheEnd(): DocumentFragment | void {
     const selection = window.getSelection();
+
+    if (!selection) {
+      return;
+    }
 
     if (!selection.rangeCount) {
       return;
@@ -87,10 +101,22 @@ export default class Caret {
      * selectRange.startContainer can point to the Text node which has no .closest() method
      */
     if (startNode.nodeType !== Node.ELEMENT_NODE) {
+      if (!startNode.parentNode) {
+        return;
+      }
       startNode = startNode.parentNode;
     }
 
-    const currentBlockInput = startNode.closest('[contenteditable]');
+    // if startNode is not htmlelement return
+    if (!isHtmlElement(startNode)) {
+      return;
+    }
+
+    const currentBlockInput = startNode.closest("[contenteditable]");
+
+    if (!currentBlockInput) {
+      return;
+    }
 
     selectRange.deleteContents();
 
@@ -109,9 +135,12 @@ export default class Caret {
    * @param {boolean} atStart - where to set focus: at the start or at the end
    * @returns {void}
    */
-  static focus(element, atStart = true) {
+  static focus(element: HTMLElement, atStart: boolean = true): void {
     const range = document.createRange();
     const selection = window.getSelection();
+    if (!selection) {
+      return;
+    }
 
     range.selectNodeContents(element);
     range.collapse(atStart);
@@ -123,16 +152,29 @@ export default class Caret {
   /**
    * Check if the caret placed at the start of the contenteditable element
    *
-   * @returns {void}
+   * @returns {boolean}
    */
-  static isAtStart() {
+  static isAtStart(): boolean {
     const selection = window.getSelection();
+
+    if (!selection) {
+      return false;
+    }
 
     if (selection.focusOffset > 0) {
       return false;
     }
 
     const focusNode = selection.focusNode;
+
+    if (!focusNode) {
+      return false;
+    }
+
+    // if focusNode is not htmlelement return false
+    if (!isHtmlElement(focusNode)) {
+      return false;
+    }
 
     /**
      * In case of
@@ -141,7 +183,7 @@ export default class Caret {
      *     |adaddad         <-- focus node
      * </div>
      */
-    const leftSiblings = Caret.getHigherLevelSiblings(focusNode, 'left');
+    const leftSiblings = Caret.getHigherLevelSiblings(focusNode, "left");
 
     const nothingAtLeft = leftSiblings.every((node) => {
       return dom.isEmpty(node);
@@ -168,25 +210,38 @@ export default class Caret {
    * @param {'left' | 'right'} direction - direction of search
    * @returns {HTMLElement[]}
    */
-  static getHigherLevelSiblings(from, direction = 'left') {
+  static getHigherLevelSiblings(
+    from: HTMLElement,
+    direction: "left" | "right" = "left"
+  ): HTMLElement[] {
     let current = from;
-    const siblings = [];
+    const siblings: HTMLElement[] = [];
+
+    // type guard to make sure that current.parentNode is an HTMLElement
+    let currentParentNode: HTMLElement | null = null;
+    if (current.parentNode && isHtmlElement(current.parentNode)) {
+      // Now we are sure parentNode is an HTMLElement
+      currentParentNode = current.parentNode as HTMLElement;
+    }
 
     /**
      * Find passed node's firs-level parent (in example - blockquote)
      */
-    while (current.parentNode && (current.parentNode).contentEditable !== 'true') {
-      current = current.parentNode;
+    while (currentParentNode && currentParentNode.contentEditable !== "true") {
+      current = currentParentNode;
     }
 
-    const sibling = direction === 'left' ? 'previousSibling' : 'nextSibling';
+    const sibling = direction === "left" ? "previousSibling" : "nextSibling";
 
     /**
      * Find all left/right siblings
      */
     while (current[sibling]) {
-      current = current[sibling];
-      siblings.push(current);
+      const siblingNode = current[sibling];
+      if (siblingNode && isHtmlElement(siblingNode)) {
+        current = siblingNode;
+        siblings.push(current);
+      }
     }
 
     return siblings;
