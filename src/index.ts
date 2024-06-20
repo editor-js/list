@@ -124,7 +124,7 @@ export default class NestedList {
   static get toolbox(): ToolboxConfig {
     return {
       icon: IconListNumbered,
-      title: 'test-List',
+      title: 'List',
     };
   }
 
