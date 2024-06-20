@@ -124,7 +124,7 @@ export default class NestedList {
   static get toolbox(): ToolboxConfig {
     return {
       icon: IconListNumbered,
-      title: 'List',
+      title: 'test-List',
     };
   }
 
@@ -584,6 +584,12 @@ export default class NestedList {
     }
 
     if (!isHtmlElement(currentNode)) {
+      currentNode = currentNode.parentNode;
+    }
+    if (!currentNode) {
+      return null;
+    }
+    if (!isHtmlElement(currentNode)) {
       return null;
     }
 
@@ -598,9 +604,6 @@ export default class NestedList {
    */
   enterPressed(event: KeyboardEvent): void {
     const currentItem = this.currentItem;
-    if (!currentItem) {
-      return;
-    }
 
     /**
      * Prevent editor.js behaviour
@@ -622,9 +625,11 @@ export default class NestedList {
     /**
      * On Enter in the last empty item, get out of list
      */
-    const isEmpty = this.getItemContent(currentItem).trim().length === 0;
-    const isFirstLevelItem = currentItem.parentNode === this.nodes.wrapper;
-    const isLastItem = currentItem.nextElementSibling === null;
+    const isEmpty = currentItem
+      ? this.getItemContent(currentItem).trim().length === 0
+      : true;
+    const isFirstLevelItem = currentItem?.parentNode === this.nodes.wrapper;
+    const isLastItem = currentItem?.nextElementSibling === null;
 
     if (isFirstLevelItem && isLastItem && isEmpty) {
       this.getOutOfList();
@@ -645,7 +650,9 @@ export default class NestedList {
       return;
     }
     const endingHTML = Dom.fragmentToString(endingFragment);
-    const itemChildren = currentItem.querySelector(`.${this.CSS.itemChildren}`);
+    const itemChildren = currentItem?.querySelector(
+      `.${this.CSS.itemChildren}`
+    );
 
     /**
      * Create the new list item
@@ -668,7 +675,7 @@ export default class NestedList {
     if (childrenExist) {
       itemChildren.prepend(itemEl);
     } else {
-      currentItem.after(itemEl);
+      currentItem?.after(itemEl);
     }
 
     this.focusItem(itemEl);
