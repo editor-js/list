@@ -217,18 +217,14 @@ export default class Caret {
     let current = from;
     const siblings: HTMLElement[] = [];
 
-    // type guard to make sure that current.parentNode is an HTMLElement
-    let currentParentNode: HTMLElement | null = null;
-    if (current.parentNode && isHtmlElement(current.parentNode)) {
-      // Now we are sure parentNode is an HTMLElement
-      currentParentNode = current.parentNode as HTMLElement;
-    }
-
     /**
      * Find passed node's firs-level parent (in example - blockquote)
      */
-    while (currentParentNode && currentParentNode.contentEditable !== 'true') {
-      current = currentParentNode;
+    while (
+      current.parentNode &&
+      (current.parentNode as HTMLElement).contentEditable !== 'true'
+    ) {
+      current = current.parentNode as HTMLElement;
     }
 
     const sibling = direction === 'left' ? 'previousSibling' : 'nextSibling';
@@ -237,11 +233,8 @@ export default class Caret {
      * Find all left/right siblings
      */
     while (current[sibling]) {
-      const siblingNode = current[sibling];
-      if (siblingNode && isHtmlElement(siblingNode)) {
-        current = siblingNode;
-        siblings.push(current);
-      }
+      current = current[sibling] as HTMLElement;
+      siblings.push(current);
     }
 
     return siblings;
