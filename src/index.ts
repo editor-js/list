@@ -1,6 +1,9 @@
 import type { API, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
 import type { PasteEvent } from './types';
-import type { TunesMenuConfig } from '@editorjs/editorjs/types/tools';
+import type {
+  BlockToolConstructorOptions,
+  TunesMenuConfig,
+} from '@editorjs/editorjs/types/tools';
 
 import { isHtmlElement } from './utils/type-guards';
 
@@ -14,13 +17,18 @@ import { IconListBulleted, IconListNumbered } from '@codexteam/icons';
 import './../styles/index.pcss';
 
 /**
+ * list style to make list as ordered or unordered
+ */
+type ListDataStyle = 'ordered' | 'unordered';
+
+/**
  * Output data
  */
 interface ListData {
   /**
    * list type 'ordered' or 'unordered'
    */
-  style: string;
+  style: ListDataStyle;
   /**
    * list of first-level elements
    */
@@ -49,30 +57,16 @@ interface NestedListConfig {
    * default list style: ordered or unordered
    * default is unordered
    */
-  defaultStyle: string;
+  defaultStyle?: ListDataStyle;
 }
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
  */
-interface NestedListParams {
-  /**
-   * Preload data for the tool
-   */
-  data: ListData;
-  /**
-   * Tool's configuration
-   */
-  config: NestedListConfig;
-  /**
-   * Editor.js API
-   */
-  api: API;
-  /**
-   * Is Nested List Tool read-only
-   */
-  readOnly: boolean;
-}
+export type NestedListParams = BlockToolConstructorOptions<
+  ListData,
+  NestedListConfig
+>;
 
 /**
  * CSS classes for the Nested List Tool
@@ -141,12 +135,12 @@ export default class NestedList {
   /**
    * Tool's configuration
    */
-  config: NestedListConfig;
+  config?: NestedListConfig;
 
   /**
    * Default list style
    */
-  defaultListStyle: NestedListConfig['defaultStyle'];
+  defaultListStyle?: NestedListConfig['defaultStyle'];
 
   /**
    * Corresponds to UiNodes type from Editor.js but with wrapper being nullable
@@ -188,7 +182,7 @@ export default class NestedList {
      * Set the default list style from the config.
      */
     this.defaultListStyle =
-      this.config.defaultStyle === 'ordered' ? 'ordered' : 'unordered';
+      this.config?.defaultStyle === 'ordered' ? 'ordered' : 'unordered';
 
     const initialData = {
       style: this.defaultListStyle,
@@ -265,12 +259,12 @@ export default class NestedList {
   renderSettings(): TunesMenuConfig {
     const tunes = [
       {
-        name: 'unordered',
+        name: 'unordered' as const,
         label: this.api.i18n.t('Unordered'),
         icon: IconListBulleted,
       },
       {
-        name: 'ordered',
+        name: 'ordered' as const,
         label: this.api.i18n.t('Ordered'),
         icon: IconListNumbered,
       },
@@ -325,7 +319,7 @@ export default class NestedList {
    */
   pasteHandler(element: PasteEvent['detail']['data']): ListData {
     const { tagName: tag } = element;
-    let style: string = '';
+    let style: ListDataStyle = 'unordered';
     let tagToSearch: string;
 
     // set list style and tag to search.
@@ -527,9 +521,9 @@ export default class NestedList {
   /**
    * Set list style
    *
-   * @param {string} style - new style to set
+   * @param {ListDataStyle} style - new style to set
    */
-  set listStyle(style: string) {
+  set listStyle(style: ListDataStyle) {
     if (!this.nodes) {
       return;
     }
@@ -561,7 +555,7 @@ export default class NestedList {
     /**
      * Update the style in data
      *
-     * @type {string}
+     * @type {ListDataStyle}
      */
     this.data.style = style;
   }

@@ -5,6 +5,9 @@ import { isHtmlElement } from './type-guards';
  * Helper for working with caret
  */
 export default class Caret {
+  /**
+   * The <span> for caret saving/restoring
+   */
   savedFakeCaret: HTMLElement | undefined;
 
   /**
@@ -12,7 +15,7 @@ export default class Caret {
    */
   constructor() {
     /**
-     * The <span> for caret saving/restoring
+     * The hidden <span> for caret saving/restoring
      */
     this.savedFakeCaret = undefined;
   }

@@ -1,7 +1,7 @@
 /**
  * HtmlElement's attribute that can be set
  */
-type HtmlElementAttributes = Pick<HTMLElement, 'contentEditable' | 'innerHTML'>;
+type HtmlElementAttributes = Partial<HTMLElement>;
 
 /**
  * Helper for making Elements with attributes
@@ -24,9 +24,11 @@ export function make(
     el.classList.add(classNames);
   }
 
-  for (const attrName in attributes) {
-    el[attrName as keyof HtmlElementAttributes] =
-      attributes[attrName as keyof HtmlElementAttributes];
+  if (attributes) {
+    Object.entries(attributes).forEach(([key, value]) => {
+      if (!value) return;
+      el.setAttribute(key, value.toString());
+    });
   }
 
   return el;
