@@ -128,21 +128,7 @@ export default class List {
       this._elements.wrapper.appendChild(this._make('li', this.CSS.item));
     }
 
-    if (!this.readOnly) {
-      // detect keydown on the last item to escape List
-      this._elements.wrapper.addEventListener('keydown', (event) => {
-        const [ENTER, BACKSPACE] = [13, 8]; // key codes
-
-        switch (event.keyCode) {
-          case ENTER:
-            this.getOutofList(event);
-            break;
-          case BACKSPACE:
-            this.backspace(event);
-            break;
-        }
-      }, false);
-    }
+    this.detectKeyEvents()
 
     return this._elements.wrapper;
   }
@@ -211,7 +197,10 @@ export default class List {
       ...item,
       isActive: this._data.style === item.name,
       closeOnActivate: true,
-      onActivate: () => this.toggleTune(item.name)
+      onActivate: () => {
+        this.toggleTune(item.name)
+        this.detectKeyEvents()
+      }
     }))
   }
 
@@ -364,6 +353,29 @@ export default class List {
     return currentNode.closest(`.${this.CSS.item}`);
   }
 
+
+  /**
+   * Add keydown listeners for escaping from a list and 
+   * back space events.
+   */
+  detectKeyEvents() {
+    if (!this.readOnly) {
+      // detect keydown on the last item to escape List
+      this._elements.wrapper.addEventListener('keydown', (event) => {
+        const [ENTER, BACKSPACE] = [13, 8]; // key codes
+
+        switch (event.keyCode) {
+          case ENTER:
+            this.getOutofList(event);
+            break;
+          case BACKSPACE:
+            this.backspace(event);
+            break;
+        }
+      }, false);
+    }
+  }
+  
   /**
    * Get out from List Tool
    * by Enter on the empty last item
@@ -401,7 +413,14 @@ export default class List {
    */
   backspace(event) {
     const items = this._elements.wrapper.querySelectorAll('.' + this.CSS.item),
-        firstItem = items[0];
+      firstItem = items[0];
+
+    if (this.currentItem.textContent.trim() === '') {
+      const target = this.currentItem;
+      window.requestIdleCallback(() => {
+        target.parentElement.removeChild(target);
+      })
+    }
 
     if (!firstItem) {
       return;
