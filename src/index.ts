@@ -125,37 +125,37 @@ export default class NestedList {
   /**
    * The Editor.js API
    */
-  api: API;
+  private api: API;
 
   /**
    * Is NestedList Tool read-only
    */
-  readOnly: boolean;
+  private readOnly: boolean;
 
   /**
    * Tool's configuration
    */
-  config?: NestedListConfig;
+  private config?: NestedListConfig;
 
   /**
    * Default list style
    */
-  defaultListStyle?: NestedListConfig['defaultStyle'];
+  private defaultListStyle?: NestedListConfig['defaultStyle'];
 
   /**
    * Corresponds to UiNodes type from Editor.js but with wrapper being nullable
    */
-  nodes: { wrapper: HTMLElement | null };
+  private nodes: { wrapper: HTMLElement | null };
 
   /**
    * Tool's data
    */
-  data: ListData;
+  private data: ListData;
 
   /**
    * Caret helper
    */
-  caret: Caret;
+  private caret: Caret;
 
   /**
    * Render plugin`s main Element and fill it with saved data
