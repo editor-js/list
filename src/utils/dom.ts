@@ -24,11 +24,10 @@ export function make(
     el.classList.add(classNames);
   }
 
-  if (attributes) {
-    Object.entries(attributes).forEach(([key, value]) => {
-      if (!value) return;
-      el.setAttribute(key, value.toString());
-    });
+  for (const attrName in attributes) {
+    // as any is used to avoid TS error that read-only properties of HTMLElement are not assignable
+    (el[attrName as keyof HtmlElementAttributes] as any) =
+      attributes[attrName as keyof HtmlElementAttributes];
   }
 
   return el;
