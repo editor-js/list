@@ -10,6 +10,7 @@ import { isHtmlElement } from './utils/type-guards';
 import * as Dom from './utils/dom';
 import Caret from './utils/caret';
 import { IconListBulleted, IconListNumbered } from '@codexteam/icons';
+import NestedListConfig from './types/config';
 
 /**
  * Build styles
@@ -47,17 +48,6 @@ interface ListItem {
    * sublist items
    */
   items: ListItem[];
-}
-
-/**
- * Tool's configuration
- */
-interface NestedListConfig {
-  /**
-   * default list style: ordered or unordered
-   * default is unordered
-   */
-  defaultStyle?: ListDataStyle;
 }
 
 /**
