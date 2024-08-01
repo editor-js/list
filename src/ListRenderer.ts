@@ -13,6 +13,10 @@ interface NestedListCssClasses {
   itemContent: string;
   itemChildren: string;
   settingsWrapper: string;
+  itemChecked: string;
+  noHover: string;
+  checkbox: string;
+  checkboxContainer: string;
 }
 
 /**
@@ -36,6 +40,10 @@ abstract class ListRenderer {
       itemContent: 'cdx-nested-list__item-content',
       itemChildren: 'cdx-nested-list__item-children',
       settingsWrapper: 'cdx-nested-list__settings',
+      itemChecked: 'cdx-checklist__item--checked',
+      noHover: 'cdx-checklist__item-checkbox--no-hover',
+      checkbox: 'cdx-checklist__item-checkbox-check',
+      checkboxContainer: 'cdx-checklist__item-checkbox'
     };
   }
 }
