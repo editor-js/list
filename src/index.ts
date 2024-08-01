@@ -10,45 +10,12 @@ import { isHtmlElement } from './utils/type-guards';
 import * as Dom from './utils/dom';
 import Caret from './utils/caret';
 import { IconListBulleted, IconListNumbered } from '@codexteam/icons';
-import NestedListConfig from './types/config';
+import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/listParams';
 
 /**
  * Build styles
  */
 import './../styles/index.pcss';
-
-/**
- * list style to make list as ordered or unordered
- */
-type ListDataStyle = 'ordered' | 'unordered';
-
-/**
- * Output data
- */
-interface ListData {
-  /**
-   * list type 'ordered' or 'unordered'
-   */
-  style: ListDataStyle;
-  /**
-   * list of first-level elements
-   */
-  items: ListItem[];
-}
-
-/**
- * List item within the output data
- */
-interface ListItem {
-  /**
-   * list item text content
-   */
-  content: string;
-  /**
-   * sublist items
-   */
-  items: ListItem[];
-}
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
