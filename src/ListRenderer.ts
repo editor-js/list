@@ -40,10 +40,10 @@ abstract class ListRenderer {
       itemContent: 'cdx-nested-list__item-content',
       itemChildren: 'cdx-nested-list__item-children',
       settingsWrapper: 'cdx-nested-list__settings',
-      itemChecked: 'cdx-checklist__item--checked',
-      noHover: 'cdx-checklist__item-checkbox--no-hover',
-      checkbox: 'cdx-checklist__item-checkbox-check',
-      checkboxContainer: 'cdx-checklist__item-checkbox'
+      itemChecked: 'cdx-nested-list__item--checked',
+      noHover: 'cdx-nested-list__item-checkbox--no-hover',
+      checkbox: 'cdx-nested-list__item-checkbox-check',
+      checkboxContainer: 'cdx-nested-list__item-checkbox'
     };
   }
 }
