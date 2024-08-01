@@ -88,6 +88,9 @@
     }
 
     &--checked {
+      line-height: 1.6em;
+      display: flex;
+      margin: 2px 0;
       ^&-checkbox {
         @media (hover: hover) {
           &:not(&--no-hover):hover {
@@ -134,10 +137,6 @@
 
   &--unordered > &__item::before {
     content: "•";
-  }
-
-  &--checklist > &__item::before {
-    content: none;
   }
 
   &__settings {
