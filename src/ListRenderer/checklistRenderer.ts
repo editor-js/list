@@ -1,6 +1,6 @@
 import { IconCheck } from '@codexteam/icons'
 import ItemMeta from "../types/itemMeta";
-import NestedListConfig from "../types/config";
+import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
 
 /**

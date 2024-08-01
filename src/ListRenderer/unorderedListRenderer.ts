@@ -1,4 +1,4 @@
-import NestedListConfig from "../types/config";
+import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
 
 /**

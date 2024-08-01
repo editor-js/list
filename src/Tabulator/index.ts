@@ -1,4 +1,4 @@
-import NestedListConfig from "../types/config"
+import { NestedListConfig, ListData } from "../types/listParams"
 
 /**
  * Class that is responsible for list tabulation
@@ -9,7 +9,10 @@ export default class Tabulator {
    */
   config: NestedListConfig
 
-  constructor(config: NestedListConfig) {
+  data: ListData;
+
+  constructor(data: ListData, config: NestedListConfig) {
     this.config = config;
+    this.data = data;
   }
 }
