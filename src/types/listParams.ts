@@ -1,7 +1,7 @@
 /**
  * list style to make list as ordered or unordered
  */
-export type ListDataStyle = 'ordered' | 'unordered';
+export type ListDataStyle = 'ordered' | 'unordered' | 'checklist';
 
 /**
  * Output data

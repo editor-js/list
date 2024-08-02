@@ -1,5 +1,6 @@
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
+import { ListRenderer } from './listRenderer';
 
 /**
  * Class that is responsible for unordered list rendering
@@ -10,7 +11,7 @@ export class UnorderedListRenderer extends ListRenderer {
    */
   protected config?: NestedListConfig;
 
-  constructor(config: NestedListConfig) {
+  constructor(config?: NestedListConfig) {
     super();
     this.config = config;
   }
@@ -40,7 +41,10 @@ export class UnorderedListRenderer extends ListRenderer {
       innerHTML: content,
     });
 
+
+    console.log(itemContent, itemContent instanceof Node);
     itemBody.appendChild(itemContent);
+    console.log(itemBody, itemBody instanceof Node);
     itemWrapper.appendChild(itemBody);
 
     return itemWrapper as HTMLLIElement;

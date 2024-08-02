@@ -4,11 +4,21 @@
   outline: none;
   counter-reset: item;
   list-style: none;
+  --radius-border: 5px;
+  --checkbox-background: #fff;
+  --color-border: #C9C9C9;
+  --color-bg-checked: #369FFF;
+  --line-height: 1.57em;
+  --color-bg-checked-hover: #0059AB;
+  --color-tick: #fff;
+  --width-checkbox: 22px;
+  --height-checkbox: 22px;
 
   &__item {
     line-height: 1.6em;
     display: flex;
     margin: 2px 0;
+    display: flex;
 
     [contenteditable]{
       outline: none;
@@ -137,6 +147,10 @@
 
   &--unordered > &__item::before {
     content: "•";
+  }
+
+  &--checklist > &__item::before {
+    content: "";
   }
 
   &__settings {

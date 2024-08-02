@@ -2,6 +2,7 @@ import { IconCheck } from '@codexteam/icons'
 import ItemMeta from "../types/itemMeta";
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
+import { ListRenderer } from './listRenderer';
 
 /**
  * Class that is responsible for checklist rendering
@@ -12,7 +13,7 @@ export class CheckListRenderer extends ListRenderer {
    */
   protected config?: NestedListConfig;
 
-  constructor(config: NestedListConfig) {
+  constructor(config?: NestedListConfig) {
     super();
     this.config = config;
   }
@@ -23,7 +24,7 @@ export class CheckListRenderer extends ListRenderer {
    * @returns - created html ol element
    */
   renderWrapper(classes: string[] = []): HTMLOListElement {
-    classes.push(this.CSS.wrapperOrdered);
+    classes.push(this.CSS.wrapperChecklist);
 
     return Dom.make('ul', [this.CSS.wrapper, ...classes]) as HTMLOListElement;
   }
@@ -34,7 +35,7 @@ export class CheckListRenderer extends ListRenderer {
    * @returns - created html list item element
    */
   renderItem(content: string): HTMLLIElement {
-    const itemWrapper = Dom.make('li', this.CSS.item);
+    const itemWrapper = Dom.make('li', [this.CSS.item, this.CSS.item]);
     const itemBody = Dom.make('div', this.CSS.itemBody);
     const itemContent = Dom.make('div', this.CSS.itemContent, {
       innerHTML: content,
@@ -53,6 +54,7 @@ export class CheckListRenderer extends ListRenderer {
     itemBody.appendChild(itemContent);
     itemWrapper.appendChild(checkboxContainer);
     itemWrapper.appendChild(itemBody);
+
     return itemWrapper as HTMLLIElement;
   }
 
