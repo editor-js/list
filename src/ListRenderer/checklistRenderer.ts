@@ -29,6 +29,12 @@ export class CheckListRenderer extends ListRenderer {
     return Dom.make('ul', [this.CSS.wrapper, ...classes]) as HTMLOListElement;
   }
 
+  renderSublistWrapper(): HTMLElement {
+    const divElement = Dom.make('ul', [this.CSS.wrapperChecklist, this.CSS.itemChildren]) as HTMLElement;
+
+    return divElement;
+  }
+
   /**
    * Redners list item element
    * @param content - content of the list item

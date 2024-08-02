@@ -27,6 +27,16 @@ export default class Tabulator {
    */
   data: ListData;
 
+  /**
+   * Rendered list of items
+   */
+  list: ListRendererTypes | undefined;
+
+  /**
+   * Wrapper of the whole list
+   */
+  listWrapper: HTMLElement | undefined;
+
   constructor(data: ListData, style: NestedListStyle, config?: NestedListConfig) {
     this.config = config;
     this.data = data;
@@ -34,38 +44,38 @@ export default class Tabulator {
   }
 
   render() {
-    let list;
-
-    console.log('style', this.style)
+    console.log(this.style);
 
     switch (this.style) {
       case 'ordered':
-        list = new OrderedListRenderer(this.config);
+        this.list = new OrderedListRenderer(this.config);
+        break
       case 'unordered':
-        list = new UnorderedListRenderer(this.config);
+        this.list = new UnorderedListRenderer(this.config);
+        break
       case 'checklist':
-        list = new CheckListRenderer(this.config);
+        this.list = new CheckListRenderer(this.config);
+        break
     }
 
-    const listWrapper = list.renderWrapper();
+    this.listWrapper = this.list.renderWrapper();
 
     // fill with data
     if (this.data.items.length) {
-      this.appendItems(list, this.data.items, listWrapper);
+      this.appendItems(this.data.items, this.listWrapper);
     } else {
       this.appendItems(
-        list,
         [
           {
             content: '',
             items: [],
           },
         ],
-        listWrapper,
+        this.listWrapper,
       );
     }
 
-    return listWrapper;
+    return this.listWrapper;
   }
 
   /**
@@ -76,18 +86,50 @@ export default class Tabulator {
    * @param {Element} parentItem - where to append
    * @returns {void}
    */
-  appendItems(list: ListRendererTypes, items: ListItem[], parentItem: Element): void {
-    items.forEach((item) => {
-      const itemEl = list.renderItem(item.content);
+  appendItems(items: ListItem[], parentItem: Element): void {
+    if (this.list !== undefined) {
+      items.forEach((item) => {
+        const itemEl = this.list?.renderItem(item.content);
 
-      console.log('rendered item', itemEl, itemEl instanceof HTMLLIElement)
+        parentItem.appendChild(itemEl!);
 
-      if (itemEl instanceof Node) {
-        console.log(parentItem instanceof Node, itemEl instanceof Node);
-        parentItem.appendChild(itemEl);
-      } else {
-        console.log(itemEl)
-      }
-    });
+        if (item.items.length) {
+          const sublistWrapper = this.list?.renderSublistWrapper()
+          this.appendItems(item.items, sublistWrapper!);
+
+          parentItem.appendChild(sublistWrapper!);
+        }
+      });
+    }
+  }
+
+  save(): ListData {
+    /**
+     * The method for recursive collecting of the child items
+     *
+     * @param {Element} parent - where to find items
+     * @returns {ListItem[]}
+     */
+    const getItems = (parent: Element): ListItem[] => {
+      const children = Array.from(
+        parent.querySelectorAll(`:scope > .cdx-nested-list__item`)
+      );
+
+      return children.map((el) => {
+        const subItemsWrapper = el.querySelector(`.cdx-nested-list__item-children`);
+        const content = this.list!.getItemContent(el);
+        const subItems = subItemsWrapper ? getItems(subItemsWrapper) : [];
+
+        return {
+          content,
+          items: subItems,
+        };
+      });
+    };
+
+    return {
+      style: this.data.style,
+      items: this.listWrapper ? getItems(this.listWrapper) : [],
+    };
   }
 }

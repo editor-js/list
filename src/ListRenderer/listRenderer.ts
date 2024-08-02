@@ -28,7 +28,7 @@ export abstract class ListRenderer {
    * @returns {NestedListCssClasses} - CSS classes names by keys
    * @private
    */
-  protected get CSS(): NestedListCssClasses {
+  get CSS(): NestedListCssClasses {
     return {
       wrapper: 'cdx-nested-list',
       wrapperOrdered: 'cdx-nested-list--ordered',

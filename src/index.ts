@@ -7,7 +7,7 @@ import type {
 
 import * as Dom from './utils/dom';
 import Caret from './utils/caret';
-import { IconListBulleted, IconListNumbered } from '@codexteam/icons';
+import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
 import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/listParams';
 import Tabulator from './Tabulator';
 
@@ -17,25 +17,6 @@ import Tabulator from './Tabulator';
 import './../styles/index.pcss';
 
 /**
- * CSS classes for the Nested List Tool
- */
-interface NestedListCssClasses {
-  wrapper: string;
-  wrapperOrdered: string;
-  wrapperUnordered: string;
-  wrapperChecklist: string;
-  item: string;
-  itemBody: string;
-  itemContent: string;
-  itemChildren: string;
-  settingsWrapper: string;
-  itemChecked: string;
-  noHover: string;
-  checkbox: string;
-  checkboxContainer: string;
-}
-
-/**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
  */
 export type NestedListParams = BlockToolConstructorOptions<
@@ -43,7 +24,6 @@ export type NestedListParams = BlockToolConstructorOptions<
   NestedListConfig
 >;
 
-type NestedListStyle = 'ordered' | 'unordered' | 'checklist';
 
 export default class NestedList {
   /**
@@ -77,6 +57,35 @@ export default class NestedList {
       icon: IconListNumbered,
       title: 'List',
     };
+  }
+
+  /**
+   * Get list style name
+   *
+   * @returns {string}
+   */
+  get listStyle(): ListDataStyle {
+    return this.data.style || this.defaultListStyle;
+  }
+
+  /**
+   * Set list style
+   *
+   * @param {ListDataStyle} style - new style to set
+   */
+  set listStyle(style: ListDataStyle) {
+    this.data.style = style;
+
+    /**
+     * Rerender list item
+     */
+    this.list = new Tabulator(this.data, this.listStyle, this.config);
+
+    const newListElement = this.list.render()
+
+    this.listElement?.replaceWith(newListElement);
+
+    this.listElement = newListElement;
   }
 
   /**
@@ -114,7 +123,13 @@ export default class NestedList {
    */
   private caret: Caret;
 
-  private style: NestedListStyle;
+  list: Tabulator | undefined;
+
+  /**
+   * Main constant wrapper of the whole list
+   */
+  listElement: HTMLElement | undefined;
+
 
   /**
    * Render plugin`s main Element and fill it with saved data
@@ -140,14 +155,13 @@ export default class NestedList {
     /**
      * Set the default list style from the config.
      */
-    this.defaultListStyle = 'checklist';
-
-    this.style = this.defaultListStyle;
+    this.defaultListStyle = 'ordered';
 
     const initialData = {
       style: this.defaultListStyle,
       items: [],
     };
+
     this.data = data && Object.keys(data).length ? data : initialData;
 
     /**
@@ -157,33 +171,97 @@ export default class NestedList {
   }
 
   render() {
-    const list = new Tabulator(this.data, this.style, this.config);
-    const rendered = list.render();
+    this.list = new Tabulator(this.data, this.listStyle, this.config);
+    this.listElement = this.list.render();
 
-    return rendered;
+    return this.listElement;
+  }
+
+  save() {
+    return this.list?.save();
   }
 
   /**
-   * Styles
+   * Creates Block Tune allowing to change the list style
    *
-   * @returns {NestedListCssClasses} - CSS classes names by keys
-   * @private
+   * @public
+   * @returns {Array}
    */
-  get CSS(): NestedListCssClasses {
+  renderSettings(): TunesMenuConfig {
+    const tunes = [
+      {
+        name: 'unordered' as const,
+        label: this.api.i18n.t('Unordered'),
+        icon: IconListBulleted,
+      },
+      {
+        name: 'ordered' as const,
+        label: this.api.i18n.t('Ordered'),
+        icon: IconListNumbered,
+      },
+      {
+        name: 'checklist' as const,
+        label: this.api.i18n.t('Checklist'),
+        icon: IconChecklist,
+      }
+    ];
+
+    return tunes.map((tune) => ({
+      name: tune.name,
+      icon: tune.icon,
+      label: tune.label,
+      isActive: this.data.style === tune.name,
+      closeOnActivate: true,
+      onActivate: () => {
+        this.listStyle = tune.name;
+      },
+    }));
+  }
+  /**
+   * On paste sanitzation config. Allow only tags that are allowed in the Tool.
+   *
+   * @returns {PasteConfig} - paste config.
+   */
+  static get pasteConfig(): PasteConfig {
     return {
-      wrapper: 'cdx-nested-list',
-      wrapperOrdered: 'cdx-nested-list--ordered',
-      wrapperUnordered: 'cdx-nested-list--unordered',
-      wrapperChecklist: 'cdx-nested-list--checklist',
-      item: 'cdx-nested-list__item',
-      itemBody: 'cdx-nested-list__item-body',
-      itemContent: 'cdx-nested-list__item-content',
-      itemChildren: 'cdx-nested-list__item-children',
-      settingsWrapper: 'cdx-nested-list__settings',
-      itemChecked: 'cdx-nested-list__item--checked',
-      noHover: 'cdx-nested-list__item-checkbox--no-hover',
-      checkbox: 'cdx-nested-list__item-checkbox-check',
-      checkboxContainer: 'cdx-nested-list__item-checkbox'
+      tags: ['OL', 'UL', 'LI'],
+    };
+  }
+
+  /**
+   * Convert from list to text for conversionConfig
+   *
+   * @param {ListData} data
+   * @returns {string}
+   */
+  static joinRecursive(data: ListData | ListItem): string {
+    return data.items
+      .map((item) => `${item.content} ${NestedList.joinRecursive(item)}`)
+      .join('');
+  }
+
+  /**
+   * Convert from text to list with import and export list to text
+   */
+  static get conversionConfig(): {
+    export: (data: ListData) => string;
+    import: (content: string) => ListData;
+  } {
+    return {
+      export: (data) => {
+        return NestedList.joinRecursive(data);
+      },
+      import: (content) => {
+        return {
+          items: [
+            {
+              content,
+              items: [],
+            },
+          ],
+          style: 'unordered',
+        };
+      },
     };
   }
 }

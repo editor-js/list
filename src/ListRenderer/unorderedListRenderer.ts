@@ -22,11 +22,17 @@ export class UnorderedListRenderer extends ListRenderer {
    * @returns - created html ol element
    */
   renderWrapper(classes: string[] = []): HTMLOListElement {
-    classes.push(this.CSS.wrapperOrdered);
+    classes.push(this.CSS.wrapperUnordered);
 
-    const olElement = Dom.make('ul', [this.CSS.wrapper, ...classes]) as HTMLOListElement;
+    const ulElement = Dom.make('ul', [this.CSS.wrapper, ...classes]) as HTMLOListElement;
 
-    return olElement;
+    return ulElement;
+  }
+
+  renderSublistWrapper(): HTMLElement {
+    const divElement = Dom.make('ul', [this.CSS.wrapperUnordered, this.CSS.itemChildren]) as HTMLElement;
+
+    return divElement;
   }
 
   /**
@@ -41,10 +47,7 @@ export class UnorderedListRenderer extends ListRenderer {
       innerHTML: content,
     });
 
-
-    console.log(itemContent, itemContent instanceof Node);
     itemBody.appendChild(itemContent);
-    console.log(itemBody, itemBody instanceof Node);
     itemWrapper.appendChild(itemBody);
 
     return itemWrapper as HTMLLIElement;

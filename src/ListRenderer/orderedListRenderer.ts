@@ -27,6 +27,12 @@ export class OrderedListRenderer extends ListRenderer {
     return Dom.make('ol', [this.CSS.wrapper, ...classes]) as HTMLOListElement;
   }
 
+  renderSublistWrapper(): HTMLElement {
+    const divElement = Dom.make('ol', [this.CSS.wrapperOrdered, this.CSS.itemChildren]) as HTMLElement;
+
+    return divElement;
+  }
+
   /**
    * Redners list item element
    * @param content - content of the list item
@@ -39,12 +45,8 @@ export class OrderedListRenderer extends ListRenderer {
       innerHTML: content,
     });
 
-    console.log(itemContent, itemContent instanceof Node);
     itemBody.appendChild(itemContent);
-    console.log(itemBody, itemBody instanceof Node);
     itemWrapper.appendChild(itemBody);
-
-    console.log('created item wrapper', itemWrapper, typeof itemWrapper)
 
     return itemWrapper as HTMLLIElement;
   }
