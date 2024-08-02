@@ -11,9 +11,12 @@ export class UnorderedListRenderer extends ListRenderer {
    */
   protected config?: NestedListConfig;
 
-  constructor(config?: NestedListConfig) {
+  readOnly: boolean;
+
+  constructor(readonly: boolean, config?: NestedListConfig) {
     super();
     this.config = config;
+    this.readOnly = readonly;
   }
 
   /**
@@ -22,15 +25,15 @@ export class UnorderedListRenderer extends ListRenderer {
    * @returns - created html ol element
    */
   renderWrapper(classes: string[] = []): HTMLOListElement {
-    classes.push(this.CSS.wrapperUnordered);
+    classes.push(ListRenderer.CSS.wrapperUnordered);
 
-    const ulElement = Dom.make('ul', [this.CSS.wrapper, ...classes]) as HTMLOListElement;
+    const ulElement = Dom.make('ul', [ListRenderer.CSS.wrapper, ...classes]) as HTMLOListElement;
 
     return ulElement;
   }
 
   renderSublistWrapper(): HTMLElement {
-    const divElement = Dom.make('ul', [this.CSS.wrapperUnordered, this.CSS.itemChildren]) as HTMLElement;
+    const divElement = Dom.make('ul', [ListRenderer.CSS.wrapperUnordered, ListRenderer.CSS.itemChildren]) as HTMLElement;
 
     return divElement;
   }
@@ -41,10 +44,11 @@ export class UnorderedListRenderer extends ListRenderer {
    * @returns - created html list item element
    */
   renderItem(content: string): HTMLLIElement {
-    const itemWrapper = Dom.make('li', this.CSS.item);
-    const itemBody = Dom.make('div', this.CSS.itemBody);
-    const itemContent = Dom.make('div', this.CSS.itemContent, {
+    const itemWrapper = Dom.make('li', ListRenderer.CSS.item);
+    const itemBody = Dom.make('div', ListRenderer.CSS.itemBody);
+    const itemContent = Dom.make('div', ListRenderer.CSS.itemContent, {
       innerHTML: content,
+      contentEditable: (!this.readOnly).toString(),
     });
 
     itemBody.appendChild(itemContent);
@@ -60,7 +64,7 @@ export class UnorderedListRenderer extends ListRenderer {
    * @returns {string}
    */
   getItemContent(item: Element): string {
-    const contentNode = item.querySelector(`.${this.CSS.itemContent}`);
+    const contentNode = item.querySelector(`.${ListRenderer.CSS.itemContent}`);
     if (!contentNode) {
       return '';
     }

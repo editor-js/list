@@ -13,9 +13,12 @@ export class CheckListRenderer extends ListRenderer {
    */
   protected config?: NestedListConfig;
 
-  constructor(config?: NestedListConfig) {
+  readOnly: boolean;
+
+  constructor(readonly: boolean, config?: NestedListConfig) {
     super();
     this.config = config;
+    this.readOnly = readonly;
   }
 
   /**
@@ -24,13 +27,13 @@ export class CheckListRenderer extends ListRenderer {
    * @returns - created html ol element
    */
   renderWrapper(classes: string[] = []): HTMLOListElement {
-    classes.push(this.CSS.wrapperChecklist);
+    classes.push(ListRenderer.CSS.wrapperChecklist);
 
-    return Dom.make('ul', [this.CSS.wrapper, ...classes]) as HTMLOListElement;
+    return Dom.make('ul', [ListRenderer.CSS.wrapper, ...classes]) as HTMLOListElement;
   }
 
   renderSublistWrapper(): HTMLElement {
-    const divElement = Dom.make('ul', [this.CSS.wrapperChecklist, this.CSS.itemChildren]) as HTMLElement;
+    const divElement = Dom.make('ul', [ListRenderer.CSS.wrapperChecklist, ListRenderer.CSS.itemChildren]) as HTMLElement;
 
     return divElement;
   }
@@ -41,14 +44,15 @@ export class CheckListRenderer extends ListRenderer {
    * @returns - created html list item element
    */
   renderItem(content: string): HTMLLIElement {
-    const itemWrapper = Dom.make('li', [this.CSS.item, this.CSS.item]);
-    const itemBody = Dom.make('div', this.CSS.itemBody);
-    const itemContent = Dom.make('div', this.CSS.itemContent, {
+    const itemWrapper = Dom.make('li', [ListRenderer.CSS.item, ListRenderer.CSS.item]);
+    const itemBody = Dom.make('div', ListRenderer.CSS.itemBody);
+    const itemContent = Dom.make('div', ListRenderer.CSS.itemContent, {
       innerHTML: content,
+      contentEditable: (!this.readOnly).toString(),
     });
 
-    const checkbox = Dom.make('span', this.CSS.checkbox);
-    const checkboxContainer = Dom.make('div', this.CSS.checkboxContainer);
+    const checkbox = Dom.make('span', ListRenderer.CSS.checkbox);
+    const checkboxContainer = Dom.make('div', ListRenderer.CSS.checkboxContainer);
 
     checkbox.innerHTML = IconCheck;
     checkboxContainer.appendChild(checkbox);
@@ -71,7 +75,7 @@ export class CheckListRenderer extends ListRenderer {
    * @returns {string}
    */
   getItemContent(item: Element): string {
-    const contentNode = item.querySelector(`.${this.CSS.itemContent}`);
+    const contentNode = item.querySelector(`.${ListRenderer.CSS.itemContent}`);
     if (!contentNode) {
       return '';
     }
@@ -85,7 +89,7 @@ export class CheckListRenderer extends ListRenderer {
 
   getItemMeta(item: HTMLElement): ItemMeta {
     return {
-      checked: item.classList.contains(this.CSS.itemChecked)
+      checked: item.classList.contains(ListRenderer.CSS.itemChecked)
     }
   }
 
@@ -97,12 +101,12 @@ export class CheckListRenderer extends ListRenderer {
    * @returns {void}
    */
   private toggleCheckbox(event: any): void {
-    const checkListItem = event.target.closest(`.${this.CSS.item}`);
-    const checkbox = checkListItem.querySelector(`.${this.CSS.checkboxContainer}`);
+    const checkListItem = event.target.closest(`.${ListRenderer.CSS.item}`);
+    const checkbox = checkListItem.querySelector(`.${ListRenderer.CSS.checkboxContainer}`);
 
     if (checkbox.contains(event.target)) {
-      checkListItem.classList.toggle(this.CSS.itemChecked);
-      checkbox.classList.add(this.CSS.noHover);
+      checkListItem.classList.toggle(ListRenderer.CSS.itemChecked);
+      checkbox.classList.add(ListRenderer.CSS.noHover);
       checkbox.addEventListener('mouseleave', () => this.removeSpecialHoverBehavior(checkbox), { once: true });
     }
   }
@@ -115,7 +119,7 @@ export class CheckListRenderer extends ListRenderer {
    * @returns {Element}
    */
   private removeSpecialHoverBehavior(el: HTMLElement) {
-    el.classList.remove(this.CSS.noHover);
+    el.classList.remove(ListRenderer.CSS.noHover);
   }
 }
 

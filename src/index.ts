@@ -4,8 +4,6 @@ import type {
   BlockToolConstructorOptions,
   TunesMenuConfig,
 } from '@editorjs/editorjs/types/tools';
-
-import * as Dom from './utils/dom';
 import Caret from './utils/caret';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
 import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/listParams';
@@ -19,12 +17,11 @@ import './../styles/index.pcss';
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
  */
-export type NestedListParams = BlockToolConstructorOptions<
-  ListData,
-  NestedListConfig
->;
+export type NestedListParams = BlockToolConstructorOptions<ListData, NestedListConfig>;
 
-
+/**
+ * Default class of the component used in editor
+ */
 export default class NestedList {
   /**
    * Notify core that read-only mode is supported
@@ -79,7 +76,7 @@ export default class NestedList {
     /**
      * Rerender list item
      */
-    this.list = new Tabulator(this.data, this.listStyle, this.config);
+    this.list = new Tabulator(this.data, this.listStyle, this.readOnly, this.api, this.config);
 
     const newListElement = this.list.render()
 
@@ -109,11 +106,6 @@ export default class NestedList {
   private defaultListStyle?: NestedListConfig['defaultStyle'];
 
   /**
-   * Corresponds to UiNodes type from Editor.js but with wrapper being nullable
-   */
-  private nodes: { wrapper: HTMLElement | null };
-
-  /**
    * Tool's data
    */
   private data: ListData;
@@ -141,13 +133,6 @@ export default class NestedList {
    * @param {boolean} params.readOnly - read-only mode flag
    */
   constructor({ data, config, api, readOnly }: NestedListParams) {
-    /**
-     * HTML nodes used in tool
-     */
-    this.nodes = {
-      wrapper: null,
-    };
-
     this.api = api;
     this.readOnly = readOnly;
     this.config = config;
@@ -155,7 +140,7 @@ export default class NestedList {
     /**
      * Set the default list style from the config.
      */
-    this.defaultListStyle = 'ordered';
+    this.defaultListStyle = this.config?.defaultStyle || 'ordered';
 
     const initialData = {
       style: this.defaultListStyle,
@@ -171,7 +156,8 @@ export default class NestedList {
   }
 
   render() {
-    this.list = new Tabulator(this.data, this.listStyle, this.config);
+    this.list = new Tabulator(this.data, this.listStyle, this.readOnly, this.api,  this.config);
+
     this.listElement = this.list.render();
 
     return this.listElement;
