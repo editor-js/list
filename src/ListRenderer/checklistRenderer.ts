@@ -26,36 +26,36 @@ export class CheckListRenderer extends ListRenderer {
 
   /**
    * Renders ol wrapper for list
-   * @returns - created html ol element
+   * @param level - level of nesting (0 for the rool level)
+   * @returns - created html ul element
    */
-  renderWrapper(): HTMLOListElement {
-    const listWrapper = Dom.make('ul', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperChecklist]) as HTMLOListElement;
+  renderWrapper(level: number): HTMLUListElement {
+    let wrapperElement: HTMLUListElement;
 
     /**
-     * Listen to clicks on checkbox
+     * Check if it's root level
      */
-    listWrapper.addEventListener('click', (event) => {
-      const target = event.target as Element;
-      if (target){
-        const checkbox = target.closest(`.${ListRenderer.CSS.checkboxContainer}`);
+    if (level === 0) {
+      wrapperElement = Dom.make('ul', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperChecklist]) as HTMLUListElement;
 
-        if (checkbox && checkbox.contains(target)) {
-          this.toggleCheckbox(checkbox);
+      /**
+       * Listen to clicks on checkbox
+       */
+      wrapperElement.addEventListener('click', (event) => {
+        const target = event.target as Element;
+        if (target){
+          const checkbox = target.closest(`.${ListRenderer.CSS.checkboxContainer}`);
+
+          if (checkbox && checkbox.contains(target)) {
+            this.toggleCheckbox(checkbox);
+          }
         }
-      }
-    });
+      });
+    } else {
+      wrapperElement = Dom.make('ul', [ListRenderer.CSS.wrapperChecklist, ListRenderer.CSS.itemChildren]) as HTMLUListElement;
+    }
 
-    return listWrapper;
-  }
-
-  /**
-   * Render wrapper of child list
-   * @returns wrapper element of the child list
-   */
-  renderSublistWrapper(): HTMLElement {
-    const divElement = Dom.make('ul', [ListRenderer.CSS.wrapperChecklist, ListRenderer.CSS.itemChildren]) as HTMLElement;
-
-    return divElement;
+    return wrapperElement;
   }
 
   /**

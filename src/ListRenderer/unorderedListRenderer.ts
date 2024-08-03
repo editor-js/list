@@ -25,23 +25,22 @@ export class UnorderedListRenderer extends ListRenderer {
 
   /**
    * Renders ol wrapper for list
-   * @returns - created html ol element
+   * @param level - level of nesting (0 for the rool level)
+   * @returns - created html ul element
    */
-  renderWrapper(): HTMLOListElement {
+  renderWrapper(level: number): HTMLUListElement {
+    let wrapperElement: HTMLUListElement;
 
-    const ulElement = Dom.make('ul', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperUnordered]) as HTMLOListElement;
+    /**
+     * Check if it's root level
+     */
+    if (level === 0) {
+      wrapperElement = Dom.make('ul', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperUnordered]) as HTMLUListElement;
+    } else {
+      wrapperElement = Dom.make('ul', [ListRenderer.CSS.wrapperUnordered, ListRenderer.CSS.itemChildren]) as HTMLUListElement;
+    }
 
-    return ulElement;
-  }
-
-  /**
-   * Render wrapper of child list
-   * @returns wrapper element of the child list
-   */
-  renderSublistWrapper(): HTMLElement {
-    const divElement = Dom.make('ul', [ListRenderer.CSS.wrapperUnordered, ListRenderer.CSS.itemChildren]) as HTMLElement;
-
-    return divElement;
+    return wrapperElement;
   }
 
   /**
@@ -81,7 +80,6 @@ export class UnorderedListRenderer extends ListRenderer {
 
     return contentNode.innerHTML;
   }
-
 
   /**
    * Returns item meta, for unordered list

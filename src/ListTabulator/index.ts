@@ -45,6 +45,11 @@ export default class ListTabulator {
   private data: ListData;
 
   /**
+   * Current level of nesting for dynamyc updates
+   */
+  private currentLevel: number;
+
+  /**
    * Style of the nested list
    */
   style: NestedListStyle;
@@ -95,6 +100,7 @@ export default class ListTabulator {
     this.style = style;
     this.readOnly = readOnly;
     this.api = api;
+    this.currentLevel = 0;
 
     /**
      * Instantiate caret helper
@@ -119,7 +125,7 @@ export default class ListTabulator {
         break
     }
 
-    this.listWrapper = this.list.renderWrapper();
+    this.listWrapper = this.list.renderWrapper(this.currentLevel);
 
     // fill with data
     if (this.data.items.length) {
@@ -174,6 +180,11 @@ export default class ListTabulator {
    * @returns {void}
    */
   appendItems(items: ListItem[], parentItem: Element): void {
+    /**
+     * Update current nesting level
+     */
+    this.currentLevel += 1;
+
     if (this.list !== undefined) {
       items.forEach((item) => {
         const itemEl = this.list!.renderItem(item.content, item.meta);
@@ -181,8 +192,9 @@ export default class ListTabulator {
         parentItem.appendChild(itemEl);
 
         if (item.items.length) {
-          const sublistWrapper = this.list?.renderSublistWrapper()
+          const sublistWrapper = this.list?.renderWrapper(this.currentLevel)
           this.appendItems(item.items, sublistWrapper!);
+          this.currentLevel -= 1;
 
           const itemBody = itemEl.querySelector(`.${ListRenderer.CSS.itemBody}`);
 

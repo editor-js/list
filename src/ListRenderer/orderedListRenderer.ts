@@ -25,22 +25,23 @@ export class OrderedListRenderer extends ListRenderer {
 
   /**
    * Renders ol wrapper for list
+   * @param level - level of nesting (0 for the rool level)
    * @returns - created html ol element
    */
-  renderWrapper(): HTMLOListElement {
-    return Dom.make('ol', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperOrdered]) as HTMLOListElement;
+  renderWrapper(level: number): HTMLOListElement {
+    let wrapperElement: HTMLOListElement;
+
+    /**
+     * Check if it's root level
+     */
+    if (level === 0) {
+      wrapperElement = Dom.make('ol', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperUnordered]) as HTMLOListElement;
+    } else {
+      wrapperElement = Dom.make('ol', [ListRenderer.CSS.wrapperUnordered, ListRenderer.CSS.itemChildren]) as HTMLOListElement;
+    }
+
+    return wrapperElement;
   }
-
-  /**
-   * Render wrapper of child list
-   * @returns wrapper element of the child list
-   */
-  renderSublistWrapper(): HTMLElement {
-    const divElement = Dom.make('ol', [ListRenderer.CSS.wrapperOrdered, ListRenderer.CSS.itemChildren]) as HTMLElement;
-
-    return divElement;
-  }
-
   /**
    * Redners list item element
    * @param content - content of the list item
