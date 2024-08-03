@@ -2,17 +2,13 @@ import type { OrderedListItemMeta } from "../types/itemMeta";
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
 import { ListRenderer } from './ListRenderer';
+import type { ListCssClasses } from './ListRenderer';
 
 /**
  * CSS classes for the Ordered list
  */
-interface OrderedListCssClasses {
-  wrapper: string;
+interface OrderedListCssClasses extends ListCssClasses {
   wrapperOrdered: string;
-  item: string;
-  itemBody: string;
-  itemContent: string;
-  itemChildren: string;
 }
 
 /**

@@ -2,14 +2,10 @@ import type { UnorderedListItemMeta } from "../types/itemMeta";
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
 import { ListRenderer } from './ListRenderer';
+import type { ListCssClasses } from './ListRenderer';
 
-interface UnoderedListCssClasses {
-  wrapper: string;
+interface UnoderedListCssClasses extends ListCssClasses {
   wrapperUnordered: string;
-  item: string;
-  itemBody: string;
-  itemContent: string;
-  itemChildren: string;
 }
 
 /**

@@ -1,7 +1,7 @@
 /**
  * CSS classes for the Nested List Tool
  */
-interface ListCssClasses {
+export interface ListCssClasses {
   wrapper: string;
   item: string;
   itemBody: string;

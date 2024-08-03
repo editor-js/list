@@ -3,14 +3,10 @@ import type { ChecklistItemMeta } from "../types/itemMeta";
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
 import { ListRenderer } from './ListRenderer';
+import type { ListCssClasses } from './ListRenderer';
 
-interface ChecklistCssClasses {
-  wrapper: string;
+interface ChecklistCssClasses extends ListCssClasses{
   wrapperChecklist: string;
-  item: string;
-  itemBody: string;
-  itemContent: string;
-  itemChildren: string;
   itemChecked: string;
   noHover: string;
   checkbox: string;
