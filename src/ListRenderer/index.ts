@@ -1,6 +1,6 @@
-import { CheckListRenderer } from "./checklistRenderer";
-import { OrderedListRenderer } from "./orderedListRenderer";
-import { UnorderedListRenderer } from "./unorderedListRenderer";
-import { ListRenderer } from './listRenderer';
+import { CheckListRenderer } from "./ChecklistRenderer";
+import { OrderedListRenderer } from "./OrderedListRenderer";
+import { UnorderedListRenderer } from "./UnorderedListRenderer";
+import { ListRenderer } from './ListRenderer';
 
 export { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer, ListRenderer };

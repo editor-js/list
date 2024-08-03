@@ -1,6 +1,6 @@
-import { CheckListRenderer } from "../ListRenderer/checklistRenderer";
-import { OrderedListRenderer } from "../ListRenderer/orderedListRenderer";
-import { UnorderedListRenderer } from "../ListRenderer/unorderedListRenderer";
+import { CheckListRenderer } from "../ListRenderer/ChecklistRenderer";
+import { OrderedListRenderer } from "../ListRenderer/OrderedListRenderer";
+import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
 import { NestedListConfig, ListData, ListDataStyle } from "../types/listParams"
 import { ListItem } from "../types/listParams";
 import { isHtmlElement } from '../utils/type-guards';
@@ -20,19 +20,34 @@ type ListRendererTypes = OrderedListRenderer | UnorderedListRenderer | CheckList
  */
 export default class ListTabulator {
   /**
+   * The Editor.js API
+   */
+  private api: API;
+
+  /**
+   * Caret helper
+   */
+  private caret: Caret;
+
+  /**
+   * Is NestedList Tool read-only option
+   */
+  private readOnly: boolean;
+
+  /**
    * Tool's configuration
    */
-  config?: NestedListConfig;
+  private config?: NestedListConfig;
+
+  /**
+   * Full content of the list
+   */
+  private data: ListData;
 
   /**
    * Style of the nested list
    */
   style: NestedListStyle;
-
-  /**
-   * Full content of the list
-   */
-  data: ListData;
 
   /**
    * Rendered list of items
@@ -43,21 +58,6 @@ export default class ListTabulator {
    * Wrapper of the whole list
    */
   listWrapper: HTMLElement | undefined;
-
-  /**
-   * Caret helper
-   */
-  private caret: Caret;
-
-  /**
-   * Is NestedList Tool read-only option
-   */
-  readOnly: boolean;
-
-  /**
-   * The Editor.js API
-   */
-  api: API;
 
   /**
    * Returns current List item by the caret position

@@ -2,7 +2,7 @@ import { IconCheck } from '@codexteam/icons'
 import ItemMeta from "../types/itemMeta";
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
-import { ListRenderer } from './listRenderer';
+import { ListRenderer } from './ListRenderer';
 
 /**
  * Class that is responsible for checklist rendering
@@ -16,7 +16,7 @@ export class CheckListRenderer extends ListRenderer {
   /**
    * Is NestedList Tool read-only option
    */
-  readOnly: boolean;
+  private readOnly: boolean;
 
   constructor(readonly: boolean, config?: NestedListConfig) {
     super();
