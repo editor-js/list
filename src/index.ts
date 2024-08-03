@@ -164,7 +164,9 @@ export default class NestedList {
   }
 
   save() {
-    return this.list?.save();
+    this.data = this.list!.save();
+
+    return this.data
   }
 
   /**
