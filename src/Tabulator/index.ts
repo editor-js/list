@@ -97,8 +97,6 @@ export default class Tabulator {
   }
 
   render() {
-    console.log(this.style);
-
     switch (this.style) {
       case 'ordered':
         this.list = new OrderedListRenderer(this.readOnly, this.config);
@@ -167,15 +165,19 @@ export default class Tabulator {
   appendItems(items: ListItem[], parentItem: Element): void {
     if (this.list !== undefined) {
       items.forEach((item) => {
-        const itemEl = this.list?.renderItem(item.content);
+        const itemEl = this.list!.renderItem(item.content);
 
-        parentItem.appendChild(itemEl!);
+        parentItem.appendChild(itemEl);
 
         if (item.items.length) {
           const sublistWrapper = this.list?.renderSublistWrapper()
           this.appendItems(item.items, sublistWrapper!);
 
-          parentItem.appendChild(sublistWrapper!);
+          const itemBody = itemEl.querySelector(`.${ListRenderer.CSS.itemBody}`);
+
+          if (itemBody) {
+            itemBody.appendChild(sublistWrapper!);
+          }
         }
       });
     }
@@ -190,11 +192,11 @@ export default class Tabulator {
      */
     const getItems = (parent: Element): ListItem[] => {
       const children = Array.from(
-        parent.querySelectorAll(`:scope > .cdx-nested-list__item`)
+        parent.querySelectorAll(`:scope > .${ListRenderer.CSS.item}`)
       );
 
       return children.map((el) => {
-        const subItemsWrapper = el.querySelector(`.cdx-nested-list__item-children`);
+        const subItemsWrapper = el.querySelector(`.${ListRenderer.CSS.itemChildren}`);
         const content = this.list!.getItemContent(el);
         const subItems = subItemsWrapper ? getItems(subItemsWrapper) : [];
 
@@ -205,10 +207,12 @@ export default class Tabulator {
       });
     };
 
-    return {
+    const re = {
       style: this.data.style,
       items: this.listWrapper ? getItems(this.listWrapper) : [],
     };
+
+    return re;
   }
 
   /**

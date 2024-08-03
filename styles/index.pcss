@@ -18,7 +18,10 @@
     line-height: 1.6em;
     display: flex;
     margin: 2px 0;
-    display: flex;
+
+    &-children {
+      padding-inline-start: 0;
+    }
 
     [contenteditable]{
       outline: none;
@@ -26,11 +29,6 @@
 
     &-body {
       flex-grow: 2;
-    }
-
-    &-content,
-    &-children {
-      flex-basis: 100%;
     }
 
     &-content {
@@ -131,8 +129,6 @@
         }
       }
     }
-
-    &-children {}
 
     &::before {
       counter-increment: item;
