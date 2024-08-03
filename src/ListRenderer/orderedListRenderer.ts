@@ -1,3 +1,4 @@
+import ItemMeta from "../types/itemMeta";
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
 import { ListRenderer } from './listRenderer';
@@ -72,5 +73,11 @@ export class OrderedListRenderer extends ListRenderer {
     }
 
     return contentNode.innerHTML;
+  }
+
+  getItemMeta(item: Element): ItemMeta  {
+    return {
+      checked: undefined,
+    }
   }
 }

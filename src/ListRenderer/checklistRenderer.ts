@@ -49,7 +49,7 @@ export class CheckListRenderer extends ListRenderer {
    * @param content - content of the list item
    * @returns - created html list item element
    */
-  renderItem(content: string): HTMLLIElement {
+  renderItem(content: string, meta: ItemMeta): HTMLLIElement {
     const itemWrapper = Dom.make('li', [ListRenderer.CSS.item, ListRenderer.CSS.item]);
     const itemBody = Dom.make('div', ListRenderer.CSS.itemBody);
     const itemContent = Dom.make('div', ListRenderer.CSS.itemContent, {
@@ -59,6 +59,10 @@ export class CheckListRenderer extends ListRenderer {
 
     const checkbox = Dom.make('span', ListRenderer.CSS.checkbox);
     const checkboxContainer = Dom.make('div', ListRenderer.CSS.checkboxContainer);
+
+    if (meta && meta.checked === true) {
+      checkboxContainer.classList.add(ListRenderer.CSS.itemChecked);
+    }
 
     checkbox.innerHTML = IconCheck;
     checkboxContainer.appendChild(checkbox);
@@ -89,9 +93,11 @@ export class CheckListRenderer extends ListRenderer {
     return contentNode.innerHTML;
   }
 
-  getItemMeta(item: HTMLElement): ItemMeta {
+  getItemMeta(item: Element): ItemMeta {
+    const checkbox = item.querySelector(`.${ListRenderer.CSS.checkboxContainer}`);
+
     return {
-      checked: item.classList.contains(ListRenderer.CSS.itemChecked)
+      checked: checkbox ? checkbox.classList.contains(ListRenderer.CSS.itemChecked) : undefined,
     }
   }
 
@@ -105,7 +111,7 @@ export class CheckListRenderer extends ListRenderer {
   private toggleCheckbox(event: any): void {
     const checkbox = event.target.closest(`.${ListRenderer.CSS.checkboxContainer}`);
 
-    if (checkbox.contains(event.target)) {
+    if (checkbox && checkbox.contains(event.target)) {
       checkbox.classList.toggle(ListRenderer.CSS.itemChecked);
       checkbox.classList.add(ListRenderer.CSS.noHover);
       checkbox.addEventListener('mouseleave', () => this.removeSpecialHoverBehavior(checkbox), { once: true });

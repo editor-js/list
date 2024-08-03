@@ -166,6 +166,8 @@ export default class NestedList {
   save() {
     this.data = this.list!.save();
 
+    console.log(this.data);
+
     return this.data
   }
 
@@ -244,6 +246,7 @@ export default class NestedList {
           items: [
             {
               content,
+              meta: {},
               items: [],
             },
           ],

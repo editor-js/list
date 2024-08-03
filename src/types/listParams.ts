@@ -1,3 +1,5 @@
+import ItemMeta from "./itemMeta";
+
 /**
  * list style to make list as ordered or unordered
  */
@@ -25,6 +27,9 @@ export interface ListItem {
    * list item text content
    */
   content: string;
+
+  meta: ItemMeta;
+
   /**
    * sublist items
    */

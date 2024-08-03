@@ -119,6 +119,7 @@ export default class Tabulator {
         [
           {
             content: '',
+            meta: {},
             items: [],
           },
         ],
@@ -165,7 +166,7 @@ export default class Tabulator {
   appendItems(items: ListItem[], parentItem: Element): void {
     if (this.list !== undefined) {
       items.forEach((item) => {
-        const itemEl = this.list!.renderItem(item.content);
+        const itemEl = this.list!.renderItem(item.content, item.meta);
 
         parentItem.appendChild(itemEl);
 
@@ -198,10 +199,12 @@ export default class Tabulator {
       return children.map((el) => {
         const subItemsWrapper = el.querySelector(`.${ListRenderer.CSS.itemChildren}`);
         const content = this.list!.getItemContent(el);
+        const meta = this.list!.getItemMeta(el);
         const subItems = subItemsWrapper ? getItems(subItemsWrapper) : [];
 
         return {
           content,
+          meta,
           items: subItems,
         };
       });
@@ -285,6 +288,7 @@ export default class Tabulator {
 
         return {
           content,
+          meta: {},
           items: subItems,
         };
       });
@@ -357,7 +361,7 @@ export default class Tabulator {
     /**
      * Create the new list item
      */
-    const itemEl = this.list!.renderItem(endingHTML);
+    const itemEl = this.list!.renderItem(endingHTML, {});
 
     /**
      * Check if child items exist
