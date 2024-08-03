@@ -142,7 +142,11 @@
   }
 
   &--ordered > &__item::before {
-    content: counters(item, ".") ". ";
+    content: counters(item, ".") " "
+  }
+
+  &--ordered {
+    counter-reset: item;
   }
 
   &--unordered > &__item::before {
