@@ -44,7 +44,7 @@
   }
 
   &--ordered > &__item::before {
-    content: counters(item, ".") " "
+    content: counters(item, ".") "."
   }
 
   &--ordered {
@@ -66,10 +66,10 @@
   }
 
   &__checkbox {
+    padding-top: 2px;
     width: var(--size-checkbox);
     height: var(--size-checkbox);
     display: flex;
-    align-items: center;
     cursor: pointer;
 
     svg {
