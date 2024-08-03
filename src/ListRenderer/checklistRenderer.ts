@@ -1,5 +1,5 @@
 import { IconCheck } from '@codexteam/icons'
-import ItemMeta from "../types/itemMeta";
+import type { ChecklistItemMeta } from "../types/itemMeta";
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
 import { ListRenderer } from './ListRenderer';
@@ -63,7 +63,7 @@ export class CheckListRenderer extends ListRenderer {
    * @param content - content of the list item
    * @returns - created html list item element
    */
-  renderItem(content: string, meta: ItemMeta): HTMLLIElement {
+  renderItem(content: string, meta: ChecklistItemMeta ): HTMLLIElement {
     const itemWrapper = Dom.make('li', [ListRenderer.CSS.item, ListRenderer.CSS.item]);
     const itemBody = Dom.make('div', ListRenderer.CSS.itemBody);
     const itemContent = Dom.make('div', ListRenderer.CSS.itemContent, {
@@ -112,11 +112,11 @@ export class CheckListRenderer extends ListRenderer {
    * @param {Element} item - item of the list to get meta from
    * @returns {ItemMeta} Item meta object
    */
-  getItemMeta(item: Element): ItemMeta {
+  getItemMeta(item: Element): ChecklistItemMeta  {
     const checkbox = item.querySelector(`.${ListRenderer.CSS.checkboxContainer}`);
 
     return {
-      checked: checkbox ? checkbox.classList.contains(ListRenderer.CSS.itemChecked) : undefined,
+      checked: checkbox ? checkbox.classList.contains(ListRenderer.CSS.itemChecked) : false,
     }
   }
 

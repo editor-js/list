@@ -1,4 +1,4 @@
-import ItemMeta from "../types/itemMeta";
+import type { OrderedListItemMeta } from "../types/itemMeta";
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
 import { ListRenderer } from './ListRenderer';
@@ -80,10 +80,10 @@ export class OrderedListRenderer extends ListRenderer {
   }
 
   /**
-   * Returns item meta, for ordered list checked will be always undefined
+   * Returns item meta, for ordered list
    * @returns Item meta object
    */
-  getItemMeta(): ItemMeta  {
+  getItemMeta(): OrderedListItemMeta  {
     return {}
   }
 }

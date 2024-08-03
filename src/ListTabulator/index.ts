@@ -375,7 +375,7 @@ export default class ListTabulator {
     /**
      * Create the new list item
      */
-    const itemEl = this.list!.renderItem(endingHTML, {});
+    const itemEl = this.list!.renderItem(endingHTML, { checked: false });
 
     /**
      * Check if child items exist

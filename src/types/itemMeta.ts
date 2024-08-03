@@ -1,9 +1,18 @@
 /**
  * Meta information of each list item
  */
-export default interface ItemMeta {
+interface ItemMeta {};
+
+/**
+ * Meta information of checklist item
+ */
+export interface ChecklistItemMeta extends ItemMeta {
   /**
-   * State of the item
+   * State of the checkbox of the item
    */
-  checked?: boolean;
-}
+  checked: boolean;
+};
+
+export interface OrderedListItemMeta extends ItemMeta {};
+
+export interface UnorderedListItemMeta extends ItemMeta {};
