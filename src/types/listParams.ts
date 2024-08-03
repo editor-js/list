@@ -28,6 +28,9 @@ export interface ListItem {
    */
   content: string;
 
+  /**
+   * Meta information of each list item
+   */
   meta: ItemMeta;
 
   /**
@@ -45,8 +48,4 @@ export interface NestedListConfig {
    * default is unordered
    */
   defaultStyle?: ListDataStyle;
-
-  starts?: number;
-
-  maxLevel?: number;
 }
