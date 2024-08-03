@@ -1,11 +1,14 @@
-import type { UnorderedListItemMeta } from "../types/itemMeta";
+import type { OrderedListItemMeta } from "../types/itemMeta";
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
-import { ListRenderer } from './ListRenderer';
+import { ListRenderer } from './List_Renderer';
 
-interface UnoderedListCssClasses {
+/**
+ * CSS classes for the Ordered list
+ */
+interface OrderedListCssClasses {
   wrapper: string;
-  wrapperUnordered: string;
+  wrapperOrdered: string;
   item: string;
   itemBody: string;
   itemContent: string;
@@ -13,9 +16,9 @@ interface UnoderedListCssClasses {
 }
 
 /**
- * Class that is responsible for unordered list rendering
+ * Class that is responsible for ordered list rendering
  */
-export class UnorderedListRenderer extends ListRenderer {
+export class OrderedListRenderer extends ListRenderer {
   /**
    * Tool's configuration
    */
@@ -26,13 +29,12 @@ export class UnorderedListRenderer extends ListRenderer {
    */
   private readOnly: boolean;
 
-
-  static get CSS(): UnoderedListCssClasses {
+  static get CSS(): OrderedListCssClasses {
     const listCssClasses = super.CSS;
 
     return {
       ...listCssClasses,
-      wrapperUnordered: 'cdx-nested-list--unordered',
+      wrapperOrdered: 'cdx-nested-list--ordered',
     }
   }
 
@@ -45,32 +47,31 @@ export class UnorderedListRenderer extends ListRenderer {
   /**
    * Renders ol wrapper for list
    * @param level - level of nesting (0 for the rool level)
-   * @returns - created html ul element
+   * @returns - created html ol element
    */
-  renderWrapper(level: number): HTMLUListElement {
-    let wrapperElement: HTMLUListElement;
+  renderWrapper(level: number): HTMLOListElement {
+    let wrapperElement: HTMLOListElement;
 
     /**
      * Check if it's root level
      */
     if (level === 0) {
-      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapper, UnorderedListRenderer.CSS.wrapperUnordered]) as HTMLUListElement;
+      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapper, OrderedListRenderer.CSS.wrapperOrdered]) as HTMLOListElement;
     } else {
-      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapperUnordered, UnorderedListRenderer.CSS.itemChildren]) as HTMLUListElement;
+      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapperOrdered, OrderedListRenderer.CSS.itemChildren]) as HTMLOListElement;
     }
 
     return wrapperElement;
   }
-
   /**
    * Redners list item element
    * @param content - content of the list item
    * @returns - created html list item element
    */
-  renderItem(content: string, meta: UnorderedListItemMeta): HTMLLIElement {
-    const itemWrapper = Dom.make('li', UnorderedListRenderer.CSS.item);
-    const itemBody = Dom.make('div', UnorderedListRenderer.CSS.itemBody);
-    const itemContent = Dom.make('div', UnorderedListRenderer.CSS.itemContent, {
+  renderItem(content: string, meta: OrderedListItemMeta): HTMLLIElement {
+    const itemWrapper = Dom.make('li', OrderedListRenderer.CSS.item);
+    const itemBody = Dom.make('div', OrderedListRenderer.CSS.itemBody);
+    const itemContent = Dom.make('div', OrderedListRenderer.CSS.itemContent, {
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
@@ -88,7 +89,7 @@ export class UnorderedListRenderer extends ListRenderer {
    * @returns {string}
    */
   getItemContent(item: Element): string {
-    const contentNode = item.querySelector(`.${UnorderedListRenderer.CSS.itemContent}`);
+    const contentNode = item.querySelector(`.${OrderedListRenderer.CSS.itemContent}`);
     if (!contentNode) {
       return '';
     }
@@ -101,10 +102,10 @@ export class UnorderedListRenderer extends ListRenderer {
   }
 
   /**
-   * Returns item meta, for unordered list
+   * Returns item meta, for ordered list
    * @returns Item meta object
    */
-  getItemMeta(): UnorderedListItemMeta  {
+  getItemMeta(): OrderedListItemMeta  {
     return {}
   }
 }
