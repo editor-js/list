@@ -84,8 +84,6 @@ export class OrderedListRenderer extends ListRenderer {
    * @returns Item meta object
    */
   getItemMeta(): ItemMeta  {
-    return {
-      checked: undefined,
-    }
+    return {}
   }
 }
