@@ -207,12 +207,10 @@ export default class Tabulator {
       });
     };
 
-    const re = {
+    return {
       style: this.data.style,
       items: this.listWrapper ? getItems(this.listWrapper) : [],
     };
-
-    return re;
   }
 
   /**

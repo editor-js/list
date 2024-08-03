@@ -29,7 +29,13 @@ export class CheckListRenderer extends ListRenderer {
   renderWrapper(classes: string[] = []): HTMLOListElement {
     classes.push(ListRenderer.CSS.wrapperChecklist);
 
-    return Dom.make('ul', [ListRenderer.CSS.wrapper, ...classes]) as HTMLOListElement;
+    const listWrapper = Dom.make('ul', [ListRenderer.CSS.wrapper, ...classes]) as HTMLOListElement;
+
+    listWrapper.addEventListener('click', (event) => {
+      this.toggleCheckbox(event);
+    });
+
+    return listWrapper;
   }
 
   renderSublistWrapper(): HTMLElement {
@@ -56,10 +62,6 @@ export class CheckListRenderer extends ListRenderer {
 
     checkbox.innerHTML = IconCheck;
     checkboxContainer.appendChild(checkbox);
-
-    checkboxContainer.addEventListener('click', (event) => {
-      this.toggleCheckbox(event);
-    });
 
     itemBody.appendChild(itemContent);
     itemWrapper.appendChild(checkboxContainer);
@@ -101,11 +103,10 @@ export class CheckListRenderer extends ListRenderer {
    * @returns {void}
    */
   private toggleCheckbox(event: any): void {
-    const checkListItem = event.target.closest(`.${ListRenderer.CSS.item}`);
-    const checkbox = checkListItem.querySelector(`.${ListRenderer.CSS.checkboxContainer}`);
+    const checkbox = event.target.closest(`.${ListRenderer.CSS.checkboxContainer}`);
 
     if (checkbox.contains(event.target)) {
-      checkListItem.classList.toggle(ListRenderer.CSS.itemChecked);
+      checkbox.classList.toggle(ListRenderer.CSS.itemChecked);
       checkbox.classList.add(ListRenderer.CSS.noHover);
       checkbox.addEventListener('mouseleave', () => this.removeSpecialHoverBehavior(checkbox), { once: true });
     }

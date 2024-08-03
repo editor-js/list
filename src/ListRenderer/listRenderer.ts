@@ -39,10 +39,10 @@ export abstract class ListRenderer {
       itemContent: 'cdx-nested-list__item-content',
       itemChildren: 'cdx-nested-list__item-children',
       settingsWrapper: 'cdx-nested-list__settings',
-      itemChecked: 'cdx-nested-list__item--checked',
-      noHover: 'cdx-nested-list__item-checkbox--no-hover',
-      checkbox: 'cdx-nested-list__item-checkbox-check',
-      checkboxContainer: 'cdx-nested-list__item-checkbox'
+      itemChecked: 'cdx-nested-list__checkbox--checked',
+      noHover: 'cdx-nested-list__checkbox--no-hover',
+      checkbox: 'cdx-nested-list__checkbox-check',
+      checkboxContainer: 'cdx-nested-list__checkbox'
     };
   }
 }
