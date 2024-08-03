@@ -4,6 +4,18 @@ import * as Dom from '../utils/dom';
 import { ListRenderer } from './ListRenderer';
 
 /**
+ * CSS classes for the Ordered list
+ */
+interface OrderedListCssClasses {
+  wrapper: string;
+  wrapperOrdered: string;
+  item: string;
+  itemBody: string;
+  itemContent: string;
+  itemChildren: string;
+}
+
+/**
  * Class that is responsible for ordered list rendering
  */
 export class OrderedListRenderer extends ListRenderer {
@@ -16,6 +28,15 @@ export class OrderedListRenderer extends ListRenderer {
    * Is NestedList Tool read-only option
    */
   private readOnly: boolean;
+
+  static get CSS(): OrderedListCssClasses {
+    const listCssClasses = super.CSS;
+
+    return {
+      ...listCssClasses,
+      wrapperOrdered: 'cdx-nested-list--ordered',
+    }
+  }
 
   constructor(readonly: boolean, config?: NestedListConfig) {
     super();
@@ -35,9 +56,9 @@ export class OrderedListRenderer extends ListRenderer {
      * Check if it's root level
      */
     if (level === 0) {
-      wrapperElement = Dom.make('ol', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperUnordered]) as HTMLOListElement;
+      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapper, OrderedListRenderer.CSS.wrapperOrdered]) as HTMLOListElement;
     } else {
-      wrapperElement = Dom.make('ol', [ListRenderer.CSS.wrapperUnordered, ListRenderer.CSS.itemChildren]) as HTMLOListElement;
+      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapperOrdered, OrderedListRenderer.CSS.itemChildren]) as HTMLOListElement;
     }
 
     return wrapperElement;
@@ -47,10 +68,10 @@ export class OrderedListRenderer extends ListRenderer {
    * @param content - content of the list item
    * @returns - created html list item element
    */
-  renderItem(content: string): HTMLLIElement {
-    const itemWrapper = Dom.make('li', ListRenderer.CSS.item);
-    const itemBody = Dom.make('div', ListRenderer.CSS.itemBody);
-    const itemContent = Dom.make('div', ListRenderer.CSS.itemContent, {
+  renderItem(content: string, meta: OrderedListItemMeta): HTMLLIElement {
+    const itemWrapper = Dom.make('li', OrderedListRenderer.CSS.item);
+    const itemBody = Dom.make('div', OrderedListRenderer.CSS.itemBody);
+    const itemContent = Dom.make('div', OrderedListRenderer.CSS.itemContent, {
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
@@ -68,7 +89,7 @@ export class OrderedListRenderer extends ListRenderer {
    * @returns {string}
    */
   getItemContent(item: Element): string {
-    const contentNode = item.querySelector(`.${ListRenderer.CSS.itemContent}`);
+    const contentNode = item.querySelector(`.${OrderedListRenderer.CSS.itemContent}`);
     if (!contentNode) {
       return '';
     }

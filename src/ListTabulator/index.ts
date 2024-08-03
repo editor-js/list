@@ -10,6 +10,7 @@ import * as Dom from '../utils/dom'
 import type { PasteEvent } from '../types';
 import type { API, PasteConfig } from '@editorjs/editorjs';
 import { NestedListParams } from "..";
+import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/itemMeta";
 
 type NestedListStyle = 'ordered' | 'unordered' | 'checklist';
 
@@ -187,7 +188,17 @@ export default class ListTabulator {
 
     if (this.list !== undefined) {
       items.forEach((item) => {
-        const itemEl = this.list!.renderItem(item.content, item.meta);
+        let itemEl: Element;
+
+        if (this.list instanceof OrderedListRenderer) {
+          itemEl = this.list!.renderItem(item.content, item.meta as OrderedListItemMeta);
+        }
+        else if (this.list instanceof UnorderedListRenderer) {
+          itemEl = this.list!.renderItem(item.content, item.meta as UnorderedListItemMeta);
+        }
+        else {
+          itemEl = this.list!.renderItem(item.content, item.meta as ChecklistItemMeta);
+        }
 
         parentItem.appendChild(itemEl);
 

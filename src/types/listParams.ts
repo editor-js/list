@@ -1,4 +1,4 @@
-import ItemMeta from "./itemMeta";
+import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "./itemMeta";
 
 /**
  * list style to make list as ordered or unordered
@@ -31,7 +31,7 @@ export interface ListItem {
   /**
    * Meta information of each list item
    */
-  meta: ItemMeta;
+  meta: OrderedListItemMeta | UnorderedListItemMeta | ChecklistItemMeta;
 
   /**
    * sublist items

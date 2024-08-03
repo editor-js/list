@@ -3,6 +3,15 @@ import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
 import { ListRenderer } from './ListRenderer';
 
+interface UnoderedListCssClasses {
+  wrapper: string;
+  wrapperUnordered: string;
+  item: string;
+  itemBody: string;
+  itemContent: string;
+  itemChildren: string;
+}
+
 /**
  * Class that is responsible for unordered list rendering
  */
@@ -16,6 +25,16 @@ export class UnorderedListRenderer extends ListRenderer {
    * Is NestedList Tool read-only option
    */
   private readOnly: boolean;
+
+
+  static get CSS(): UnoderedListCssClasses {
+    const listCssClasses = super.CSS;
+
+    return {
+      ...listCssClasses,
+      wrapperUnordered: 'cdx-nested-list--unordered',
+    }
+  }
 
   constructor(readonly: boolean, config?: NestedListConfig) {
     super();
@@ -35,9 +54,9 @@ export class UnorderedListRenderer extends ListRenderer {
      * Check if it's root level
      */
     if (level === 0) {
-      wrapperElement = Dom.make('ul', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperUnordered]) as HTMLUListElement;
+      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapper, UnorderedListRenderer.CSS.wrapperUnordered]) as HTMLUListElement;
     } else {
-      wrapperElement = Dom.make('ul', [ListRenderer.CSS.wrapperUnordered, ListRenderer.CSS.itemChildren]) as HTMLUListElement;
+      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapperUnordered, UnorderedListRenderer.CSS.itemChildren]) as HTMLUListElement;
     }
 
     return wrapperElement;
@@ -48,10 +67,10 @@ export class UnorderedListRenderer extends ListRenderer {
    * @param content - content of the list item
    * @returns - created html list item element
    */
-  renderItem(content: string): HTMLLIElement {
-    const itemWrapper = Dom.make('li', ListRenderer.CSS.item);
-    const itemBody = Dom.make('div', ListRenderer.CSS.itemBody);
-    const itemContent = Dom.make('div', ListRenderer.CSS.itemContent, {
+  renderItem(content: string, meta: UnorderedListItemMeta): HTMLLIElement {
+    const itemWrapper = Dom.make('li', UnorderedListRenderer.CSS.item);
+    const itemBody = Dom.make('div', UnorderedListRenderer.CSS.itemBody);
+    const itemContent = Dom.make('div', UnorderedListRenderer.CSS.itemContent, {
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
@@ -69,7 +88,7 @@ export class UnorderedListRenderer extends ListRenderer {
    * @returns {string}
    */
   getItemContent(item: Element): string {
-    const contentNode = item.querySelector(`.${ListRenderer.CSS.itemContent}`);
+    const contentNode = item.querySelector(`.${UnorderedListRenderer.CSS.itemContent}`);
     if (!contentNode) {
       return '';
     }
