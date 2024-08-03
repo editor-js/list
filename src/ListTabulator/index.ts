@@ -1,6 +1,6 @@
-import { CheckListRenderer } from "../ListRenderer/Checklist__Renderer";
-import { OrderedListRenderer } from "../ListRenderer/Order_edListRenderer";
-import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRendere_r";
+import { CheckListRenderer } from "../ListRenderer/ChecklistRenderer";
+import { OrderedListRenderer } from "../ListRenderer/OrderedListRenderer";
+import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
 import { NestedListConfig, ListData, ListDataStyle } from "../types/listParams"
 import { ListItem } from "../types/listParams";
 import { isHtmlElement } from '../utils/type-guards';

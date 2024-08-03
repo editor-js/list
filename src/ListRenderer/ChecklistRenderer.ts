@@ -2,7 +2,7 @@ import { IconCheck } from '@codexteam/icons'
 import type { ChecklistItemMeta } from "../types/itemMeta";
 import { NestedListConfig } from "../types/listParams";
 import * as Dom from '../utils/dom';
-import { ListRenderer } from './List_Renderer';
+import { ListRenderer } from './ListRenderer';
 
 interface ChecklistCssClasses {
   wrapper: string;
