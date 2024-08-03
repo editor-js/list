@@ -31,8 +31,18 @@ export class CheckListRenderer extends ListRenderer {
   renderWrapper(): HTMLOListElement {
     const listWrapper = Dom.make('ul', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperChecklist]) as HTMLOListElement;
 
+    /**
+     * Listen to clicks on checkbox
+     */
     listWrapper.addEventListener('click', (event) => {
-      this.toggleCheckbox(event);
+      const target = event.target as Element;
+      if (target){
+        const checkbox = target.closest(`.${ListRenderer.CSS.checkboxContainer}`);
+
+        if (checkbox && checkbox.contains(target)) {
+          this.toggleCheckbox(checkbox);
+        }
+      }
     });
 
     return listWrapper;
@@ -117,15 +127,11 @@ export class CheckListRenderer extends ListRenderer {
    * @param {MouseEvent} event - click
    * @returns {void}
    */
-  private toggleCheckbox(event: any): void {
-    const checkbox = event.target.closest(`.${ListRenderer.CSS.checkboxContainer}`);
-
-    if (checkbox && checkbox.contains(event.target)) {
-      checkbox.classList.toggle(ListRenderer.CSS.itemChecked);
-      checkbox.classList.add(ListRenderer.CSS.noHover);
-      checkbox.addEventListener('mouseleave', () => this.removeSpecialHoverBehavior(checkbox), { once: true });
+  private toggleCheckbox(checkbox: Element): void {
+    checkbox.classList.toggle(ListRenderer.CSS.itemChecked);
+    checkbox.classList.add(ListRenderer.CSS.noHover);
+    checkbox.addEventListener('mouseleave', () => this.removeSpecialHoverBehavior(checkbox), { once: true });
     }
-  }
 
   /**
    * Removes class responsible for special hover behavior on an item
@@ -134,7 +140,7 @@ export class CheckListRenderer extends ListRenderer {
    * @param {Element} el - item wrapper
    * @returns {Element}
    */
-  private removeSpecialHoverBehavior(el: HTMLElement) {
+  private removeSpecialHoverBehavior(el: Element) {
     el.classList.remove(ListRenderer.CSS.noHover);
   }
 }
