@@ -7,7 +7,7 @@ import type {
 import Caret from './utils/caret';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
 import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/listParams';
-import Tabulator from './Tabulator';
+import ListTabulator from './ListTabulator';
 
 /**
  * Build styles
@@ -74,9 +74,17 @@ export default class NestedList {
     this.data.style = style;
 
     /**
-     * Rerender list item
+     * Create new instance of list
      */
-    this.list = new Tabulator(this.data, this.listStyle, this.readOnly, this.api, this.config);
+    this.list = new ListTabulator(
+      {
+        data: this.data,
+        api: this.api,
+        readOnly: this.readOnly,
+        config: this.config,
+      },
+      this.listStyle
+    );
 
     const newListElement = this.list.render()
 
@@ -111,11 +119,9 @@ export default class NestedList {
   private data: ListData;
 
   /**
-   * Caret helper
+   * Class that is responsible for list complete list rendering and saving
    */
-  private caret: Caret;
-
-  list: Tabulator | undefined;
+  list: ListTabulator | undefined;
 
   /**
    * Main constant wrapper of the whole list
@@ -138,7 +144,7 @@ export default class NestedList {
     this.config = config;
 
     /**
-     * Set the default list style from the config.
+     * Set the default list style from the config or presetted 'ordered'.
      */
     this.defaultListStyle = this.config?.defaultStyle || 'ordered';
 
@@ -148,25 +154,33 @@ export default class NestedList {
     };
 
     this.data = data && Object.keys(data).length ? data : initialData;
-
-    /**
-     * Instantiate caret helper
-     */
-    this.caret = new Caret();
   }
 
+  /**
+   * Function that is responsible for content rendering
+   * @returns rendered list wrapper with all contents
+   */
   render() {
-    this.list = new Tabulator(this.data, this.listStyle, this.readOnly, this.api,  this.config);
+    this.list = new ListTabulator({
+      data: this.data,
+      readOnly: this.readOnly,
+      api: this.api,
+      config: this.config,
+    },
+    this.listStyle
+  );
 
     this.listElement = this.list.render();
 
     return this.listElement;
   }
 
+  /**
+   * Function that is responsible for content saving
+   * @returns formatted content used in editor
+   */
   save() {
     this.data = this.list!.save();
-
-    console.log(this.data);
 
     return this.data
   }
@@ -175,7 +189,7 @@ export default class NestedList {
    * Creates Block Tune allowing to change the list style
    *
    * @public
-   * @returns {Array}
+   * @returns {Array} array of tune configs
    */
   renderSettings(): TunesMenuConfig {
     const tunes = [
@@ -207,6 +221,7 @@ export default class NestedList {
       },
     }));
   }
+
   /**
    * On paste sanitzation config. Allow only tags that are allowed in the Tool.
    *

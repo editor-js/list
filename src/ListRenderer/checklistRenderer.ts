@@ -13,6 +13,9 @@ export class CheckListRenderer extends ListRenderer {
    */
   protected config?: NestedListConfig;
 
+  /**
+   * Is NestedList Tool read-only option
+   */
   readOnly: boolean;
 
   constructor(readonly: boolean, config?: NestedListConfig) {
@@ -23,13 +26,10 @@ export class CheckListRenderer extends ListRenderer {
 
   /**
    * Renders ol wrapper for list
-   * @param classes -
    * @returns - created html ol element
    */
-  renderWrapper(classes: string[] = []): HTMLOListElement {
-    classes.push(ListRenderer.CSS.wrapperChecklist);
-
-    const listWrapper = Dom.make('ul', [ListRenderer.CSS.wrapper, ...classes]) as HTMLOListElement;
+  renderWrapper(): HTMLOListElement {
+    const listWrapper = Dom.make('ul', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperChecklist]) as HTMLOListElement;
 
     listWrapper.addEventListener('click', (event) => {
       this.toggleCheckbox(event);
@@ -38,6 +38,10 @@ export class CheckListRenderer extends ListRenderer {
     return listWrapper;
   }
 
+  /**
+   * Render wrapper of child list
+   * @returns wrapper element of the child list
+   */
   renderSublistWrapper(): HTMLElement {
     const divElement = Dom.make('ul', [ListRenderer.CSS.wrapperChecklist, ListRenderer.CSS.itemChildren]) as HTMLElement;
 
@@ -93,6 +97,11 @@ export class CheckListRenderer extends ListRenderer {
     return contentNode.innerHTML;
   }
 
+  /**
+   * Return meta object of certain element
+   * @param {Element} item - item of the list to get meta from
+   * @returns {ItemMeta} Item meta object
+   */
   getItemMeta(item: Element): ItemMeta {
     const checkbox = item.querySelector(`.${ListRenderer.CSS.checkboxContainer}`);
 

@@ -12,6 +12,9 @@ export class OrderedListRenderer extends ListRenderer {
    */
   protected config?: NestedListConfig;
 
+  /**
+   * Is NestedList Tool read-only option
+   */
   readOnly: boolean;
 
   constructor(readonly: boolean, config?: NestedListConfig) {
@@ -22,15 +25,16 @@ export class OrderedListRenderer extends ListRenderer {
 
   /**
    * Renders ol wrapper for list
-   * @param classes -
    * @returns - created html ol element
    */
-  renderWrapper(classes: string[] = []): HTMLOListElement {
-    classes.push(ListRenderer.CSS.wrapperOrdered);
-
-    return Dom.make('ol', [ListRenderer.CSS.wrapper, ...classes]) as HTMLOListElement;
+  renderWrapper(): HTMLOListElement {
+    return Dom.make('ol', [ListRenderer.CSS.wrapper, ListRenderer.CSS.wrapperOrdered]) as HTMLOListElement;
   }
 
+  /**
+   * Render wrapper of child list
+   * @returns wrapper element of the child list
+   */
   renderSublistWrapper(): HTMLElement {
     const divElement = Dom.make('ol', [ListRenderer.CSS.wrapperOrdered, ListRenderer.CSS.itemChildren]) as HTMLElement;
 
@@ -75,7 +79,11 @@ export class OrderedListRenderer extends ListRenderer {
     return contentNode.innerHTML;
   }
 
-  getItemMeta(item: Element): ItemMeta  {
+  /**
+   * Returns item meta, for ordered list checked will be always undefined
+   * @returns Item meta object
+   */
+  getItemMeta(): ItemMeta  {
     return {
       checked: undefined,
     }

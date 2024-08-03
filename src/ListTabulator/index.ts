@@ -9,6 +9,7 @@ import { ListRenderer } from "../ListRenderer";
 import * as Dom from '../utils/dom'
 import type { PasteEvent } from '../types';
 import type { API, PasteConfig } from '@editorjs/editorjs';
+import { NestedListParams } from "..";
 
 type NestedListStyle = 'ordered' | 'unordered' | 'checklist';
 
@@ -17,7 +18,7 @@ type ListRendererTypes = OrderedListRenderer | UnorderedListRenderer | CheckList
 /**
  * Class that is responsible for list tabulation
  */
-export default class Tabulator {
+export default class ListTabulator {
   /**
    * Tool's configuration
    */
@@ -48,9 +49,14 @@ export default class Tabulator {
    */
   private caret: Caret;
 
-
+  /**
+   * Is NestedList Tool read-only option
+   */
   readOnly: boolean;
 
+  /**
+   * The Editor.js API
+   */
   api: API;
 
   /**
@@ -83,11 +89,11 @@ export default class Tabulator {
     return currentNode.closest(`.cdx-nested-list__item`);
   }
 
-  constructor(data: ListData, style: NestedListStyle, readonly: boolean, api: API, config?: NestedListConfig) {
+  constructor({data, config, api, readOnly}: NestedListParams, style: NestedListStyle) {
     this.config = config;
     this.data = data;
     this.style = style;
-    this.readOnly = readonly;
+    this.readOnly = readOnly;
     this.api = api;
 
     /**
@@ -96,6 +102,10 @@ export default class Tabulator {
     this.caret = new Caret();
   }
 
+  /**
+   * Function that is responsible for rendering nested list with contents
+   * @returns Filled with content wrapper element of the list
+   */
   render() {
     switch (this.style) {
       case 'ordered':
@@ -184,6 +194,10 @@ export default class Tabulator {
     }
   }
 
+  /**
+   * Function that is responsible for list content saving
+   * @returns saved list data
+   */
   save(): ListData {
     /**
      * The method for recursive collecting of the child items
