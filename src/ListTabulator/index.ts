@@ -752,7 +752,7 @@ export default class ListTabulator {
        * - Create and append children wrapper to the previous item
        * - Append current item to it
        */
-      const sublistWrapper = this.list!.renderSublistWrapper();
+      const sublistWrapper = this.list!.renderWrapper(1);
       const prevItemBody = prevItem.querySelector(`.${ListRenderer.CSS.itemBody}`);
 
       sublistWrapper.appendChild(currentItem);
