@@ -15,25 +15,27 @@
 
   &__item {
     line-height: 1.6em;
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "checkbox content"
+      ". child";
     margin: 2px 0;
 
     &-children {
-      padding-inline-start: 0;
+      grid-area: child;
     }
 
     [contenteditable]{
       outline: none;
     }
 
-    &-body {
-      flex-grow: 2;
-    }
-
     &-content {
       margin-left: 8px;
       word-break: break-word;
       white-space: pre-wrap;
+      grid-area: content;
     }
 
     &::before {
@@ -66,7 +68,8 @@
   }
 
   &__checkbox {
-    padding-top: 2px;
+    padding-top: 0.1em;
+    grid-area: checkbox;
     width: var(--size-checkbox);
     height: var(--size-checkbox);
     display: flex;

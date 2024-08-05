@@ -207,10 +207,10 @@ export default class ListTabulator {
           this.appendItems(item.items, sublistWrapper!);
           this.currentLevel -= 1;
 
-          const itemBody = itemEl.querySelector(`.${ListRenderer.CSS.itemBody}`);
+          const itemBody = itemEl.querySelector(`.${ListRenderer.CSS.item}`);
 
-          if (itemBody) {
-            itemBody.appendChild(sublistWrapper!);
+          if (itemEl) {
+            itemEl.appendChild(sublistWrapper!);
           }
         }
       });

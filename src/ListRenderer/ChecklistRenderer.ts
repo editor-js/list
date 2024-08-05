@@ -87,7 +87,7 @@ export class CheckListRenderer extends ListRenderer {
    */
   renderItem(content: string, meta: ChecklistItemMeta ): HTMLLIElement {
     const itemWrapper = Dom.make('li', [CheckListRenderer.CSS.item, CheckListRenderer.CSS.item]);
-    const itemBody = Dom.make('div', CheckListRenderer.CSS.itemBody);
+    // const itemBody = Dom.make('div', CheckListRenderer.CSS.itemBody);
     const itemContent = Dom.make('div', CheckListRenderer.CSS.itemContent, {
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
@@ -103,9 +103,9 @@ export class CheckListRenderer extends ListRenderer {
     checkbox.innerHTML = IconCheck;
     checkboxContainer.appendChild(checkbox);
 
-    itemBody.appendChild(itemContent);
     itemWrapper.appendChild(checkboxContainer);
-    itemWrapper.appendChild(itemBody);
+    itemWrapper.appendChild(itemContent);
+    // itemWrapper.appendChild(itemBody);
 
     return itemWrapper as HTMLLIElement;
   }
