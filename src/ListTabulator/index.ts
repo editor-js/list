@@ -207,8 +207,6 @@ export default class ListTabulator {
           this.appendItems(item.items, sublistWrapper!);
           this.currentLevel -= 1;
 
-          const itemBody = itemEl.querySelector(`.${ListRenderer.CSS.item}`);
-
           if (itemEl) {
             itemEl.appendChild(sublistWrapper!);
           }
@@ -727,6 +725,7 @@ export default class ListTabulator {
     event.preventDefault();
 
     const currentItem = this.currentItem;
+
     if (!currentItem) {
       return;
     }
@@ -735,6 +734,9 @@ export default class ListTabulator {
       return;
     }
     if (!isHtmlElement(prevItem)) {
+      return;
+    }
+    if (currentItem.querySelector(`.${ListRenderer.CSS.itemChildren}`) !== null) {
       return;
     }
     const isFirstChild = !prevItem;
@@ -756,18 +758,32 @@ export default class ListTabulator {
      * If prev item has child items, just append current to them
      */
     if (prevItemChildrenList) {
-      prevItemChildrenList.appendChild(currentItem);
+      /**
+       * CurrentItem would not be removed soon (it should be cleared content and checkbox would be removed)
+       * after that elements with child items would be moveable too
+       */
+      currentItem.remove();
+      const newSublistItem = this.list!.renderItem(this.list!.getItemContent(currentItem), {checked: false});
+      prevItemChildrenList.appendChild(newSublistItem);
     } else {
+      /**
+       * CurrentItem would not be removed soon (it should be cleared content and checkbox would be removed)
+       * after that elements with child items would be moveable too
+       */
+      currentItem.remove();
       /**
        * If prev item has no child items
        * - Create and append children wrapper to the previous item
        * - Append current item to it
        */
       const sublistWrapper = this.list!.renderWrapper(1);
-      const prevItemBody = prevItem.querySelector(`.${ListRenderer.CSS.itemBody}`);
+      const newSublistItem = this.list!.renderItem(this.list!.getItemContent(currentItem), {checked: false});
 
-      sublistWrapper.appendChild(currentItem);
-      prevItemBody?.appendChild(sublistWrapper);
+      sublistWrapper.appendChild(newSublistItem);
+
+      console.log(prevItem, sublistWrapper)
+
+      prevItem?.appendChild(sublistWrapper);
     }
 
     this.caret.restore();

@@ -4,7 +4,6 @@
 export interface ListCssClasses {
   wrapper: string;
   item: string;
-  itemBody: string;
   itemContent: string;
   itemChildren: string;
 }
@@ -24,7 +23,6 @@ export abstract class ListRenderer {
     return {
       wrapper: 'cdx-nested-list',
       item: 'cdx-nested-list__item',
-      itemBody: 'cdx-nested-list__item-body',
       itemContent: 'cdx-nested-list__item-content',
       itemChildren: 'cdx-nested-list__item-children',
     };

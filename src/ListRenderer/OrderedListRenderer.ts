@@ -66,14 +66,12 @@ export class OrderedListRenderer extends ListRenderer {
    */
   renderItem(content: string, meta: OrderedListItemMeta): HTMLLIElement {
     const itemWrapper = Dom.make('li', OrderedListRenderer.CSS.item);
-    const itemBody = Dom.make('div', OrderedListRenderer.CSS.itemBody);
     const itemContent = Dom.make('div', OrderedListRenderer.CSS.itemContent, {
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
 
-    itemBody.appendChild(itemContent);
-    itemWrapper.appendChild(itemBody);
+    itemWrapper.appendChild(itemContent);
 
     return itemWrapper as HTMLLIElement;
   }

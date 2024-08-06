@@ -65,14 +65,12 @@ export class UnorderedListRenderer extends ListRenderer {
    */
   renderItem(content: string, meta: UnorderedListItemMeta): HTMLLIElement {
     const itemWrapper = Dom.make('li', UnorderedListRenderer.CSS.item);
-    const itemBody = Dom.make('div', UnorderedListRenderer.CSS.itemBody);
     const itemContent = Dom.make('div', UnorderedListRenderer.CSS.itemContent, {
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
 
-    itemBody.appendChild(itemContent);
-    itemWrapper.appendChild(itemBody);
+    itemWrapper.appendChild(itemContent);
 
     return itemWrapper as HTMLLIElement;
   }
