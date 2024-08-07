@@ -482,9 +482,9 @@ export default class NestedList {
     classes.push(styleClass);
 
     // since tag is either 'ol' or 'ul' we can safely cast it to HTMLOListElement | HTMLUListElement
-    return Dom.make(tag, [this.CSS.wrapper, ...classes]) as
-      | HTMLOListElement
-      | HTMLUListElement;
+    return Dom.make(tag, [this.CSS.wrapper, ...classes], {
+      contentEditable: (!this.readOnly).toString()
+    }) as HTMLOListElement | HTMLUListElement;
   }
 
   /**
