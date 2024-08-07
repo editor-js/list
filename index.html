@@ -61,7 +61,7 @@
 
   <!-- Initialization -->
   <script type="module">
-    import NestedList from './src/index.ts';
+    import List from './src/index.ts';
 
     /**
      * To initialize the Editor, create a new instance with configuration object
@@ -93,8 +93,8 @@
         /**
          * Each Tool is a Plugin. Pass them via 'class' option with necessary settings {@link docs/tools.md}
          */
-        nestedList: {
-          class: NestedList,
+        List: {
+          class: List,
           inlineToolbar: true,
           shortcut: 'CMD+SHIFT+L',
           config: {
@@ -114,7 +114,7 @@
       data: {
         blocks: [
           {
-            type : 'nestedList',
+            type : 'List',
             data : {
               items : [
                 {

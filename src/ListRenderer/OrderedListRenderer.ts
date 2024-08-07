@@ -8,13 +8,13 @@ import type { ListCssClasses } from './ListRenderer';
  * CSS classes for the Ordered list
  */
 interface OrderedListCssClasses extends ListCssClasses {
-  wrapperOrdered: string;
+  orderedList: string;
 }
 
 /**
  * Class that is responsible for ordered list rendering
  */
-export class OrderedListRenderer implements ListRendererInterface {
+export class OrderedListRenderer implements ListRendererInterface<OrderedListItemMeta> {
   /**
    * Tool's configuration
    */
@@ -28,7 +28,7 @@ export class OrderedListRenderer implements ListRendererInterface {
   static get CSS(): OrderedListCssClasses {
     return {
       ...DefaultListCssClasses,
-      wrapperOrdered: `${CssPrefix}--ordered`,
+      orderedList: `${CssPrefix}-ordered`,
     }
   }
 
@@ -49,9 +49,9 @@ export class OrderedListRenderer implements ListRendererInterface {
      * Check if it's root level
      */
     if (level === 0) {
-      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapper, OrderedListRenderer.CSS.wrapperOrdered]) as HTMLOListElement;
+      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapper, OrderedListRenderer.CSS.orderedList]) as HTMLOListElement;
     } else {
-      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapperOrdered, OrderedListRenderer.CSS.itemChildren]) as HTMLOListElement;
+      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.orderedList, OrderedListRenderer.CSS.itemChildren]) as HTMLOListElement;
     }
 
     return wrapperElement;

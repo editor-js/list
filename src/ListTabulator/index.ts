@@ -9,10 +9,8 @@ import { DefaultListCssClasses } from "../ListRenderer";
 import * as Dom from '../utils/Dom'
 import type { PasteEvent } from '../types';
 import type { API, PasteConfig } from '@editorjs/editorjs';
-import { NestedListParams } from "..";
+import { ListParams } from "..";
 import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/ItemMeta";
-
-type NestedListStyle = 'ordered' | 'unordered' | 'checklist';
 
 type ListRendererTypes = OrderedListRenderer | UnorderedListRenderer | CheckListRenderer;
 
@@ -53,7 +51,7 @@ export default class ListTabulator {
   /**
    * Style of the nested list
    */
-  style: NestedListStyle;
+  style: ListDataStyle;
 
   /**
    * Rendered list of items
@@ -95,7 +93,7 @@ export default class ListTabulator {
     return currentNode.closest(DefaultListCssClasses.item);
   }
 
-  constructor({data, config, api, readOnly}: NestedListParams, style: NestedListStyle) {
+  constructor({data, config, api, readOnly}: ListParams, style: ListDataStyle) {
     this.config = config;
     this.data = data;
     this.style = style;
@@ -202,8 +200,15 @@ export default class ListTabulator {
 
         parentItem.appendChild(itemEl);
 
+        /**
+         * Check if there are child items
+         */
         if (item.items.length) {
-          const sublistWrapper = this.list?.renderWrapper(this.currentLevel)
+          const sublistWrapper = this.list?.renderWrapper(this.currentLevel);
+
+          /**
+           * Recursively render child items
+           */
           this.appendItems(item.items, sublistWrapper!);
           this.currentLevel -= 1;
 

@@ -1,17 +1,17 @@
 import type { UnorderedListItemMeta } from "../types/ItemMeta";
 import { NestedListConfig } from "../types/ListParams";
 import * as Dom from '../utils/Dom';
-import { ListRendererInterface, DefaultListCssClasses } from './ListRenderer';
+import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListRenderer';
 import type { ListCssClasses } from './ListRenderer';
 
 interface UnoderedListCssClasses extends ListCssClasses {
-  wrapperUnordered: string;
+  unorderedList: string;
 }
 
 /**
  * Class that is responsible for unordered list rendering
  */
-export class UnorderedListRenderer implements ListRendererInterface {
+export class UnorderedListRenderer implements ListRendererInterface<UnorderedListItemMeta> {
   /**
    * Tool's configuration
    */
@@ -28,7 +28,7 @@ export class UnorderedListRenderer implements ListRendererInterface {
   static get CSS(): UnoderedListCssClasses {
     return {
       ...DefaultListCssClasses,
-      wrapperUnordered: '${CssPrefix}--unordered',
+      unorderedList: `${CssPrefix}-unordered`,
     }
   }
 
@@ -49,9 +49,9 @@ export class UnorderedListRenderer implements ListRendererInterface {
      * Check if it's root level
      */
     if (level === 0) {
-      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapper, UnorderedListRenderer.CSS.wrapperUnordered]) as HTMLUListElement;
+      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapper, UnorderedListRenderer.CSS.unorderedList]) as HTMLUListElement;
     } else {
-      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapperUnordered, UnorderedListRenderer.CSS.itemChildren]) as HTMLUListElement;
+      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.unorderedList, UnorderedListRenderer.CSS.itemChildren]) as HTMLUListElement;
     }
 
     return wrapperElement;

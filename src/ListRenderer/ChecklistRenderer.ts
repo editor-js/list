@@ -6,7 +6,7 @@ import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListR
 import type { ListCssClasses } from './ListRenderer';
 
 interface ChecklistCssClasses extends ListCssClasses{
-  wrapperChecklist: string;
+  checklist: string;
   itemChecked: string;
   noHover: string;
   checkbox: string;
@@ -16,7 +16,7 @@ interface ChecklistCssClasses extends ListCssClasses{
 /**
  * Class that is responsible for checklist rendering
  */
-export class CheckListRenderer implements ListRendererInterface {
+export class CheckListRenderer implements ListRendererInterface<ChecklistItemMeta> {
   /**
    * Tool's configuration
    */
@@ -30,7 +30,7 @@ export class CheckListRenderer implements ListRendererInterface {
   static get CSS(): ChecklistCssClasses {
     return {
       ...DefaultListCssClasses,
-      wrapperChecklist: `${CssPrefix}--checklist`,
+      checklist: `${CssPrefix}-checklist`,
       itemChecked: `${CssPrefix}__checkbox--checked`,
       noHover: `${CssPrefix}__checkbox--no-hover`,
       checkbox: `${CssPrefix}__checkbox-check`,
@@ -44,7 +44,7 @@ export class CheckListRenderer implements ListRendererInterface {
   }
 
   /**
-   * Renders ol wrapper for list
+   * Renders ul wrapper for list
    * @param level - level of nesting (0 for the rool level)
    * @returns - created html ul element
    */
@@ -55,7 +55,7 @@ export class CheckListRenderer implements ListRendererInterface {
      * Check if it's root level
      */
     if (level === 0) {
-      wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.wrapper, CheckListRenderer.CSS.wrapperChecklist]) as HTMLUListElement;
+      wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.wrapper, CheckListRenderer.CSS.checklist]) as HTMLUListElement;
 
       /**
        * Delegate clicks from wrapper to items
@@ -71,7 +71,7 @@ export class CheckListRenderer implements ListRendererInterface {
         }
       });
     } else {
-      wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.wrapperChecklist, CheckListRenderer.CSS.itemChildren]) as HTMLUListElement;
+      wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.checklist, CheckListRenderer.CSS.itemChildren]) as HTMLUListElement;
     }
 
     return wrapperElement;
@@ -107,7 +107,6 @@ export class CheckListRenderer implements ListRendererInterface {
 
   /**
    * Return the item content
-   *
    * @param {Element} item - item wrapper (<li>)
    * @returns {string}
    */

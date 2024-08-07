@@ -15,7 +15,7 @@ import './../styles/index.pcss';
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
  */
-export type NestedListParams = BlockToolConstructorOptions<ListData, NestedListConfig>;
+export type ListParams = BlockToolConstructorOptions<ListData, NestedListConfig>;
 
 /**
  * Default class of the component used in editor
@@ -136,7 +136,7 @@ export default class NestedList {
    * @param {object} params.api - Editor.js API
    * @param {boolean} params.readOnly - read-only mode flag
    */
-  constructor({ data, config, api, readOnly }: NestedListParams) {
+  constructor({ data, config, api, readOnly }: ListParams) {
     this.api = api;
     this.readOnly = readOnly;
     this.config = config;

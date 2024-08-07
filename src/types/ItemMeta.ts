@@ -1,7 +1,7 @@
 /**
  * Meta information of each list item
  */
-interface ItemMeta {};
+export interface ItemMeta {};
 
 /**
  * Meta information of checklist item

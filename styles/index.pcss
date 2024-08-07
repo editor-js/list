@@ -1,4 +1,4 @@
-.${CssPrefix} {
+.cdx-list {
   margin: 0;
   padding: 0;
   outline: none;
@@ -45,19 +45,19 @@
     }
   }
 
-  &--ordered > &__item::before {
-    content: counters(item, ".") "."
+  &-ordered &__item::before {
+    content: counters(item, ".") ".";
   }
 
-  &--ordered {
+  &-ordered {
     counter-reset: item;
   }
 
-  &--unordered > &__item::before {
+  &-unordered &__item::before {
     content: "•";
   }
 
-  &--checklist > &__item::before {
+  &-checklist &__item::before {
     content: "";
   }
 
@@ -68,6 +68,7 @@
   }
 
   &__checkbox {
+    padding-top: calc((var(--line-height) - var(--size-checkbox)) / 2);
     grid-area: checkbox;
     width: var(--size-checkbox);
     height: var(--size-checkbox);
