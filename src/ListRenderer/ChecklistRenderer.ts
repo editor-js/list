@@ -5,7 +5,7 @@ import * as Dom from '../utils/Dom';
 import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListRenderer';
 import type { ListCssClasses } from './ListRenderer';
 
-interface ChecklistCssClasses extends ListCssClasses{
+interface ChecklistCssClasses extends ListCssClasses {
   checklist: string;
   itemChecked: string;
   noHover: string;

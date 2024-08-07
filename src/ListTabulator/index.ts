@@ -207,7 +207,8 @@ export default class ListTabulator {
           const sublistWrapper = this.list?.renderWrapper(this.currentLevel);
 
           /**
-           * Recursively render child items
+           * Recursively render child items, it will increase currentLevel varible
+           * after filling level with items we will need to decrease currentLevel
            */
           this.appendItems(item.items, sublistWrapper!);
           this.currentLevel -= 1;
