@@ -4,7 +4,7 @@ import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
 import { NestedListConfig, ListData, ListDataStyle } from "../types/ListParams"
 import { ListItem } from "../types/ListParams";
 import { isHtmlElement } from '../utils/type-guards';
-import Caret from '../utils/t';
+import Caret from '../utils/Caret';
 import { ListRenderer } from "../ListRenderer";
 import * as Dom from '../utils/Dom'
 import type { PasteEvent } from '../types';
