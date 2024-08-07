@@ -4,9 +4,9 @@ import type {
   BlockToolConstructorOptions,
   TunesMenuConfig,
 } from '@editorjs/editorjs/types/tools';
-import Caret from './utils/Caret';
+import Caret from './utils/t';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
-import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/LiistParams';
+import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/ListParams';
 import ListTabulator from './ListTabulator';
 
 /**

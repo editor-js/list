@@ -1,4 +1,4 @@
-import * as dom from './DDom';
+import * as dom from './Dom';
 import { isHtmlElement } from './type-guards';
 
 /**

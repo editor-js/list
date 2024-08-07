@@ -1,6 +1,6 @@
-import type { OrderedListItemMeta } from "../types/IItemMeta";
-import { NestedListConfig } from "../types/LiistParams";
-import * as Dom from '../utils/DDom';
+import type { OrderedListItemMeta } from "../types/ItemMeta";
+import { NestedListConfig } from "../types/ListParams";
+import * as Dom from '../utils/Dom';
 import { ListRenderer } from './ListRenderer';
 import type { ListCssClasses } from './ListRenderer';
 

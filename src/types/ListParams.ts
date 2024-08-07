@@ -1,4 +1,4 @@
-import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "./IItemMeta";
+import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "./ItemMeta";
 
 /**
  * list style to make list as ordered or unordered
