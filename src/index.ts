@@ -6,7 +6,7 @@ import type {
 } from '@editorjs/editorjs/types/tools';
 import Caret from './utils/caret';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
-import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/listParams';
+import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/LiistParams';
 import ListTabulator from './ListTabulator';
 
 /**

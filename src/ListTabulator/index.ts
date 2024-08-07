@@ -1,8 +1,8 @@
 import { CheckListRenderer } from "../ListRenderer/ChecklistRenderer";
 import { OrderedListRenderer } from "../ListRenderer/OrderedListRenderer";
 import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
-import { NestedListConfig, ListData, ListDataStyle } from "../types/listParams"
-import { ListItem } from "../types/listParams";
+import { NestedListConfig, ListData, ListDataStyle } from "../types/LiistParams"
+import { ListItem } from "../types/LiistParams";
 import { isHtmlElement } from '../utils/type-guards';
 import Caret from '../utils/caret';
 import { ListRenderer } from "../ListRenderer";
@@ -10,7 +10,7 @@ import * as Dom from '../utils/dom'
 import type { PasteEvent } from '../types';
 import type { API, PasteConfig } from '@editorjs/editorjs';
 import { NestedListParams } from "..";
-import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/itemMeta";
+import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/IItemMeta";
 
 type NestedListStyle = 'ordered' | 'unordered' | 'checklist';
 
