@@ -1,7 +1,7 @@
 import type { OrderedListItemMeta } from "../types/ItemMeta";
 import { NestedListConfig } from "../types/ListParams";
 import * as Dom from '../utils/Dom';
-import { ListRenderer } from './ListRenderer';
+import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListRenderer';
 import type { ListCssClasses } from './ListRenderer';
 
 /**
@@ -14,7 +14,7 @@ interface OrderedListCssClasses extends ListCssClasses {
 /**
  * Class that is responsible for ordered list rendering
  */
-export class OrderedListRenderer extends ListRenderer {
+export class OrderedListRenderer implements ListRendererInterface {
   /**
    * Tool's configuration
    */
@@ -26,16 +26,13 @@ export class OrderedListRenderer extends ListRenderer {
   private readOnly: boolean;
 
   static get CSS(): OrderedListCssClasses {
-    const listCssClasses = super.CSS;
-
     return {
-      ...listCssClasses,
-      wrapperOrdered: 'cdx-nested-list--ordered',
+      ...DefaultListCssClasses,
+      wrapperOrdered: `${CssPrefix}--ordered`,
     }
   }
 
   constructor(readonly: boolean, config?: NestedListConfig) {
-    super();
     this.config = config;
     this.readOnly = readonly;
   }

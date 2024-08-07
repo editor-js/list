@@ -1,5 +1,20 @@
 /**
- * CSS classes for the Nested List Tool
+ * Default css prefix for list
+ */
+export const CssPrefix = 'cdx-list';
+
+/**
+ * CSS classes for the List Tool
+ */
+export const DefaultListCssClasses = {
+  wrapper: CssPrefix,
+  item: `${CssPrefix}__item`,
+  itemContent: `${CssPrefix}__item-content`,
+  itemChildren: `${CssPrefix}__item-children`,
+}
+
+/**
+ * Interface that represents default list css classes
  */
 export interface ListCssClasses {
   wrapper: string;
@@ -9,22 +24,9 @@ export interface ListCssClasses {
 }
 
 /**
- * List renderer class
- * Used for storing css classes and
+ * List renderer interface
+ * It is implemented by all renderer classes
  */
-export abstract class ListRenderer {
-  /**
-   * Styles
-   *
-   * @returns {NestedListCssClasses} - CSS classes names by keys
-   * @private
-   */
-  static get CSS(): ListCssClasses {
-    return {
-      wrapper: 'cdx-nested-list',
-      item: 'cdx-nested-list__item',
-      itemContent: 'cdx-nested-list__item-content',
-      itemChildren: 'cdx-nested-list__item-children',
-    };
-  }
+export interface ListRendererInterface {
+
 }

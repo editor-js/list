@@ -1,7 +1,7 @@
 import type { UnorderedListItemMeta } from "../types/ItemMeta";
 import { NestedListConfig } from "../types/ListParams";
 import * as Dom from '../utils/Dom';
-import { ListRenderer } from './ListRenderer';
+import { ListRendererInterface, DefaultListCssClasses } from './ListRenderer';
 import type { ListCssClasses } from './ListRenderer';
 
 interface UnoderedListCssClasses extends ListCssClasses {
@@ -11,7 +11,7 @@ interface UnoderedListCssClasses extends ListCssClasses {
 /**
  * Class that is responsible for unordered list rendering
  */
-export class UnorderedListRenderer extends ListRenderer {
+export class UnorderedListRenderer implements ListRendererInterface {
   /**
    * Tool's configuration
    */
@@ -22,18 +22,17 @@ export class UnorderedListRenderer extends ListRenderer {
    */
   private readOnly: boolean;
 
-
+  /**
+   * Getter for all CSS classes used in unordered list rendering
+   */
   static get CSS(): UnoderedListCssClasses {
-    const listCssClasses = super.CSS;
-
     return {
-      ...listCssClasses,
-      wrapperUnordered: 'cdx-nested-list--unordered',
+      ...DefaultListCssClasses,
+      wrapperUnordered: '${CssPrefix}--unordered',
     }
   }
 
   constructor(readonly: boolean, config?: NestedListConfig) {
-    super();
     this.config = config;
     this.readOnly = readonly;
   }

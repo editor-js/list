@@ -5,7 +5,7 @@ import { NestedListConfig, ListData, ListDataStyle } from "../types/ListParams"
 import { ListItem } from "../types/ListParams";
 import { isHtmlElement } from '../utils/type-guards';
 import Caret from '../utils/Caret';
-import { ListRenderer } from "../ListRenderer";
+import { DefaultListCssClasses } from "../ListRenderer";
 import * as Dom from '../utils/Dom'
 import type { PasteEvent } from '../types';
 import type { API, PasteConfig } from '@editorjs/editorjs';
@@ -92,7 +92,7 @@ export default class ListTabulator {
       return null;
     }
 
-    return currentNode.closest(`.cdx-nested-list__item`);
+    return currentNode.closest(DefaultListCssClasses.item);
   }
 
   constructor({data, config, api, readOnly}: NestedListParams, style: NestedListStyle) {
@@ -228,11 +228,11 @@ export default class ListTabulator {
      */
     const getItems = (parent: Element): ListItem[] => {
       const children = Array.from(
-        parent.querySelectorAll(`:scope > .${ListRenderer.CSS.item}`)
+        parent.querySelectorAll(`:scope > .${DefaultListCssClasses.item}`)
       );
 
       return children.map((el) => {
-        const subItemsWrapper = el.querySelector(`.${ListRenderer.CSS.itemChildren}`);
+        const subItemsWrapper = el.querySelector(`.${DefaultListCssClasses.itemChildren}`);
         const content = this.list!.getItemContent(el);
         const meta = this.list!.getItemMeta(el);
         const subItems = subItemsWrapper ? getItems(subItemsWrapper) : [];
@@ -390,7 +390,7 @@ export default class ListTabulator {
     }
     const endingHTML = Dom.fragmentToString(endingFragment);
     const itemChildren = currentItem?.querySelector(
-      `.${ListRenderer.CSS.itemChildren}`
+      `.${DefaultListCssClasses.itemChildren}`
     );
 
     /**
@@ -405,7 +405,7 @@ export default class ListTabulator {
      */
     const childrenExist =
       itemChildren &&
-      Array.from(itemChildren.querySelectorAll(`.${ListRenderer.CSS.item}`)).length > 0;
+      Array.from(itemChildren.querySelectorAll(`.${DefaultListCssClasses.item}`)).length > 0;
 
     /**
      * If item has children, prepend to them
@@ -450,7 +450,7 @@ export default class ListTabulator {
     if (!isHtmlElement(currentItem.parentNode)) {
       return;
     }
-    const parentItem = currentItem.parentNode.closest(`.${ListRenderer.CSS.item}`);
+    const parentItem = currentItem.parentNode.closest(`.${DefaultListCssClasses.item}`);
 
     /**
      * Do nothing with the first item in the first-level list.
@@ -500,7 +500,7 @@ export default class ListTabulator {
      */
     if (previousItem) {
       const childrenOfPreviousItem = previousItem.querySelectorAll(
-        `.${ListRenderer.CSS.item}`
+        `.${DefaultListCssClasses.item}`
       );
 
       targetItem = Array.from(childrenOfPreviousItem).pop() || previousItem;
@@ -524,7 +524,7 @@ export default class ListTabulator {
       return;
     }
     const targetItemContent = targetItem.querySelector<HTMLElement>(
-      `.${ListRenderer.CSS.itemContent}`
+      `.${DefaultListCssClasses.itemContent}`
     );
 
     /**
@@ -550,7 +550,7 @@ export default class ListTabulator {
      */
     let currentItemSublistItems: NodeListOf<Element> | Element[] =
       currentItem.querySelectorAll(
-        `.${ListRenderer.CSS.itemChildren} > .${ListRenderer.CSS.item}`
+        `.${DefaultListCssClasses.itemChildren} > .${DefaultListCssClasses.item}`
       );
 
     /**
@@ -570,7 +570,7 @@ export default class ListTabulator {
       if (!isHtmlElement(node.parentNode)) {
         return false;
       }
-      return node.parentNode.closest(`.${ListRenderer.CSS.item}`) === currentItem;
+      return node.parentNode.closest(`.${DefaultListCssClasses.item}`) === currentItem;
     });
 
     /**
@@ -675,7 +675,7 @@ export default class ListTabulator {
       return;
     }
 
-    const parentItem = currentItem.parentNode.closest(`.${ListRenderer.CSS.item}`);
+    const parentItem = currentItem.parentNode.closest(`.${DefaultListCssClasses.item}`);
 
     /**
      * If item in the first-level list then no need to do anything
@@ -694,7 +694,7 @@ export default class ListTabulator {
      * If previous parent's children list is now empty, remove it.
      */
     const prevParentChildrenList = parentItem.querySelector(
-      `.${ListRenderer.CSS.itemChildren}`
+      `.${DefaultListCssClasses.itemChildren}`
     );
     if (!prevParentChildrenList) {
       return;
@@ -736,7 +736,7 @@ export default class ListTabulator {
     if (!isHtmlElement(prevItem)) {
       return;
     }
-    if (currentItem.querySelector(`.${ListRenderer.CSS.itemChildren}`) !== null) {
+    if (currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`) !== null) {
       return;
     }
     const isFirstChild = !prevItem;
@@ -749,7 +749,7 @@ export default class ListTabulator {
     }
 
     const prevItemChildrenList = prevItem.querySelector(
-      `.${ListRenderer.CSS.itemChildren}`
+      `.${DefaultListCssClasses.itemChildren}`
     );
 
     this.caret.save();
@@ -798,7 +798,7 @@ export default class ListTabulator {
    */
   focusItem(item: Element, atStart: boolean = true): void {
     const itemContent = item.querySelector<HTMLElement>(
-      `.${ListRenderer.CSS.itemContent}`
+      `.${DefaultListCssClasses.itemContent}`
     );
     if (!itemContent) {
       return;

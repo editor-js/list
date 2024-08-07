@@ -2,7 +2,7 @@ import { IconCheck } from '@codexteam/icons'
 import type { ChecklistItemMeta } from "../types/ItemMeta";
 import { NestedListConfig } from "../types/ListParams";
 import * as Dom from '../utils/Dom';
-import { ListRenderer } from './ListRenderer';
+import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListRenderer';
 import type { ListCssClasses } from './ListRenderer';
 
 interface ChecklistCssClasses extends ListCssClasses{
@@ -16,7 +16,7 @@ interface ChecklistCssClasses extends ListCssClasses{
 /**
  * Class that is responsible for checklist rendering
  */
-export class CheckListRenderer extends ListRenderer {
+export class CheckListRenderer implements ListRendererInterface {
   /**
    * Tool's configuration
    */
@@ -28,20 +28,17 @@ export class CheckListRenderer extends ListRenderer {
   private readOnly: boolean;
 
   static get CSS(): ChecklistCssClasses {
-    const listCssClasses = super.CSS;
-
     return {
-      ...listCssClasses,
-      wrapperChecklist: 'cdx-nested-list--checklist',
-      itemChecked: 'cdx-nested-list__checkbox--checked',
-      noHover: 'cdx-nested-list__checkbox--no-hover',
-      checkbox: 'cdx-nested-list__checkbox-check',
-      checkboxContainer: 'cdx-nested-list__checkbox'
+      ...DefaultListCssClasses,
+      wrapperChecklist: `${CssPrefix}--checklist`,
+      itemChecked: `${CssPrefix}__checkbox--checked`,
+      noHover: `${CssPrefix}__checkbox--no-hover`,
+      checkbox: `${CssPrefix}__checkbox-check`,
+      checkboxContainer: `${CssPrefix}__checkbox`
     }
   }
 
   constructor(readonly: boolean, config?: NestedListConfig) {
-    super();
     this.config = config;
     this.readOnly = readonly;
   }
@@ -61,7 +58,7 @@ export class CheckListRenderer extends ListRenderer {
       wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.wrapper, CheckListRenderer.CSS.wrapperChecklist]) as HTMLUListElement;
 
       /**
-       * Listen to clicks on checkbox
+       * Delegate clicks from wrapper to items
        */
       wrapperElement.addEventListener('click', (event) => {
         const target = event.target as Element;

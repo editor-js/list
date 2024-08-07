@@ -1,10 +1,8 @@
 import type { API, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
-import type { PasteEvent } from './types';
 import type {
   BlockToolConstructorOptions,
   TunesMenuConfig,
 } from '@editorjs/editorjs/types/tools';
-import Caret from './utils/Caret';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
 import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/ListParams';
 import ListTabulator from './ListTabulator';
