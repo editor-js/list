@@ -4,9 +4,9 @@ import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
 import { NestedListConfig, ListData, ListDataStyle } from "../types/LiistParams"
 import { ListItem } from "../types/LiistParams";
 import { isHtmlElement } from '../utils/type-guards';
-import Caret from '../utils/caret';
+import Caret from '../utils/Caret';
 import { ListRenderer } from "../ListRenderer";
-import * as Dom from '../utils/dom'
+import * as Dom from '../utils/DDom'
 import type { PasteEvent } from '../types';
 import type { API, PasteConfig } from '@editorjs/editorjs';
 import { NestedListParams } from "..";
