@@ -20,5 +20,9 @@ export default {
     VERSION: JSON.stringify(VERSION),
   },
 
+  server: {
+    port: 3303,
+    open: true,
+  },
   plugins: [cssInjectedByJsPlugin(), dts()],
 };
