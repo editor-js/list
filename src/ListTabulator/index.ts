@@ -71,9 +71,13 @@ export default class ListTabulator {
   get currentItem(): Element | null {
     const selection = window.getSelection();
 
-    if (!selection) {
+    /**
+     * Check if selection exists
+     */
+    if (selection === null) {
       return null;
     }
+
     let currentNode = selection.anchorNode;
 
     if (!currentNode) {
@@ -90,7 +94,37 @@ export default class ListTabulator {
       return null;
     }
 
-    return currentNode.closest(DefaultListCssClasses.item);
+    return currentNode.closest(`.${DefaultListCssClasses.item}`);
+  }
+
+  /**
+   * Returns parent item of the current one if it exists, null otherwise
+   *
+   * @returns {Element}
+   */
+  get parentItem(): Element | null {
+    const currentItem = this.currentItem;
+
+    /**
+     * Check that current item exists
+     */
+    if (currentItem === null) {
+      return null
+    }
+    /**
+     * Check that item has parent node
+     */
+    if (currentItem.parentNode === null) {
+      return null;
+    }
+    /**
+     * Check that current item parent node is a html element
+     */
+    if (!isHtmlElement(currentItem.parentNode)) {
+      return null;
+    }
+
+    return currentItem.parentNode.closest(`.${DefaultListCssClasses.item}`);
   }
 
   constructor({data, config, api, readOnly}: ListParams, style: ListDataStyle) {
@@ -671,26 +705,40 @@ export default class ListTabulator {
    */
   unshiftItem(): void {
     const currentItem = this.currentItem;
-    if (!currentItem) {
-      return;
-    }
-    if (!currentItem.parentNode) {
-      return;
-    }
-    if (!isHtmlElement(currentItem.parentNode)) {
-      return;
-    }
+    const parentItem = this.parentItem;
 
-    const parentItem = currentItem.parentNode.closest(`.${DefaultListCssClasses.item}`);
+    if (currentItem === null) {
+      return;
+    }
 
     /**
      * If item in the first-level list then no need to do anything
      */
-    if (!parentItem) {
+    if (parentItem === null) {
       return;
     }
 
+    const currentItemWrapper = this.list!.renderWrapper(1);
+
+    let sibling = currentItem.nextElementSibling;
+
+    while (sibling) {
+      console.log('sib', sibling)
+      if (sibling.classList.contains(DefaultListCssClasses.item)) {
+        currentItemWrapper.appendChild(sibling);
+      }
+      sibling = sibling.nextElementSibling;
+    }
+
+    console.log('wrapper with siblings', currentItemWrapper);
+
+    currentItem.appendChild(currentItemWrapper);
+
+    console.log('current item generated', currentItem);
+
     this.caret.save();
+
+    console.log(parentItem);
 
     parentItem.after(currentItem);
 
@@ -786,8 +834,6 @@ export default class ListTabulator {
       const newSublistItem = this.list!.renderItem(this.list!.getItemContent(currentItem), {checked: false});
 
       sublistWrapper.appendChild(newSublistItem);
-
-      console.log(prevItem, sublistWrapper)
 
       prevItem?.appendChild(sublistWrapper);
     }
