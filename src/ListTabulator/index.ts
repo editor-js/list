@@ -718,30 +718,45 @@ export default class ListTabulator {
       return;
     }
 
-    const currentItemWrapper = this.list!.renderWrapper(1);
+    let currentItemChildWrapper = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+
+    if (currentItemChildWrapper === null) {
+      currentItemChildWrapper = this.list!.renderWrapper(1);
+    }
 
     let sibling = currentItem.nextElementSibling;
 
+    /**
+     * Check for trailing siblings of the current item
+     */
     while (sibling) {
-      console.log('sib', sibling)
+      /**
+       * Check for trailing siblings of the item
+       * If they exist, they should be moved to children of curret item
+       * This will let them stay on their nesting level
+       */
       if (sibling.classList.contains(DefaultListCssClasses.item)) {
-        currentItemWrapper.appendChild(sibling);
+        currentItemChildWrapper.appendChild(sibling);
       }
+
       sibling = sibling.nextElementSibling;
     }
 
-    console.log('wrapper with siblings', currentItemWrapper);
+    currentItem.appendChild(currentItemChildWrapper);
 
-    currentItem.appendChild(currentItemWrapper);
-
-    console.log('current item generated', currentItem);
-
+    /**
+     * Save caret inside the current item element
+     */
     this.caret.save();
 
-    console.log(parentItem);
-
+    /**
+     * Move current item with all childs and trailing siblings as childs after the parent
+     */
     parentItem.after(currentItem);
 
+    /**
+     * Restore caret after moving current item to other parent
+     */
     this.caret.restore();
 
     /**
