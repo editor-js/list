@@ -414,25 +414,43 @@ export default class ListTabulator {
 
         const newListItems: Element[] = [];
 
+        /**
+         * Form array of trailing elements to be moved to separate list
+         */
         while (trailingElement !== null) {
           newListItems.push(trailingElement);
 
           trailingElement = trailingElement.nextElementSibling;
         }
 
+        /**
+         * Append new list wrapper with trailing elements
+         */
         newListItems.forEach((item) => {
           newListWrapper.appendChild(item);
         })
 
         const newListContent = this.save(newListWrapper);
 
+        /**
+         * Get current list block index
+         */
         const currentBlockIndex = this.api.blocks.getCurrentBlockIndex();
         const currentBlock = this.api.blocks.getBlockByIndex(currentBlockIndex);
 
+        /**
+         * Insert paragraph
+         */
         this.getOutOfList();
 
+        /**
+         * Insert separated list with trailing items
+         */
         this.api.blocks.insert(currentBlock?.name, newListContent, this.config, currentBlockIndex + 2);
 
+        /**
+         * Remove temporary new list wrapper used for content save
+         */
         newListWrapper.remove();
       }
 
