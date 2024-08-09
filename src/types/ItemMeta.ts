@@ -1,7 +1,12 @@
 /**
  * Meta information of each list item
  */
-export interface ItemMeta {};
+export interface ItemMeta {
+  /**
+   * Level of the current item nesting
+   */
+  level: number;
+};
 
 /**
  * Meta information of checklist item

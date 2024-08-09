@@ -15,17 +15,7 @@
 
   &__item {
     line-height: var(--line-height);
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    grid-template-areas:
-      "checkbox content"
-      ". child";
-    margin: 2px 0;
-
-    &-children {
-      grid-area: child;
-    }
+    display: flex;
 
     [contenteditable]{
       outline: none;
@@ -35,14 +25,19 @@
       margin-left: 8px;
       word-break: break-word;
       white-space: pre-wrap;
-      grid-area: content;
     }
 
     &::before {
-      counter-increment: item;
       margin-right: 5px;
       white-space: nowrap;
     }
+  }
+
+  &__item[level] {
+    counter-reset: item;
+    counter-increment: item;
+    --level: attr(level number);
+    padding-left: calc(var(--level) * 20px);
   }
 
   &-ordered &__item::before {
@@ -69,7 +64,6 @@
 
   &__checkbox {
     padding-top: calc((var(--line-height) - var(--size-checkbox)) / 2);
-    grid-area: checkbox;
     width: var(--size-checkbox);
     height: var(--size-checkbox);
     display: flex;

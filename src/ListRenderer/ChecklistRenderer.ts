@@ -48,31 +48,24 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
    * @param level - level of nesting (0 for the rool level)
    * @returns - created html ul element
    */
-  renderWrapper(level: number): HTMLUListElement {
+  renderWrapper(): HTMLUListElement {
     let wrapperElement: HTMLUListElement;
 
+    wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.wrapper, CheckListRenderer.CSS.checklist]) as HTMLUListElement;
+
     /**
-     * Check if it's root level
+     * Delegate clicks from wrapper to items
      */
-    if (level === 0) {
-      wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.wrapper, CheckListRenderer.CSS.checklist]) as HTMLUListElement;
+    wrapperElement.addEventListener('click', (event) => {
+      const target = event.target as Element;
+      if (target){
+        const checkbox = target.closest(`.${CheckListRenderer.CSS.checkboxContainer}`);
 
-      /**
-       * Delegate clicks from wrapper to items
-       */
-      wrapperElement.addEventListener('click', (event) => {
-        const target = event.target as Element;
-        if (target){
-          const checkbox = target.closest(`.${CheckListRenderer.CSS.checkboxContainer}`);
-
-          if (checkbox && checkbox.contains(target)) {
-            this.toggleCheckbox(checkbox);
-          }
+        if (checkbox && checkbox.contains(target)) {
+          this.toggleCheckbox(checkbox);
         }
-      });
-    } else {
-      wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.checklist, CheckListRenderer.CSS.itemChildren]) as HTMLUListElement;
-    }
+      }
+    });
 
     return wrapperElement;
   }
@@ -82,7 +75,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
    * @param content - content of the list item
    * @returns - created html list item element
    */
-  renderItem(content: string, meta: ChecklistItemMeta ): HTMLLIElement {
+  renderItem(content: string, meta: ChecklistItemMeta): HTMLLIElement {
     const itemWrapper = Dom.make('li', [CheckListRenderer.CSS.item, CheckListRenderer.CSS.item]);
     const itemContent = Dom.make('div', CheckListRenderer.CSS.itemContent, {
       innerHTML: content,
@@ -98,6 +91,9 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
 
     checkbox.innerHTML = IconCheck;
     checkboxContainer.appendChild(checkbox);
+
+    itemWrapper.setAttribute('level', meta.level.toString());
+    itemWrapper.setAttribute('style', `--level: ${meta.level};`);
 
     itemWrapper.appendChild(checkboxContainer);
     itemWrapper.appendChild(itemContent);
@@ -131,7 +127,22 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
   getItemMeta(item: Element): ChecklistItemMeta  {
     const checkbox = item.querySelector(`.${CheckListRenderer.CSS.checkboxContainer}`);
 
+    const itemLevelAttribute = item.getAttribute('level');
+
+    let itemLevel: number;
+
+    if (itemLevelAttribute === null) {
+      itemLevel = 0;
+    } else {
+      try {
+        itemLevel = parseInt(itemLevelAttribute);
+      } catch {
+        itemLevel = 0;
+      };
+    }
+
     return {
+      level: itemLevel,
       checked: checkbox ? checkbox.classList.contains(CheckListRenderer.CSS.itemChecked) : false,
     }
   }
@@ -159,5 +170,15 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
   private removeSpecialHoverBehavior(el: Element) {
     el.classList.remove(CheckListRenderer.CSS.noHover);
   }
+
+  clearItemContent(item: Element): void {
+    const itemContent = item.querySelector(`.${CheckListRenderer.CSS.itemContent}`);
+
+    itemContent?.remove();
+
+    const itemCheckbox = item.querySelector(`.${CheckListRenderer.CSS.checkboxContainer}`);
+
+    itemCheckbox?.remove();
+  };
 }
 

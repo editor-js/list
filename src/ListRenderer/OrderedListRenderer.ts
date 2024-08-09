@@ -42,17 +42,10 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
    * @param level - level of nesting (0 for the rool level)
    * @returns - created html ol element
    */
-  renderWrapper(level: number): HTMLOListElement {
+  renderWrapper(): HTMLOListElement {
     let wrapperElement: HTMLOListElement;
 
-    /**
-     * Check if it's root level
-     */
-    if (level === 0) {
-      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapper, OrderedListRenderer.CSS.orderedList]) as HTMLOListElement;
-    } else {
-      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.orderedList, OrderedListRenderer.CSS.itemChildren]) as HTMLOListElement;
-    }
+    wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapper, OrderedListRenderer.CSS.orderedList]) as HTMLOListElement;
 
     return wrapperElement;
   }
@@ -67,6 +60,9 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
+
+    itemWrapper.setAttribute('level', meta.level.toString());
+    itemWrapper.setAttribute('style', `--level: ${meta.level};`);
 
     itemWrapper.appendChild(itemContent);
 
@@ -94,9 +90,32 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
 
   /**
    * Returns item meta, for ordered list
+   * @param {Element} item - item of the list to get meta from
    * @returns Item meta object
    */
-  getItemMeta(): OrderedListItemMeta  {
-    return {}
+  getItemMeta(item: Element): OrderedListItemMeta  {
+    const itemLevelAttribute = item.getAttribute('level');
+
+    let itemLevel: number;
+
+    if (itemLevelAttribute === null) {
+      itemLevel = 0;
+    } else {
+      try {
+        itemLevel = parseInt(itemLevelAttribute);
+      } catch {
+        itemLevel = 0;
+      };
+    }
+
+    return {
+      level: itemLevel,
+    }
   }
+
+  clearItemContent(item: Element): void {
+    const itemContent = item.querySelector(`.${OrderedListRenderer.CSS.itemContent}`);
+
+    itemContent?.remove();
+  };
 }

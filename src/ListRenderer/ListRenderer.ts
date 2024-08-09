@@ -12,6 +12,7 @@ export const DefaultListCssClasses = {
   item: `${CssPrefix}__item`,
   itemContent: `${CssPrefix}__item-content`,
   itemChildren: `${CssPrefix}__item-children`,
+  itemAnchor: `${CssPrefix}-anchor`,
 }
 
 /**
@@ -22,6 +23,7 @@ export interface ListCssClasses {
   item: string;
   itemContent: string;
   itemChildren: string;
+  itemAnchor: string;
 }
 
 /**
@@ -30,17 +32,16 @@ export interface ListCssClasses {
 export interface ListRendererInterface<ItemMeta> {
   /**
    * Renders wrapper for list
-   * @param level - level of nesting (0 for the rool level)
-   * @returns - created html ul element
+   * @returns - created html element
    */
-  renderWrapper: (level: number) => HTMLElement;
+  renderWrapper: () => HTMLElement;
 
   /**
    * Redners list item element
    * @param content - content of the list item
    * @returns - created html list item element
    */
-  renderItem: (content: string, meta: ItemMeta) => HTMLElement;
+  renderItem: (content: string, meta: ItemMeta, level: number) => HTMLElement | null;
 
   /**
    * Return the item content
@@ -55,4 +56,11 @@ export interface ListRendererInterface<ItemMeta> {
    * @returns {ItemMeta} Item meta object
    */
   getItemMeta: (item: Element) => ItemMeta;
+
+  /**
+   * Deletes item content with list bullet (could be checkbox or counter or bullet)
+   * @param item - item, whose content would be cleared
+   * @returns {void}
+   */
+  clearItemContent: (item: Element) => void;
 };

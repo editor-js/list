@@ -42,17 +42,10 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
    * @param level - level of nesting (0 for the rool level)
    * @returns - created html ul element
    */
-  renderWrapper(level: number): HTMLUListElement {
+  renderWrapper(): HTMLUListElement {
     let wrapperElement: HTMLUListElement;
 
-    /**
-     * Check if it's root level
-     */
-    if (level === 0) {
-      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapper, UnorderedListRenderer.CSS.unorderedList]) as HTMLUListElement;
-    } else {
-      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.unorderedList, UnorderedListRenderer.CSS.itemChildren]) as HTMLUListElement;
-    }
+    wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapper, UnorderedListRenderer.CSS.unorderedList]) as HTMLUListElement;
 
     return wrapperElement;
   }
@@ -68,6 +61,9 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
+
+    itemWrapper.setAttribute('level', meta.level.toString());
+    itemWrapper.setAttribute('style', `--level: ${meta.level};`);
 
     itemWrapper.appendChild(itemContent);
 
@@ -95,9 +91,32 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
 
   /**
    * Returns item meta, for unordered list
+   * @param {Element} item - item of the list to get meta from
    * @returns Item meta object
    */
-  getItemMeta(): UnorderedListItemMeta  {
-    return {}
+  getItemMeta(item: Element): UnorderedListItemMeta  {
+    const itemLevelAttribute = item.getAttribute('level');
+
+    let itemLevel: number;
+
+    if (itemLevelAttribute === null) {
+      itemLevel = 0;
+    } else {
+      try {
+        itemLevel = parseInt(itemLevelAttribute);
+      } catch {
+        itemLevel = 0;
+      };
+    }
+
+    return {
+      level: itemLevel,
+    }
   }
+
+  clearItemContent(item: Element): void {
+    const itemContent = item.querySelector(`.${UnorderedListRenderer.CSS.itemContent}`);
+
+    itemContent?.remove();
+  };
 }
