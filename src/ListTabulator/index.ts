@@ -663,7 +663,6 @@ export default class ListTabulator {
     this.unshiftItem();
   }
 
-
   /**
    * Decrease indentation of the current item
    *
@@ -807,16 +806,11 @@ export default class ListTabulator {
         child.classList.contains(`${DefaultListCssClasses.item}`)
       );
 
-      console.log(currentItemChildrenList)
-
-
       /**
        * Move current item sublists one level back
        */
       if (currentItemChildrenList !== null) {
-        const childrenList = Array.from(currentItemChildrenList);
-
-        childrenList.forEach((child) => {
+        currentItemChildrenList.forEach((child) => {
           prevItemChildrenList.appendChild(child);
         })
       }
@@ -830,19 +824,22 @@ export default class ListTabulator {
       prevItemChildrenListWrapper.appendChild(currentItem);
 
       /**
+       * Get current item child wrapper
+       */
+      const currentItemChildWrapper = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+
+      /**
        * Get all current item child to be moved to previous nesting level
        */
-      const currentItemChildrenList = currentItem.querySelectorAll(
-        `.${DefaultListCssClasses.item}`
+      const currentItemChildrenList = Array.from(currentItemChildWrapper?.children ?? []).filter(child =>
+        child.classList.contains(`${DefaultListCssClasses.item}`)
       );
 
       /**
        * Move current item sublists one level back
        */
       if (currentItemChildrenList !== null) {
-        const childrenList = Array.from(currentItemChildrenList);
-
-        childrenList.forEach((child) => {
+        currentItemChildrenList.forEach((child) => {
           prevItemChildrenListWrapper.appendChild(child);
         })
       }
