@@ -223,9 +223,12 @@ export default class ListTabulator {
 
   /**
    * Function that is responsible for list content saving
-   * @returns saved list data
+   * @param wrapper - optional argument wrapper
+   * @returns whole list saved data if wrapper not passes, otherwise will return data of the passed wrapper
    */
-  save(): ListData {
+  save(wrapper?: HTMLElement): ListData {
+    const listWrapper = wrapper ?? this.listWrapper;
+
     /**
      * The method for recursive collecting of the child items
      *
@@ -253,7 +256,7 @@ export default class ListTabulator {
 
     return {
       style: this.data.style,
-      items: this.listWrapper ? getItems(this.listWrapper) : [],
+      items: listWrapper ? getItems(listWrapper) : [],
     };
   }
 
@@ -366,6 +369,9 @@ export default class ListTabulator {
     if (event.isComposing) {
       return;
     }
+    if (currentItem === null) {
+      return;
+    }
 
     /**
      * On Enter in the last empty item, get out of list
@@ -373,14 +379,65 @@ export default class ListTabulator {
     const isEmpty = currentItem
       ? this.list?.getItemContent(currentItem).trim().length === 0
       : true;
-    const isFirstLevelItem = currentItem?.parentNode === this.listWrapper;
-    const isLastItem = currentItem?.nextElementSibling === null;
+    const isFirstLevelItem = currentItem.parentNode === this.listWrapper;
+    const isLastItem = currentItem.nextElementSibling === null;
 
-    if (isFirstLevelItem && isLastItem && isEmpty) {
-      this.getOutOfList();
+    if (isFirstLevelItem && isEmpty) {
+      if (isLastItem) {
+        this.getOutOfList();
+      }
+      /**
+       * If enter is pressed in the senter of the list we should split it
+       */
+      else {
+        const currentItemChildWrapper = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+
+        let firstChildItem: Element | null = null;
+
+        /**
+         * We should unshift child items to the first level before splitting
+         */
+        if (currentItemChildWrapper !== null) {
+          firstChildItem = currentItemChildWrapper.querySelector(`.${DefaultListCssClasses.item}`);
+
+          if (firstChildItem !== null) {
+            this.unshiftItem(firstChildItem);
+          }
+        }
+
+        /**
+         * Render new wrapper for list that would be separated
+         */
+        const newListWrapper = this.list!.renderWrapper(0);
+
+        let trailingElement: Element | null = currentItem.nextElementSibling;
+
+        const newListItems: Element[] = [];
+
+        while (trailingElement !== null) {
+          newListItems.push(trailingElement);
+
+          trailingElement = trailingElement.nextElementSibling;
+        }
+
+        newListItems.forEach((item) => {
+          newListWrapper.appendChild(item);
+        })
+
+        const newListContent = this.save(newListWrapper);
+
+        const currentBlockIndex = this.api.blocks.getCurrentBlockIndex();
+        const currentBlock = this.api.blocks.getBlockByIndex(currentBlockIndex);
+
+        this.getOutOfList();
+
+        this.api.blocks.insert(currentBlock?.name, newListContent, this.config, currentBlockIndex + 2);
+
+        newListWrapper.remove();
+      }
 
       return;
-    } else if (isLastItem && isEmpty) {
+    } else if (isEmpty) {
       this.unshiftItem();
 
       return;
@@ -668,8 +725,8 @@ export default class ListTabulator {
    *
    * @returns {void}
    */
-  unshiftItem(): void {
-    const currentItem = this.currentItem;
+  unshiftItem(item?: Element): void {
+    const currentItem = item ?? this.currentItem;
     if (!currentItem) {
       return;
     }
