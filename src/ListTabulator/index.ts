@@ -381,9 +381,10 @@ export default class ListTabulator {
       : true;
     const isFirstLevelItem = currentItem.parentNode === this.listWrapper;
     const isLastItem = currentItem.nextElementSibling === null;
+    const hasSublist = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`) !== null;
 
     if (isFirstLevelItem && isEmpty) {
-      if (isLastItem) {
+      if (isLastItem && !hasSublist) {
         this.getOutOfList();
       }
       /**
@@ -418,6 +419,7 @@ export default class ListTabulator {
          * Form array of trailing elements to be moved to separate list
          */
         while (trailingElement !== null) {
+          console.log('trailing', trailingElement);
           newListItems.push(trailingElement);
 
           trailingElement = trailingElement.nextElementSibling;
@@ -429,6 +431,8 @@ export default class ListTabulator {
         newListItems.forEach((item) => {
           newListWrapper.appendChild(item);
         })
+
+        console.log('new wrapper', newListWrapper);
 
         const newListContent = this.save(newListWrapper);
 
