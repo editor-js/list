@@ -90,7 +90,7 @@ export default class ListTabulator {
       return null;
     }
 
-    return currentNode.closest(DefaultListCssClasses.item);
+    return currentNode.closest(`.${DefaultListCssClasses.item}`);
   }
 
   constructor({data, config, api, readOnly}: ListParams, style: ListDataStyle) {
@@ -690,6 +690,36 @@ export default class ListTabulator {
       return;
     }
 
+
+    let currentItemWrapper = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+
+    /**
+     * If there is no child wrapper, render one
+     */
+    if (currentItemWrapper === null) {
+      currentItemWrapper = this.list!.renderWrapper(1);
+    }
+
+    let sibling = currentItem.nextElementSibling;
+
+    const trailingSiblings: Element[] = [];
+
+    /**
+     * Form trailing siblings array
+     */
+    while (sibling) {
+      if (sibling.classList.contains(DefaultListCssClasses.item)) {
+        trailingSiblings.push(sibling);
+      }
+      sibling = sibling.nextElementSibling;
+    }
+
+    trailingSiblings.forEach((sibling) => {
+      currentItemWrapper.appendChild(sibling);
+    })
+
+    currentItem.appendChild(currentItemWrapper);
+
     this.caret.save();
 
     parentItem.after(currentItem);
@@ -735,22 +765,16 @@ export default class ListTabulator {
     if (!currentItem) {
       return;
     }
+
+    /**
+     * Check that the item has potential parent
+     */
     const prevItem = currentItem.previousSibling;
-    if (!prevItem) {
+
+    if (prevItem === null) {
       return;
     }
     if (!isHtmlElement(prevItem)) {
-      return;
-    }
-    if (currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`) !== null) {
-      return;
-    }
-    const isFirstChild = !prevItem;
-
-    /**
-     * In the first item we should not handle Tabs (because there is no parent item above)
-     */
-    if (isFirstChild) {
       return;
     }
 
@@ -762,34 +786,68 @@ export default class ListTabulator {
 
     /**
      * If prev item has child items, just append current to them
+     * Else render new child wrapper for previous item
      */
     if (prevItemChildrenList) {
       /**
-       * CurrentItem would not be removed soon (it should be cleared content and checkbox would be removed)
-       * after that elements with child items would be moveable too
+       * Previous item would be appended with current item and it's sublists
+       * After that sublists would be moved one level back
        */
-      currentItem.remove();
-      const newSublistItem = this.list!.renderItem(this.list!.getItemContent(currentItem), {checked: false});
-      prevItemChildrenList.appendChild(newSublistItem);
+      prevItemChildrenList.appendChild(currentItem);
+
+      /**
+       * Get current item child wrapper
+       */
+      const currentItemChildWrapper = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+
+      /**
+       * Get all current item child to be moved to previous nesting level
+       */
+      const currentItemChildrenList = Array.from(currentItemChildWrapper?.children ?? []).filter(child =>
+        child.classList.contains(`${DefaultListCssClasses.item}`)
+      );
+
+      console.log(currentItemChildrenList)
+
+
+      /**
+       * Move current item sublists one level back
+       */
+      if (currentItemChildrenList !== null) {
+        const childrenList = Array.from(currentItemChildrenList);
+
+        childrenList.forEach((child) => {
+          prevItemChildrenList.appendChild(child);
+        })
+      }
     } else {
+      const prevItemChildrenListWrapper = this.list!.renderWrapper(1);
+
       /**
-       * CurrentItem would not be removed soon (it should be cleared content and checkbox would be removed)
-       * after that elements with child items would be moveable too
+       * Previous item would be appended with current item and it's sublists
+       * After that sublists would be moved one level back
        */
-      currentItem.remove();
+      prevItemChildrenListWrapper.appendChild(currentItem);
+
       /**
-       * If prev item has no child items
-       * - Create and append children wrapper to the previous item
-       * - Append current item to it
+       * Get all current item child to be moved to previous nesting level
        */
-      const sublistWrapper = this.list!.renderWrapper(1);
-      const newSublistItem = this.list!.renderItem(this.list!.getItemContent(currentItem), {checked: false});
+      const currentItemChildrenList = currentItem.querySelectorAll(
+        `.${DefaultListCssClasses.item}`
+      );
 
-      sublistWrapper.appendChild(newSublistItem);
+      /**
+       * Move current item sublists one level back
+       */
+      if (currentItemChildrenList !== null) {
+        const childrenList = Array.from(currentItemChildrenList);
 
-      console.log(prevItem, sublistWrapper)
+        childrenList.forEach((child) => {
+          prevItemChildrenListWrapper.appendChild(child);
+        })
+      }
 
-      prevItem?.appendChild(sublistWrapper);
+      prevItem.appendChild(prevItemChildrenListWrapper);
     }
 
     this.caret.restore();
