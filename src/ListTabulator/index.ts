@@ -484,22 +484,15 @@ export default class ListTabulator {
     const itemEl = this.list!.renderItem(endingHTML, { checked: false });
 
     /**
-     * Check if child items exist
-     *
-     * @type {boolean}
+     * Move new item after current
      */
-    const childrenExist =
-      itemChildren &&
-      Array.from(itemChildren.querySelectorAll(`.${DefaultListCssClasses.item}`)).length > 0;
+    currentItem?.after(itemEl);
 
     /**
-     * If item has children, prepend to them
-     * Otherwise, insert the new item after current
+     * If current item has children, move them to the new item
      */
-    if (childrenExist) {
-      itemChildren.prepend(itemEl);
-    } else {
-      currentItem?.after(itemEl);
+    if (itemChildren) {
+      itemEl.appendChild(itemChildren);
     }
 
     this.focusItem(itemEl);
