@@ -1,6 +1,6 @@
 import type { UnorderedListItemMeta } from "../types/ItemMeta";
 import { NestedListConfig } from "../types/ListParams";
-import * as Dom from '../utils/Dom';
+import * as Dom from '@editorjs/dom';
 import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListRenderer';
 import type { ListCssClasses } from './ListRenderer';
 

@@ -4,9 +4,10 @@ import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
 import { NestedListConfig, ListData, ListDataStyle } from "../types/ListParams"
 import { ListItem } from "../types/ListParams";
 import { isHtmlElement } from '../utils/type-guards';
-import Caret from '../utils/Caret';
+import { save, getContenteditableSlice, getCaretNodeAndOffset, focus } from '@editorjs/caret';
+import { isCaretAtStartOfInput } from '@editorjs/caret';
 import { DefaultListCssClasses } from "../ListRenderer";
-import * as Dom from '../utils/Dom'
+import * as Dom from '@editorjs/dom'
 import type { PasteEvent } from '../types';
 import type { API, PasteConfig } from '@editorjs/editorjs';
 import { ListParams } from "..";
@@ -22,11 +23,6 @@ export default class ListTabulator {
    * The Editor.js API
    */
   private api: API;
-
-  /**
-   * Caret helper
-   */
-  private caret: Caret;
 
   /**
    * Is NestedList Tool read-only option
@@ -68,7 +64,7 @@ export default class ListTabulator {
    *
    * @returns {Element}
    */
-  get currentItem(): Element | null {
+  get currentItem(): HTMLElement | null {
     const selection = window.getSelection();
 
     if (!selection) {
@@ -100,11 +96,6 @@ export default class ListTabulator {
     this.readOnly = readOnly;
     this.api = api;
     this.currentLevel = 0;
-
-    /**
-     * Instantiate caret helper
-     */
-    this.caret = new Caret();
   }
 
   /**
@@ -465,15 +456,21 @@ export default class ListTabulator {
       return;
     }
 
+    const [ currentNode, offset ] = getCaretNodeAndOffset();
+
+    if ( currentNode === null ) {
+      console.log('current node is null');
+      return;
+    }
+
     /**
      * On other Enters, get content from caret till the end of the block
      * And move it to the new item
      */
-    const endingFragment = Caret.extractFragmentFromCaretPositionTillTheEnd();
-    if (!endingFragment) {
-      return;
-    }
-    const endingHTML = Dom.fragmentToString(endingFragment);
+    const endingHTML = getContenteditableSlice(currentItem, currentNode, offset, 'right', true);
+
+    console.log(endingHTML);
+
     const itemChildren = currentItem?.querySelector(
       `.${DefaultListCssClasses.itemChildren}`
     );
@@ -504,11 +501,17 @@ export default class ListTabulator {
    * @param {KeyboardEvent} event - keydown
    */
   backspace(event: KeyboardEvent): void {
+    const currentItem = this.currentItem;
+
+    if (currentItem === null) {
+      return;
+    }
+
     /**
      * Caret is not at start of the item
      * Then backspace button should remove letter as usual
      */
-    if (!Caret.isAtStart()) {
+    if (!isCaretAtStartOfInput(currentItem)) {
       return;
     }
 
@@ -517,10 +520,6 @@ export default class ListTabulator {
      */
     event.preventDefault();
 
-    const currentItem = this.currentItem;
-    if (!currentItem) {
-      return;
-    }
     const previousItem = currentItem.previousSibling;
     if (!currentItem.parentNode) {
       return;
@@ -586,14 +585,16 @@ export default class ListTabulator {
       targetItem = parentItem;
     }
 
-    /**
-     * Get content from caret till the end of the block to move it to the new item
-     */
-    const endingFragment = Caret.extractFragmentFromCaretPositionTillTheEnd();
-    if (!endingFragment) {
+    const [ currentNode, offset ] = getCaretNodeAndOffset();
+
+    if ( currentNode === null ) {
       return;
     }
-    const endingHTML = Dom.fragmentToString(endingFragment);
+
+    /**
+     * Get content from caret till the end of the block
+     */
+    const endingHTML = getContenteditableSlice(currentItem, currentNode, offset, 'right', true);
 
     /**
      * Get the target item content element
@@ -611,12 +612,12 @@ export default class ListTabulator {
     if (!targetItemContent) {
       return;
     }
-    Caret.focus(targetItemContent, false);
+    focus(targetItemContent, false);
 
     /**
      * Save the caret position
      */
-    this.caret.save();
+    const restore = save();
 
     /**
      * Update target item content by merging with current item html content
@@ -708,7 +709,7 @@ export default class ListTabulator {
     /**
      * Restore the caret position
      */
-    this.caret.restore();
+    restore();
   }
 
 
@@ -791,11 +792,11 @@ export default class ListTabulator {
 
     currentItem.appendChild(currentItemWrapper);
 
-    this.caret.save();
+    const restore = save();
 
     parentItem.after(currentItem);
 
-    this.caret.restore();
+    restore();
 
     /**
      * If previous parent's children list is now empty, remove it.
@@ -853,7 +854,7 @@ export default class ListTabulator {
       `.${DefaultListCssClasses.itemChildren}`
     );
 
-    this.caret.save();
+    const restore = save();
 
     /**
      * If prev item has child items, just append current to them
@@ -919,7 +920,7 @@ export default class ListTabulator {
       prevItem.appendChild(prevItemChildrenListWrapper);
     }
 
-    this.caret.restore();
+    restore();
   }
 
   /**
@@ -937,7 +938,7 @@ export default class ListTabulator {
       return;
     }
 
-    Caret.focus(itemContent, atStart);
+    focus(itemContent, atStart);
   }
 
   /**
