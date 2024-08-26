@@ -410,7 +410,6 @@ export default class ListTabulator {
          * Form array of trailing elements to be moved to separate list
          */
         while (trailingElement !== null) {
-          console.log('trailing', trailingElement);
           newListItems.push(trailingElement);
 
           trailingElement = trailingElement.nextElementSibling;
@@ -422,8 +421,6 @@ export default class ListTabulator {
         newListItems.forEach((item) => {
           newListWrapper.appendChild(item);
         })
-
-        console.log('new wrapper', newListWrapper);
 
         const newListContent = this.save(newListWrapper);
 
@@ -459,7 +456,6 @@ export default class ListTabulator {
     const [ currentNode, offset ] = getCaretNodeAndOffset();
 
     if ( currentNode === null ) {
-      console.log('current node is null');
       return;
     }
 
@@ -599,11 +595,6 @@ export default class ListTabulator {
     if ( currentNode === null ) {
       return;
     }
-
-    /**
-     * Ending html string of the current item
-     */
-    let endingHTML: string;
 
     /**
      * Get current item content
