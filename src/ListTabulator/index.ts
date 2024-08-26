@@ -463,13 +463,22 @@ export default class ListTabulator {
       return;
     }
 
-    /**
-     * On other Enters, get content from caret till the end of the block
-     * And move it to the new item
-     */
-    const endingHTML = getContenteditableSlice(currentItem, currentNode, offset, 'right', true);
+    const currentItemContent = currentItem.querySelector<HTMLElement>(`.${DefaultListCssClasses.itemContent}`);
 
-    console.log(endingHTML);
+    let endingHTML: string;
+
+    /**
+     * If current item has no content, we should pass an empty string to the next created list item
+     */
+    if (currentItemContent === null) {
+      endingHTML = '';
+    } else {
+      /**
+       * On other Enters, get content from caret till the end of the block
+       * And move it to the new item
+       */
+      endingHTML = getContenteditableSlice(currentItemContent, currentNode, offset, 'right', true);
+    }
 
     const itemChildren = currentItem?.querySelector(
       `.${DefaultListCssClasses.itemChildren}`
@@ -592,9 +601,14 @@ export default class ListTabulator {
     }
 
     /**
-     * Get content from caret till the end of the block
+     * Ending html string of the current item
      */
-    const endingHTML = getContenteditableSlice(currentItem, currentNode, offset, 'right', true);
+    let endingHTML: string;
+
+    /**
+     * Get current item content
+     */
+    const currentItemContent = currentItem.querySelector(`.${DefaultListCssClasses.itemContent}`)?.innerHTML ?? '';
 
     /**
      * Get the target item content element
@@ -622,7 +636,7 @@ export default class ListTabulator {
     /**
      * Update target item content by merging with current item html content
      */
-    targetItemContent.insertAdjacentHTML('beforeend', endingHTML);
+    targetItemContent.insertAdjacentHTML('beforeend', currentItemContent);
 
     /**
      * Get the sublist first-level items for current item
