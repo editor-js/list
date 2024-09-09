@@ -4,10 +4,11 @@ import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
 import { NestedListConfig, ListData, ListDataStyle } from "../types/ListParams"
 import { ListItem } from "../types/ListParams";
 import { isHtmlElement } from '../utils/type-guards';
-import { save, getContenteditableSlice, getCaretNodeAndOffset, focus } from '@editorjs/caret';
-import { isCaretAtStartOfInput } from '@editorjs/caret';
+import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput } from '@editorjs/caret';
+// import { save } from '../../../../../../utils/packages/caret/src/save/index'
+import { save } from '@editorjs/caret';
 import { DefaultListCssClasses } from "../ListRenderer";
-import * as Dom from '@editorjs/dom'
+// import * as Dom from '@editorjs/dom'
 import type { PasteEvent } from '../types';
 import type { API, PasteConfig } from '@editorjs/editorjs';
 import { ListParams } from "..";
@@ -526,6 +527,7 @@ export default class ListTabulator {
     event.preventDefault();
 
     const previousItem = currentItem.previousSibling;
+
     if (!currentItem.parentNode) {
       return;
     }
@@ -557,6 +559,13 @@ export default class ListTabulator {
      *
      */
     if (!previousItem && !parentItem) {
+      this.tryToMergeLists(currentItem);
+
+      /**
+       * Prevent editor.js behaviour
+       */
+      event.stopPropagation();
+
       return;
     }
 
@@ -607,6 +616,7 @@ export default class ListTabulator {
     if (!targetItem) {
       return;
     }
+
     const targetItemContent = targetItem.querySelector<HTMLElement>(
       `.${DefaultListCssClasses.itemContent}`
     );
@@ -951,10 +961,149 @@ export default class ListTabulator {
    *
    * @returns {void}
    */
-    getOutOfList(): void {
-      this.currentItem?.remove();
+  getOutOfList(): void {
+    this.currentItem?.remove();
 
-      this.api.blocks.insert();
-      this.api.caret.setToBlock(this.api.blocks.getCurrentBlockIndex());
+    this.api.blocks.insert();
+    this.api.caret.setToBlock(this.api.blocks.getCurrentBlockIndex());
+  }
+
+  /**
+   * Function that merges curret list with previous one
+   * This function has four parts of merging:
+   * 1. Check that previous block is actually list
+   * 2. Extract current element's content and append last child of the previous list
+   * 3. Move all child items of the current one to the 2nd level of the previous list
+   * 4. Move all items items, that are left in the current list to the end of the 1st level of the previous list
+   * @param currentItem - first item of the second list to be merged
+   */
+  tryToMergeLists(currentItem: Element): void {
+    const currentBlockIndex = this.api.blocks.getCurrentBlockIndex();
+
+    /**
+     * Check, that previous block exists
+     */
+    if (currentBlockIndex === 0) {
+      return;
     }
+
+    const previousBlock = this.api.blocks.getBlockByIndex(currentBlockIndex - 1);
+
+    /**
+     *
+     */
+    if (previousBlock === undefined) {
+      return;
+    }
+
+    const currentBlock = this.api.blocks.getBlockByIndex(this.api.blocks.getCurrentBlockIndex());
+
+    if (currentBlock?.name === previousBlock.name) {
+      const [ currentNode, offset ] = getCaretNodeAndOffset();
+
+      if ( currentNode === null ) {
+        return;
+
+
+      }
+
+      const currentItemContent = currentItem.querySelector<HTMLElement>(`.${DefaultListCssClasses.itemContent}`);
+
+      let endingHTML: string;
+
+      /**
+       * If current item has no content, we should pass an empty string to the next created list item
+       */
+      if (currentItemContent === null) {
+        endingHTML = '';
+      } else {
+        /**
+         * On other Enters, get content from caret till the end of the block
+         * And move it to the new item
+         */
+        endingHTML = getContenteditableSlice(currentItemContent, currentNode, offset, 'right', true);
+      }
+
+      /**
+       * Get last item content element of the previous nested-list block
+       */
+      const previousBlockItemContents = previousBlock.holder.querySelectorAll(`.${DefaultListCssClasses.itemContent}`) as NodeListOf<HTMLElement>;
+      const previousBlockLastItemContent = previousBlockItemContents[previousBlockItemContents.length - 1];
+
+      /**
+       * Set focus at the end of the previous list
+       */
+      focus(previousBlockLastItemContent, false);
+
+      const restore = save();
+      previousBlockLastItemContent.insertAdjacentHTML('beforeend', endingHTML);
+      restore();
+
+
+      // const firstChild = currentItem?.querySelector(`.${DefaultListCssClasses.item}`);
+
+      /**
+       * Get first level item of the previous list block
+       */
+      let firstLevelItem = previousBlock.holder.querySelector(`.${DefaultListCssClasses.item}`);
+
+      if (firstLevelItem === null) {
+        return;
+      }
+
+      /**
+       * Get last first level item of the previous list
+       */
+      while (firstLevelItem.nextElementSibling) {
+        firstLevelItem = firstLevelItem.nextElementSibling;
+      }
+
+      const firstLevelItemChildWrapper = firstLevelItem.querySelector(`.${DefaultListCssClasses.itemChildren}`) ?? this.list?.renderWrapper(1);
+
+      let currentItemChild = currentItem.querySelector(`.${DefaultListCssClasses.item}`);
+
+      /**
+       * Move all children of the current item to the last element of the previous list
+       */
+      if (currentItemChild !== null) {
+        firstLevelItemChildWrapper?.appendChild(currentItemChild);
+
+        while (currentItemChild.nextElementSibling) {
+          currentItemChild = currentItemChild?.nextElementSibling;
+
+          firstLevelItemChildWrapper?.appendChild(currentItemChild);
+        }
+      }
+
+      /**
+       * Current item is fully moved to the previous block, so it should be removed
+       */
+      currentItem.remove();
+
+      /**
+       * Get all first level items of the current block
+       */
+      let currentBlockFirstLevelItem = currentBlock.holder.querySelector(`.${DefaultListCssClasses.item}`);
+
+      const firstLevelItemParentNode = firstLevelItem.parentNode;
+
+      if (firstLevelItemParentNode === null) {
+        return;
+      }
+
+      /**
+       * Append previous block with all first level item of the current block
+       */
+      while (currentBlockFirstLevelItem?.nextElementSibling) {
+        currentBlockFirstLevelItem = currentBlockFirstLevelItem?.nextElementSibling;
+
+        firstLevelItemParentNode.appendChild(currentBlockFirstLevelItem);
+      }
+
+      /**
+       * Remove current block after all of it's data merged with previous block
+       */
+      this.api.blocks.delete(currentBlockIndex);
+    }
+  }
 }

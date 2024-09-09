@@ -114,77 +114,80 @@
       data: {
         blocks: [
           {
-            type : 'List',
-            data : {
-              items : [
+            type: 'List',
+            data: {
+              items: [
                 {
-                  "content": "Canon",
-                  "items": [
+                  content: "Canon",
+                  items: [
                     {
-                      "content": "Fisheye",
-                      "items": [
+                      content: "Fisheye",
+                      items: [
                         {
-                          "content": "Canon 15mm f/2.8",
-                          "items": []
-                        },
+                          content: "Canon 15mm f/2.8",
+                          items: []
+                        }
                       ]
                     },
                     {
-                      "content": "Normal",
-                      "items": [
+                      content: "Normal",
+                      items: [
                         {
-                          "content": "Canon 40mm f/2.8",
-                          "items": []
+                          content: "Canon 40mm f/2.8",
+                          items: []
                         },
                         {
-                          "content": "Canon 50mm f/1.8",
-                          "items": []
-                        },
+                          content: "Canon 50mm f/1.8",
+                          items: []
+                        }
                       ]
                     },
                     {
-                      "content": "Zoom",
-                      "items": [
-                        {
-                          "content": "Canon 75-300mm f/4-5.6",
-                          "items": []
-                        },
-                      ]
-                    },
+                      content: "Zoom",
+                      items: []
+                    }
                   ]
                 },
                 {
-                  "content": "Tamron",
-                  "items": [
+                  content: "",
+                  items: [
                     {
-                      "content": "Zoom",
-                      "items": [
-                        {
-                          "content": "Tamron 28-75mm f/2.8",
-                          "items": []
-                        },
-                      ]
-                    },
+                      content: "Canon 75-300mm f/4-5.6",
+                      items: []
+                    }
                   ]
                 },
                 {
-                  "content": "Samyang",
-                  "items": [
+                  content: "Tamron",
+                  items: [
                     {
-                      "content": "Wide",
-                      "items": [
+                      content: "Zoom",
+                      items: [
                         {
-                          "content": "Samyang 14mm f/2.8",
-                          "items": []
-                        },
+                          content: "Tamron 28-75mm f/2.8",
+                          items: []
+                        }
                       ]
-                    },
+                    }
                   ]
                 },
-              ],
-              style: 'checklist'
+                {
+                  content: "Samyang",
+                  items: [
+                    {
+                      content: "Wide",
+                      items: [
+                        {
+                          content: "Samyang 14mm f/2.8",
+                            items: []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
-          },
+          }
         ]
       },
       onReady: function(){
@@ -196,6 +199,7 @@
     });
 
     window.editor = editor;
+
 
     /**
      * Saving button
