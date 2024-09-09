@@ -5,21 +5,18 @@ import { NestedListConfig, ListData, ListDataStyle } from "../types/ListParams"
 import { ListItem } from "../types/ListParams";
 import { isHtmlElement } from '../utils/type-guards';
 import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput } from '@editorjs/caret';
-// import { save } from '../../../../../../utils/packages/caret/src/save/index'
 import { save } from '@editorjs/caret';
 import { DefaultListCssClasses } from "../ListRenderer";
-// import * as Dom from '@editorjs/dom'
 import type { PasteEvent } from '../types';
 import type { API, PasteConfig } from '@editorjs/editorjs';
 import { ListParams } from "..";
 import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/ItemMeta";
-
-type ListRendererTypes = OrderedListRenderer | UnorderedListRenderer | CheckListRenderer;
+import type { ListRendererTypes } from '../'
 
 /**
  * Class that is responsible for list tabulation
  */
-export default class ListTabulator {
+export default class ListTabulator<ListRenderer extends ListRendererTypes> {
   /**
    * The Editor.js API
    */
@@ -46,14 +43,9 @@ export default class ListTabulator {
   private currentLevel: number;
 
   /**
-   * Style of the nested list
-   */
-  style: ListDataStyle;
-
-  /**
    * Rendered list of items
    */
-  list: ListRendererTypes | undefined;
+  list: ListRenderer;
 
   /**
    * Wrapper of the whole list
@@ -90,13 +82,14 @@ export default class ListTabulator {
     return currentNode.closest(`.${DefaultListCssClasses.item}`);
   }
 
-  constructor({data, config, api, readOnly}: ListParams, style: ListDataStyle) {
+  constructor({data, config, api, readOnly}: ListParams, list: ListRenderer) {
     this.config = config;
     this.data = data;
-    this.style = style;
     this.readOnly = readOnly;
     this.api = api;
     this.currentLevel = 0;
+
+    this.list = list;
   }
 
   /**
@@ -104,18 +97,6 @@ export default class ListTabulator {
    * @returns Filled with content wrapper element of the list
    */
   render() {
-    switch (this.style) {
-      case 'ordered':
-        this.list = new OrderedListRenderer(this.readOnly, this.config);
-        break
-      case 'unordered':
-        this.list = new UnorderedListRenderer(this.readOnly, this.config);
-        break
-      case 'checklist':
-        this.list = new CheckListRenderer(this.readOnly, this.config);
-        break
-    }
-
     this.listWrapper = this.list.renderWrapper(this.currentLevel);
 
     // fill with data

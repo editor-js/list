@@ -1,4 +1,4 @@
-import type { API, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
+import type { API, BlockAPI, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
 import type {
   BlockToolConstructorOptions,
   TunesMenuConfig,
@@ -11,6 +11,20 @@ import ListTabulator from './ListTabulator';
  * Build styles
  */
 import './../styles/index.pcss';
+import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
+import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from './types/ItemMeta';
+
+/**
+ * @todo move to types
+ * Type that represents all possible list renderer types
+ */
+export type ListRendererTypes = OrderedListRenderer | UnorderedListRenderer | CheckListRenderer;
+
+/**
+ * @todo move to types
+ * Type that represents all possible item meta types
+ */
+export type ListItemMeta = OrderedListItemMeta | UnorderedListItemMeta | ChecklistItemMeta;
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
@@ -71,18 +85,53 @@ export default class NestedList {
   set listStyle(style: ListDataStyle) {
     this.data.style = style;
 
+    switch (style) {
+      case 'ordered':
+        this.list = new ListTabulator<OrderedListRenderer>(
+          {
+            data: this.data,
+            api: this.api,
+            readOnly: this.readOnly,
+            config: this.config,
+            block: this.block,
+          },
+          this.orderedList,
+        );
+        break;
+
+      case 'unordered':
+        this.list = new ListTabulator<UnorderedListRenderer>(
+          {
+            data: this.data,
+            api: this.api,
+            readOnly: this.readOnly,
+            config: this.config,
+            block: this.block,
+          },
+          this.unorderedList,
+        );
+
+        break;
+
+      case 'checklist':
+        this.list = new ListTabulator<CheckListRenderer>(
+          {
+            data: this.data,
+            api: this.api,
+            readOnly: this.readOnly,
+            config: this.config,
+            block: this.block,
+          },
+          this.checklist,
+        );
+
+        break;
+    }
+
     /**
      * Create new instance of list
      */
-    this.list = new ListTabulator(
-      {
-        data: this.data,
-        api: this.api,
-        readOnly: this.readOnly,
-        config: this.config,
-      },
-      this.listStyle
-    );
+
 
     const newListElement = this.list.render()
 
@@ -104,7 +153,7 @@ export default class NestedList {
   /**
    * Tool's configuration
    */
-  private config?: NestedListConfig;
+  private config: NestedListConfig;
 
   /**
    * Default list style
@@ -117,9 +166,29 @@ export default class NestedList {
   private data: ListData;
 
   /**
+   * Editor block api
+   */
+  private block: BlockAPI;
+
+  /**
+   * Ordered list renderer instance
+   */
+  private orderedList: OrderedListRenderer;
+
+  /**
+   * Unordered list renderer instance
+   */
+  private unorderedList: UnorderedListRenderer;
+
+  /**
+   * Checklist renderer instance
+   */
+  private checklist: CheckListRenderer;
+
+  /**
    * Class that is responsible for list complete list rendering and saving
    */
-  list: ListTabulator | undefined;
+  list: ListTabulator<ListRendererTypes> | undefined;
 
   /**
    * Main constant wrapper of the whole list
@@ -136,10 +205,19 @@ export default class NestedList {
    * @param {object} params.api - Editor.js API
    * @param {boolean} params.readOnly - read-only mode flag
    */
-  constructor({ data, config, api, readOnly }: ListParams) {
+  constructor({ data, config, api, readOnly, block }: ListParams) {
     this.api = api;
     this.readOnly = readOnly;
     this.config = config;
+    this.block = block;
+
+
+    /**
+     * Inilialize list renderers
+     */
+    this.orderedList = new OrderedListRenderer(this.readOnly, this.config);
+    this.unorderedList = new UnorderedListRenderer(this.readOnly, this.config);
+    this.checklist = new CheckListRenderer(this.readOnly, this.config);
 
     /**
      * Set the default list style from the config or presetted 'ordered'.
@@ -159,14 +237,46 @@ export default class NestedList {
    * @returns rendered list wrapper with all contents
    */
   render() {
-    this.list = new ListTabulator({
-      data: this.data,
-      readOnly: this.readOnly,
-      api: this.api,
-      config: this.config,
-    },
-    this.listStyle
-  );
+    switch (this.listStyle) {
+      case 'ordered':
+        this.list = new ListTabulator<OrderedListRenderer>({
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        this.orderedList,
+      );
+
+      break;
+
+      case 'unordered':
+        this.list = new ListTabulator<UnorderedListRenderer>({
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        this.unorderedList,
+      );
+
+      break;
+
+      case 'checklist':
+        this.list = new ListTabulator<CheckListRenderer>({
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        this.checklist,
+      );
+
+      break;
+    }
 
     this.listElement = this.list.render();
 
