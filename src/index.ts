@@ -6,25 +6,13 @@ import type {
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
 import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/ListParams';
 import ListTabulator from './ListTabulator';
+import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
+import { ListRendererTypes } from './types/ListRenderer';
 
 /**
  * Build styles
  */
 import './../styles/index.pcss';
-import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
-import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from './types/ItemMeta';
-
-/**
- * @todo move to types
- * Type that represents all possible list renderer types
- */
-export type ListRendererTypes = OrderedListRenderer | UnorderedListRenderer | CheckListRenderer;
-
-/**
- * @todo move to types
- * Type that represents all possible item meta types
- */
-export type ListItemMeta = OrderedListItemMeta | UnorderedListItemMeta | ChecklistItemMeta;
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings

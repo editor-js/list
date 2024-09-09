@@ -11,7 +11,7 @@ import type { PasteEvent } from '../types';
 import type { API, PasteConfig } from '@editorjs/editorjs';
 import { ListParams } from "..";
 import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/ItemMeta";
-import type { ListRendererTypes } from '../'
+import type { ListRendererTypes } from '../types/ListRenderer'
 
 /**
  * Class that is responsible for list tabulation
