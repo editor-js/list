@@ -4,4 +4,4 @@ import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from '.
  * @todo move to types
  * Type that represents all possible list renderer types
  */
-export type ListRendererTypes = OrderedListRenderer | UnorderedListRenderer | CheckListRenderer;
+export type ListRenderer = OrderedListRenderer | UnorderedListRenderer | CheckListRenderer;

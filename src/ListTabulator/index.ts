@@ -10,12 +10,12 @@ import type { PasteEvent } from '../types';
 import type { API, BlockAPI, PasteConfig } from '@editorjs/editorjs';
 import { ListParams } from "..";
 import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/ItemMeta";
-import type { ListRendererTypes } from '../types/ListRenderer'
+import type { ListRenderer } from '../types/ListRenderer'
 
 /**
  * Class that is responsible for list tabulation
  */
-export default class ListTabulator<ListRenderer extends ListRendererTypes> {
+export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * The Editor.js API
    */
@@ -49,7 +49,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
   /**
    * Rendered list of items
    */
-  renderer: ListRenderer;
+  renderer: Renderer;
 
   /**
    * Wrapper of the whole list
@@ -86,7 +86,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
     return currentNode.closest(`.${DefaultListCssClasses.item}`);
   }
 
-  constructor({data, config, api, readOnly, block}: ListParams, renderer: ListRenderer) {
+  constructor({data, config, api, readOnly, block}: ListParams, renderer: Renderer) {
     this.config = config;
     this.data = data;
     this.readOnly = readOnly;
