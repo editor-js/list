@@ -281,6 +281,10 @@ export default class NestedList {
     return this.data
   }
 
+  merge(data: ListData) {
+    this.list?.merge(data);
+  }
+
   /**
    * Creates Block Tune allowing to change the list style
    *
