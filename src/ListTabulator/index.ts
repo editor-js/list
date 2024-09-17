@@ -495,8 +495,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
         /**
          * Get current list block index
          */
-        const currentBlockIndex = this.api.blocks.getCurrentBlockIndex();
-        const currentBlock = this.api.blocks.getBlockByIndex(currentBlockIndex);
+        const currentBlock = this.block;
 
         /**
          * Insert paragraph
@@ -508,7 +507,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
          * Insertion will be applied after paragraph block inserted in getOutOfList method
          * this is why we need to increase currentBlock index by 2
          */
-        this.api.blocks.insert(currentBlock?.name, newListContent, this.config, currentBlockIndex + 2);
+        this.api.blocks.insert(currentBlock?.name, newListContent, this.config, this.api.blocks.getCurrentBlockIndex() + 2);
 
         /**
          * Remove temporary new list wrapper used for content save
