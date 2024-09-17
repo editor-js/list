@@ -1,4 +1,4 @@
-  /**
+/**
  * Meta information of each list item
  */
 export interface ItemMeta {};

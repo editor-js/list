@@ -73,55 +73,12 @@ export default class NestedList {
   set listStyle(style: ListDataStyle) {
     this.data.style = style;
 
-    switch (style) {
-      case 'ordered':
-        this.list = new ListTabulator<OrderedListRenderer>(
-          {
-            data: this.data,
-            api: this.api,
-            readOnly: this.readOnly,
-            config: this.config,
-            block: this.block,
-          },
-          this.orderedList,
-        );
-        break;
-
-      case 'unordered':
-        this.list = new ListTabulator<UnorderedListRenderer>(
-          {
-            data: this.data,
-            api: this.api,
-            readOnly: this.readOnly,
-            config: this.config,
-            block: this.block,
-          },
-          this.unorderedList,
-        );
-
-        break;
-
-      case 'checklist':
-        this.list = new ListTabulator<CheckListRenderer>(
-          {
-            data: this.data,
-            api: this.api,
-            readOnly: this.readOnly,
-            config: this.config,
-            block: this.block,
-          },
-          this.checklist,
-        );
-
-        break;
-    }
+    this.changeTabulatorByStyle(style);
 
     /**
-     * Create new instance of list
+     * Create new list element
      */
-
-
-    const newListElement = this.list.render()
+    const newListElement = this.list!.render()
 
     this.listElement?.replaceWith(newListElement);
 
@@ -159,21 +116,6 @@ export default class NestedList {
   private block: BlockAPI;
 
   /**
-   * Ordered list renderer instance
-   */
-  private orderedList: OrderedListRenderer;
-
-  /**
-   * Unordered list renderer instance
-   */
-  private unorderedList: UnorderedListRenderer;
-
-  /**
-   * Checklist renderer instance
-   */
-  private checklist: CheckListRenderer;
-
-  /**
    * Class that is responsible for list complete list rendering and saving
    */
   list: ListTabulator<ListRendererTypes> | undefined;
@@ -199,14 +141,6 @@ export default class NestedList {
     this.config = config;
     this.block = block;
 
-
-    /**
-     * Inilialize list renderers
-     */
-    this.orderedList = new OrderedListRenderer(this.readOnly, this.config);
-    this.unorderedList = new UnorderedListRenderer(this.readOnly, this.config);
-    this.checklist = new CheckListRenderer(this.readOnly, this.config);
-
     /**
      * Set the default list style from the config or presetted 'ordered'.
      */
@@ -218,6 +152,8 @@ export default class NestedList {
     };
 
     this.data = data && Object.keys(data).length ? data : initialData;
+
+    this.changeTabulatorByStyle(this.defaultListStyle);
   }
 
   /**
@@ -225,48 +161,7 @@ export default class NestedList {
    * @returns rendered list wrapper with all contents
    */
   render() {
-    switch (this.listStyle) {
-      case 'ordered':
-        this.list = new ListTabulator<OrderedListRenderer>({
-          data: this.data,
-          readOnly: this.readOnly,
-          api: this.api,
-          config: this.config,
-          block: this.block,
-        },
-        this.orderedList,
-      );
-
-      break;
-
-      case 'unordered':
-        this.list = new ListTabulator<UnorderedListRenderer>({
-          data: this.data,
-          readOnly: this.readOnly,
-          api: this.api,
-          config: this.config,
-          block: this.block,
-        },
-        this.unorderedList,
-      );
-
-      break;
-
-      case 'checklist':
-        this.list = new ListTabulator<CheckListRenderer>({
-          data: this.data,
-          readOnly: this.readOnly,
-          api: this.api,
-          config: this.config,
-          block: this.block,
-        },
-        this.checklist,
-      );
-
-      break;
-    }
-
-    this.listElement = this.list.render();
+    this.listElement = this.list!.render();
 
     return this.listElement;
   }
@@ -282,7 +177,7 @@ export default class NestedList {
   }
 
   merge(data: ListData) {
-    this.list?.merge(data);
+    this.list!.merge(data);
   }
 
   /**
@@ -320,6 +215,53 @@ export default class NestedList {
         this.listStyle = tune.name;
       },
     }));
+  }
+
+  /**
+   * This method allows changing
+   * @param style
+   */
+  changeTabulatorByStyle(style: ListDataStyle) {
+    switch (this.listStyle) {
+      case 'ordered':
+        this.list = new ListTabulator<OrderedListRenderer>({
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        new OrderedListRenderer(this.readOnly, this.config),
+      );
+
+      break;
+
+      case 'unordered':
+        this.list = new ListTabulator<UnorderedListRenderer>({
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        new UnorderedListRenderer(this.readOnly, this.config),
+      );
+
+      break;
+
+      case 'checklist':
+        this.list = new ListTabulator<CheckListRenderer>({
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        new CheckListRenderer(this.readOnly, this.config),
+      );
+
+      break;
+    }
   }
 
   /**

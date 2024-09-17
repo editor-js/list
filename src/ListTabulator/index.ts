@@ -431,9 +431,6 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
       return;
     }
 
-    /**
-     * On Enter in the last empty item, get out of list
-     */
     const isEmpty = currentItem
       ? this.renderer?.getItemContent(currentItem).trim().length === 0
       : true;
@@ -441,6 +438,10 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
     const isLastItem = currentItem.nextElementSibling === null;
     const hasSublist = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`) !== null;
 
+
+    /**
+     * On Enter in the last empty item, get out of list
+     */
     if (isFirstLevelItem && isEmpty) {
       if (isLastItem && !hasSublist) {
         this.getOutOfList();
@@ -504,6 +505,8 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
 
         /**
          * Insert separated list with trailing items
+         * Insertion will be applied after paragraph block inserted in getOutOfList method
+         * this is why we need to increase currentBlock index by 2
          */
         this.api.blocks.insert(currentBlock?.name, newListContent, this.config, currentBlockIndex + 2);
 
@@ -515,7 +518,15 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
 
       return;
     } else if (isEmpty) {
-      this.unshiftItem();
+      /**
+       * Check that current item exists
+       */
+      if (this.currentItem === null) {
+        return;
+      }
+
+
+      this.unshiftItem(this.currentItem);
 
       return;
     }
@@ -805,29 +816,32 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
     event.preventDefault();
 
     /**
+     * Check that current item exists
+     */
+    if (this.currentItem === null) {
+      return;
+    }
+
+    /**
      * Move item from current list to parent list
      */
-    this.unshiftItem();
+    this.unshiftItem(this.currentItem);
   }
 
   /**
-   * Decrease indentation of the current item
+   * Decrease indentation of the passed item
    *
    * @returns {void}
    */
-  unshiftItem(item?: Element): void {
-    const currentItem = item ?? this.currentItem;
-    if (!currentItem) {
+  unshiftItem(item: Element): void {
+    if (!item.parentNode) {
       return;
     }
-    if (!currentItem.parentNode) {
-      return;
-    }
-    if (!isHtmlElement(currentItem.parentNode)) {
+    if (!isHtmlElement(item.parentNode)) {
       return;
     }
 
-    const parentItem = currentItem.parentNode.closest(`.${DefaultListCssClasses.item}`);
+    const parentItem = item.parentNode.closest(`.${DefaultListCssClasses.item}`);
 
     /**
      * If item in the first-level list then no need to do anything
@@ -837,7 +851,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
     }
 
 
-    let currentItemWrapper = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+    let currentItemWrapper = item.querySelector(`.${DefaultListCssClasses.itemChildren}`);
 
     /**
      * If there is no child wrapper, render one
@@ -846,29 +860,33 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
       currentItemWrapper = this.renderer!.renderWrapper(1);
     }
 
-    let sibling = currentItem.nextElementSibling;
-
-    const trailingSiblings: Element[] = [];
-
-    /**
-     * Form trailing siblings array
-     */
-    while (sibling) {
-      if (sibling.classList.contains(DefaultListCssClasses.item)) {
-        trailingSiblings.push(sibling);
-      }
-      sibling = sibling.nextElementSibling;
+    if (item.parentElement === null) {
+      return;
     }
 
-    trailingSiblings.forEach((sibling) => {
-      currentItemWrapper.appendChild(sibling);
+    const siblings = this.getChildItems(item.parentElement);
+
+    if (siblings === null) {
+      return;
+    }
+
+    let currentItemPassed = false;
+
+    siblings.forEach((sibling) => {
+      if (currentItemPassed) {
+        currentItemWrapper.appendChild(sibling);
+      }
+
+      if (sibling === item) {
+        currentItemPassed = true;
+      }
     })
 
-    currentItem.appendChild(currentItemWrapper);
+    item.appendChild(currentItemWrapper);
 
     const restore = save();
 
-    parentItem.after(currentItem);
+    parentItem.after(item);
 
     restore();
 
@@ -914,6 +932,8 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
 
     /**
      * Check that the item has potential parent
+     * Previous sibling is potential parent in case of adding tab
+     * After adding tab current item would be moved to the previous sibling's child list
      */
     const prevItem = currentItem.previousSibling;
 
@@ -944,14 +964,20 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
       /**
        * Get current item child wrapper
        */
-      const currentItemChildWrapper = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+      const currentItemChildWrapper = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`) as HTMLElement;
+
+      /**
+       * If current item has no child wrapper, than it has no childs
+       * So it is completely moved to new nesting level
+       */
+      if (currentItemChildWrapper === null) {
+        return;
+      }
 
       /**
        * Get all current item child to be moved to previous nesting level
        */
-      const currentItemChildrenList = Array.from(currentItemChildWrapper?.children ?? []).filter(child =>
-        child.classList.contains(`${DefaultListCssClasses.item}`)
-      );
+      const currentItemChildrenList = this.getChildItems(currentItemChildWrapper);
 
       /**
        * Move current item sublists one level back

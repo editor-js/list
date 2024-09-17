@@ -10,7 +10,7 @@ export type ListDataStyle = 'ordered' | 'unordered' | 'checklist';
  */
 export interface ListData {
   /**
-   * list type 'ordered' or 'unordered'
+   * list type 'ordered' or 'unordered' or 'checklist'
    */
   style: ListDataStyle;
   /**
