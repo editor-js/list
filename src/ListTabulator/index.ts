@@ -49,7 +49,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
   /**
    * Rendered list of items
    */
-  list: ListRenderer;
+  renderer: ListRenderer;
 
   /**
    * Wrapper of the whole list
@@ -86,7 +86,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
     return currentNode.closest(`.${DefaultListCssClasses.item}`);
   }
 
-  constructor({data, config, api, readOnly, block}: ListParams, list: ListRenderer) {
+  constructor({data, config, api, readOnly, block}: ListParams, renderer: ListRenderer) {
     this.config = config;
     this.data = data;
     this.readOnly = readOnly;
@@ -94,7 +94,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
     this.block = block;
     this.currentLevel = 0;
 
-    this.list = list;
+    this.renderer = renderer;
   }
 
   /**
@@ -111,7 +111,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
    * @returns Filled with content wrapper element of the list
    */
   render() {
-    this.listWrapper = this.list.renderWrapper(this.currentLevel);
+    this.listWrapper = this.renderer.renderWrapper(this.currentLevel);
 
     // fill with data
     if (this.data.items.length) {
@@ -171,18 +171,18 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
      */
     this.currentLevel += 1;
 
-    if (this.list !== undefined) {
+    if (this.renderer !== undefined) {
       items.forEach((item) => {
         let itemEl: Element;
 
-        if (this.list instanceof OrderedListRenderer) {
-          itemEl = this.list!.renderItem(item.content, item.meta as OrderedListItemMeta);
+        if (this.renderer instanceof OrderedListRenderer) {
+          itemEl = this.renderer!.renderItem(item.content, item.meta as OrderedListItemMeta);
         }
-        else if (this.list instanceof UnorderedListRenderer) {
-          itemEl = this.list!.renderItem(item.content, item.meta as UnorderedListItemMeta);
+        else if (this.renderer instanceof UnorderedListRenderer) {
+          itemEl = this.renderer!.renderItem(item.content, item.meta as UnorderedListItemMeta);
         }
         else {
-          itemEl = this.list!.renderItem(item.content, item.meta as ChecklistItemMeta);
+          itemEl = this.renderer!.renderItem(item.content, item.meta as ChecklistItemMeta);
         }
 
         parentItem.appendChild(itemEl);
@@ -191,7 +191,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
          * Check if there are child items
          */
         if (item.items.length) {
-          const sublistWrapper = this.list?.renderWrapper(this.currentLevel);
+          const sublistWrapper = this.renderer?.renderWrapper(this.currentLevel);
 
           /**
            * Recursively render child items, it will increase currentLevel varible
@@ -229,8 +229,8 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
 
       return children.map((el) => {
         const subItemsWrapper = el.querySelector(`.${DefaultListCssClasses.itemChildren}`);
-        const content = this.list!.getItemContent(el);
-        const meta = this.list!.getItemMeta(el);
+        const content = this.renderer!.getItemContent(el);
+        const meta = this.renderer!.getItemMeta(el);
         const subItems = subItemsWrapper ? getItems(subItemsWrapper) : [];
 
         return {
@@ -313,7 +313,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
        * Render child wrapper of the last item if it does not exist
        */
       if (lastFirstLevelItemChildWrapper === null) {
-        lastFirstLevelItemChildWrapper = this.list.renderWrapper(1);
+        lastFirstLevelItemChildWrapper = this.renderer.renderWrapper(1);
       }
 
       this.appendItems(data.items[0].items, lastFirstLevelItemChildWrapper);
@@ -435,7 +435,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
      * On Enter in the last empty item, get out of list
      */
     const isEmpty = currentItem
-      ? this.list?.getItemContent(currentItem).trim().length === 0
+      ? this.renderer?.getItemContent(currentItem).trim().length === 0
       : true;
     const isFirstLevelItem = currentItem.parentNode === this.listWrapper;
     const isLastItem = currentItem.nextElementSibling === null;
@@ -446,7 +446,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
         this.getOutOfList();
       }
       /**
-       * If enter is pressed in the senter of the list we should split it
+       * If enter is pressed in the сenter of the list item we should split it
        */
       else {
         const currentItemChildWrapper = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
@@ -467,7 +467,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
         /**
          * Render new wrapper for list that would be separated
          */
-        const newListWrapper = this.list!.renderWrapper(0);
+        const newListWrapper = this.renderer!.renderWrapper(0);
 
         let trailingElement: Element | null = currentItem.nextElementSibling;
 
@@ -550,7 +550,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
     /**
      * Create the new list item
      */
-    const itemEl = this.list!.renderItem(endingHTML, { checked: false });
+    const itemEl = this.renderer!.renderItem(endingHTML, { checked: false });
 
     /**
      * Move new item after current
@@ -843,7 +843,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
      * If there is no child wrapper, render one
      */
     if (currentItemWrapper === null) {
-      currentItemWrapper = this.list!.renderWrapper(1);
+      currentItemWrapper = this.renderer!.renderWrapper(1);
     }
 
     let sibling = currentItem.nextElementSibling;
@@ -962,7 +962,7 @@ export default class ListTabulator<ListRenderer extends ListRendererTypes> {
         })
       }
     } else {
-      const prevItemChildrenListWrapper = this.list!.renderWrapper(1);
+      const prevItemChildrenListWrapper = this.renderer!.renderWrapper(1);
 
       /**
        * Previous item would be appended with current item and it's sublists
