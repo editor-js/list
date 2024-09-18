@@ -30,10 +30,10 @@ export interface ListCssClasses {
 export interface ListRendererInterface<ItemMeta> {
   /**
    * Renders wrapper for list
-   * @param level - level of nesting (0 for the rool level)
+   * @param isRoot - boolean variable that represents level of the wrappre (root or childList)
    * @returns - created html ul element
    */
-  renderWrapper: (level: number) => HTMLElement;
+  renderWrapper: (isRoot: boolean) => HTMLElement;
 
   /**
    * Redners list item element

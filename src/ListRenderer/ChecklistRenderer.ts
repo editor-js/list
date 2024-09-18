@@ -45,16 +45,16 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
 
   /**
    * Renders ul wrapper for list
-   * @param level - level of nesting (0 for the rool level)
+   * @param isRoot - boolean variable that represents level of the wrappre (root or childList)
    * @returns - created html ul element
    */
-  renderWrapper(level: number): HTMLUListElement {
+  renderWrapper(isRoot: boolean): HTMLUListElement {
     let wrapperElement: HTMLUListElement;
 
     /**
      * Check if it's root level
      */
-    if (level === 0) {
+    if (isRoot === true) {
       wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.wrapper, CheckListRenderer.CSS.checklist]) as HTMLUListElement;
 
       /**

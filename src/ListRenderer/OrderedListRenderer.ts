@@ -39,16 +39,16 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
 
   /**
    * Renders ol wrapper for list
-   * @param level - level of nesting (0 for the rool level)
+   * @param isRoot - boolean variable that represents level of the wrappre (root or childList)
    * @returns - created html ol element
    */
-  renderWrapper(level: number): HTMLOListElement {
+  renderWrapper(isRoot: boolean): HTMLOListElement {
     let wrapperElement: HTMLOListElement;
 
     /**
      * Check if it's root level
      */
-    if (level === 0) {
+    if (isRoot === true) {
       wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapper, OrderedListRenderer.CSS.orderedList]) as HTMLOListElement;
     } else {
       wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.orderedList, OrderedListRenderer.CSS.itemChildren]) as HTMLOListElement;
