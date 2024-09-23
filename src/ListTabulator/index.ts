@@ -106,7 +106,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     /**
      * Check if itemChildWrapper is not null
-     * It could be null if current item has no child item wrapper
+     * It could be null if current item has no child items
      * Or if passed element is not item and not childItemWrapper element
      */
     if (itemChildWrapper === null) {
@@ -117,9 +117,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * Filter child items of the curret child item wrapper
      * In case that child could be not only list item
      */
-    return Array.from(itemChildWrapper.children).filter(child =>
-      child.classList.contains(`${DefaultListCssClasses.item}`)
-    );
+    return Array.from(itemChildWrapper.querySelectorAll(`:scope > .${DefaultListCssClasses.item}`))
   }
 
   /**
@@ -319,9 +317,21 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     let lastFirstLevelItemChildWrapper = lastFirstLevelItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
 
     /**
+     * Get first item of the list to be merged with current one
+     */
+    const firstItem = data.items.shift();
+
+    /**
+     * Check that first item exists
+     */
+    if (firstItem === undefined) {
+      return;
+    }
+
+    /**
      * Append child items of the first element
      */
-    if (data.items[0].items.length !== 0) {
+    if (firstItem.items.length !== 0) {
       /**
        * Render child wrapper of the last item if it does not exist
        */
@@ -329,13 +339,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         lastFirstLevelItemChildWrapper = this.renderer.renderWrapper(false);
       }
 
-      this.appendItems(data.items[0].items, lastFirstLevelItemChildWrapper);
+      this.appendItems(firstItem.items, lastFirstLevelItemChildWrapper);
     }
-
-    /**
-     * Remove first item that is already merged
-     */
-    data.items.shift();
 
     if (data.items.length > 0) {
       this.appendItems(data.items, this.listWrapper);
@@ -458,11 +463,13 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     if (isFirstLevelItem && isEmpty) {
       if (isLastItem && !hasSublist) {
         this.getOutOfList();
+
+        return;
       }
       /**
        * If enter is pressed in the сenter of the list item we should split it
-       */
-      else {
+      */
+     else {
         const currentItemChildWrapper = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
 
         let firstChildItem: Element | null = null;
@@ -510,17 +517,20 @@ export default class ListTabulator<Renderer extends ListRenderer> {
          */
         const currentBlock = this.block;
 
-        /**
-         * Insert paragraph
-         */
-        this.getOutOfList();
+        const currentBlockIndex = this.api.blocks.getCurrentBlockIndex()
 
         /**
          * Insert separated list with trailing items
          * Insertion will be applied after paragraph block inserted in getOutOfList method
          * this is why we need to increase currentBlock index by 1 (current block index is index of the paragraph block)
          */
-        this.api.blocks.insert(currentBlock?.name, newListContent, this.config, this.api.blocks.getCurrentBlockIndex() + 1);
+        this.api.blocks.insert(currentBlock?.name, newListContent, this.config, currentBlockIndex + 1);
+
+        /**
+         * Insert paragraph
+         */
+        this.getOutOfList(currentBlockIndex + 1);
+
 
         /**
          * Remove temporary new list wrapper used for content save
@@ -871,6 +881,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     const siblings = this.getChildItems(item.parentElement);
 
     if (siblings === null) {
+      console.log('siblings are null')
       return;
     }
 
@@ -894,7 +905,15 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       }
     })
 
-    item.appendChild(currentItemWrapper);
+    /**
+     * Check that we have any trailing items appended to the currentItemWrapper
+     * If currentItemWrapper has no child items, than remove currentItemWrapper
+     */
+    if (currentItemWrapper.childElementCount !== 0) {
+      item.appendChild(currentItemWrapper);
+    } else {
+      currentItemWrapper.remove();
+    }
 
     const restore = save();
 
@@ -1038,10 +1057,19 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    *
    * @returns {void}
    */
-  getOutOfList(): void {
-    this.currentItem?.remove();
+  getOutOfList(index?: number): void {
+    let newBlock;
 
-    this.api.blocks.insert();
-    this.api.caret.setToBlock(this.api.blocks.getCurrentBlockIndex());
+    /**
+     * Check that index passed
+     */
+    if (index !== undefined) {
+      newBlock = this.api.blocks.insert(undefined, undefined, undefined, index);
+    } else {
+      newBlock = this.api.blocks.insert();
+    }
+
+    this.currentItem?.remove();
+    this.api.caret.setToBlock(newBlock);
   }
 }

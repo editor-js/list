@@ -7,7 +7,7 @@ import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/ic
 import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/ListParams';
 import ListTabulator from './ListTabulator';
 import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
-import { ListRendererTypes } from './types/ListRenderer';
+import { ListRenderer } from './types/ListRenderer';
 
 /**
  * Build styles
@@ -118,7 +118,7 @@ export default class NestedList {
   /**
    * Class that is responsible for list complete list rendering and saving
    */
-  list: ListTabulator<ListRendererTypes> | undefined;
+  list: ListTabulator<ListRenderer> | undefined;
 
   /**
    * Main constant wrapper of the whole list
