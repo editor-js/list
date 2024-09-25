@@ -92,7 +92,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
-   * Get all child items of the current list item
+   * Get all child items of the passed list item
    */
   private getChildItems(element: HTMLElement): ListItemElement[] | null {
     let itemChildWrapper: HTMLElement = element;
@@ -106,8 +106,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     /**
      * Check if itemChildWrapper is not null
-     * It could be null if current item has no child items
-     * Or if passed element is not item and not childItemWrapper element
      */
     if (itemChildWrapper === null) {
       return null;
@@ -267,9 +265,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @public
    */
   merge(data: ListData): void {
-    const blockItems = this.block.holder.querySelectorAll(`.${DefaultListCssClasses.item}`);
+    const items = this.block.holder.querySelectorAll(`.${DefaultListCssClasses.item}`);
 
-    const deepestBlockItem = blockItems[blockItems.length - 1] as HTMLElement;
+    const deepestBlockItem = items[items.length - 1] as HTMLElement;
     const deepestBlockItemContent = deepestBlockItem.querySelector(`.${DefaultListCssClasses.itemContent}`) as HTMLElement;
 
     if (deepestBlockItem === null || deepestBlockItemContent === null) {

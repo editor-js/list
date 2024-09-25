@@ -101,10 +101,8 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
     return {}
   }
 
-
   /**
    * Returns default item meta used on creation of the new item
-   * @returns item meta object
    */
   composeDefaultMeta(): UnorderedListItemMeta {
     return {};

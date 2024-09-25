@@ -56,10 +56,8 @@ export interface ListRendererInterface<ItemMeta> {
    */
   getItemMeta: (item: Element) => ItemMeta;
 
-
   /**
    * Returns default item meta used on creation of the new item
-   * @returns item meta object
    */
   composeDefaultMeta: () => ItemMeta;
 };
