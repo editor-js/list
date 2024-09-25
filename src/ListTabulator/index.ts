@@ -562,7 +562,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    let currentItemWrapper = item.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+    let currentItemChildWrapper = item.querySelector(`.${DefaultListCssClasses.itemChildren}`);
 
     if (item.parentElement === null) {
       return;
@@ -574,22 +574,22 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * If current item has no childs, than render child wrapper
      * After that trailing siblings would be appended to the child wrapper
      */
-    if (currentItemWrapper === null) {
-      currentItemWrapper = this.renderer!.renderWrapper(false);
+    if (currentItemChildWrapper === null) {
+      currentItemChildWrapper = this.renderer!.renderWrapper(false);
     }
 
     siblings?.forEach((sibling) => {
-      currentItemWrapper.appendChild(sibling);
+      currentItemChildWrapper.appendChild(sibling);
     })
 
     /**
      * Check that we have any trailing items appended to the currentItemWrapper
      * If currentItemWrapper has no child items, than remove currentItemWrapper
      */
-    if (currentItemWrapper.childElementCount !== 0) {
-      item.appendChild(currentItemWrapper);
+    if (currentItemChildWrapper.childElementCount !== 0) {
+      item.appendChild(currentItemChildWrapper);
     } else {
-      currentItemWrapper.remove();
+      currentItemChildWrapper.remove();
     }
 
     const restore = saveCaret();
