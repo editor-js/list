@@ -3,8 +3,7 @@ import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
 import { NestedListConfig, ListData, ListDataStyle } from "../types/ListParams"
 import { ListItem, ListItemElement } from "../types/ListParams";
 import { isHtmlElement } from '../utils/type-guards';
-import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput } from '@editorjs/caret';
-import { save } from '@editorjs/caret';
+import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput, save as saveCaret } from '@editorjs/caret';
 import { DefaultListCssClasses } from "../ListRenderer";
 import type { PasteEvent } from '../types';
 import type { API, BlockAPI, PasteConfig } from '@editorjs/editorjs';
@@ -279,7 +278,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     focus(deepestBlockItemContent);
 
-    const restore = save();
+    const restore = saveCaret();
     /**
      * Insert trailing html to the deepest block item content
      */
@@ -595,7 +594,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       currentItemWrapper.remove();
     }
 
-    const restore = save();
+    const restore = saveCaret();
 
     parentItem.after(item);
 
@@ -824,7 +823,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Save the caret position
      */
-    const restore = save();
+    const restore = saveCaret();
 
     /**
      * Update target item content by merging with current item html content
@@ -917,7 +916,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       `.${DefaultListCssClasses.itemChildren}`
     );
 
-    const restore = save();
+    const restore = saveCaret();
 
     /**
      * If prev item has child items, just append current to them
