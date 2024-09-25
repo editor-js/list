@@ -785,7 +785,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
-     * make sure previousItem is an HTMLElement
+     * Make sure previousItem is an HTMLElement
      */
     if (previousItem && !isHtmlElement(previousItem)) {
       return;
