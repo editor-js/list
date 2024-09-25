@@ -1,7 +1,7 @@
 import { OrderedListRenderer } from "../ListRenderer/OrderedListRenderer";
 import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
 import { NestedListConfig, ListData, ListDataStyle } from "../types/ListParams"
-import { ListItem } from "../types/ListParams";
+import { ListItem, ListItemElement } from "../types/ListParams";
 import { isHtmlElement } from '../utils/type-guards';
 import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput } from '@editorjs/caret';
 import { save } from '@editorjs/caret';
@@ -11,6 +11,7 @@ import type { API, BlockAPI, PasteConfig } from '@editorjs/editorjs';
 import { ListParams } from "..";
 import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/ItemMeta";
 import type { ListRenderer } from '../types/ListRenderer'
+import { getSiblings } from '../utils/getSiblings';
 
 /**
  * Class that is responsible for list tabulation
@@ -94,7 +95,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Get all child items of the current list item
    */
-  private getChildItems(element: HTMLElement): Element[] | null {
+  private getChildItems(element: HTMLElement): ListItemElement[] | null {
     let itemChildWrapper: HTMLElement = element;
 
     /**
@@ -179,22 +180,12 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param {Element} parentItem - where to append
    * @returns {void}
    */
-  appendItems(items: ListItem[], parentItem: Element): void {
+  appendItems(items: ListItem[], parentElement: Element): void {
     if (this.renderer !== undefined) {
       items.forEach((item) => {
-        let itemEl: Element;
+        const itemEl = this.renderItem(item.content, item.meta);
 
-        if (this.renderer instanceof OrderedListRenderer) {
-          itemEl = this.renderer!.renderItem(item.content, item.meta as OrderedListItemMeta);
-        }
-        else if (this.renderer instanceof UnorderedListRenderer) {
-          itemEl = this.renderer!.renderItem(item.content, item.meta as UnorderedListItemMeta);
-        }
-        else {
-          itemEl = this.renderer!.renderItem(item.content, item.meta as ChecklistItemMeta);
-        }
-
-        parentItem.appendChild(itemEl);
+        parentElement.appendChild(itemEl);
 
         /**
          * Check if there are child items
@@ -518,12 +509,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      */
     event.preventDefault();
 
-    /**
-     * Prevent editor.js behaviour
-     */
-    event.stopPropagation();
-
-    this.mergeCurrentItemWithPrevious(currentItem);
+    this.mergeItemWithPrevious(currentItem);
   }
 
 
@@ -562,7 +548,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    *
    * @returns {void}
    */
-  unshiftItem(item: Element): void {
+  unshiftItem(item: ListItemElement): void {
     if (!item.parentNode) {
       return;
     }
@@ -585,12 +571,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    const siblings = this.getChildItems(item.parentElement);
-
-    if (siblings === null) {
-      console.log('siblings are null')
-      return;
-    }
+    const siblings = getSiblings(item as HTMLElement);
 
     /**
      * If current item has no childs, than render child wrapper
@@ -600,16 +581,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       currentItemWrapper = this.renderer!.renderWrapper(false);
     }
 
-    let currentItemPassed = false;
-
-    siblings.forEach((sibling) => {
-      if (currentItemPassed) {
-        currentItemWrapper.appendChild(sibling);
-      }
-
-      if (sibling === item) {
-        currentItemPassed = true;
-      }
+    siblings?.forEach((sibling) => {
+      currentItemWrapper.appendChild(sibling);
     })
 
     /**
@@ -647,10 +620,10 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Method that is used for list splitting and moving trailing items to the new separated list
-   * @param currentItem - current item html element
+   * @param item - current item html element
    */
-  splitList(currentItem: HTMLElement): void {
-    const currentItemChildrenList = this.getChildItems(currentItem);
+  splitList(item: ListItemElement): void {
+    const currentItemChildrenList = this.getChildItems(item);
 
     /**
      * First child item should be unshifted because separated list should start
@@ -663,22 +636,18 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
+     * Get trailing siblings of the current item
+     */
+    const newListItems = getSiblings(item);
+
+    if (newListItems === null) {
+      return;
+    }
+
+    /**
      * Render new wrapper for list that would be separated
      */
     const newListWrapper = this.renderer!.renderWrapper(true);
-
-    let trailingElement: Element | null = currentItem.nextElementSibling;
-
-    const newListItems: Element[] = [];
-
-    /**
-     * Form array of trailing elements to be moved to separate list
-     */
-    while (trailingElement !== null) {
-      newListItems.push(trailingElement);
-
-      trailingElement = trailingElement.nextElementSibling;
-    }
 
     /**
      * Append new list wrapper with trailing elements
@@ -718,7 +687,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Method that is used for splitting item content and moving trailing content to the new sibling item
    * @param currentItem - current item html element
    */
-  splitItem(currentItem: HTMLElement): void {
+  splitItem(currentItem: ListItemElement): void {
     const [ currentNode, offset ] = getCaretNodeAndOffset();
 
     if ( currentNode === null ) {
@@ -749,7 +718,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Create the new list item
      */
-    const itemEl = this.renderer!.renderItem(endingHTML, { checked: false });
+    const itemEl = this.renderItem(endingHTML);
 
     /**
      * Move new item after current
@@ -772,10 +741,22 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Current item children would not change nesting level
    * @param currentItem - current item html element
    */
-  mergeCurrentItemWithPrevious(currentItem: HTMLElement): void {
-    const previousItem = currentItem.previousElementSibling;
+  mergeItemWithPrevious(item: ListItemElement): void {
+    const previousItem = item.previousElementSibling;
 
-    const parentItem = currentItem.closest(`.${DefaultListCssClasses.item}`);
+    const currentItemParentNode = item.parentNode;
+
+    /**
+     * Check that parent node of the current element exists
+     */
+    if (currentItemParentNode === null) {
+      return;
+    }
+    if (!isHtmlElement(currentItemParentNode)) {
+      return;
+    }
+
+    const parentItem = currentItemParentNode.closest<ListItemElement>(`.${DefaultListCssClasses.item}`);
 
     /**
      * Check that current item has any previous siblings to be merged with
@@ -794,7 +775,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Lets compute the item which will be merged with current item text
      */
-    let targetItem: Element | null;
+    let targetItem: ListItemElement | null;
 
     /**
      * If there is a previous item then we get a deepest item in its sublists
@@ -802,8 +783,14 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * Otherwise we will use the parent item
      */
     if (previousItem) {
-      const childrenOfPreviousItem = previousItem.querySelectorAll(`.${DefaultListCssClasses.item}`);
+      /**
+       * Get list of all levels children of the previous item
+       */
+      const childrenOfPreviousItem = previousItem.querySelectorAll<ListItemElement>(`.${DefaultListCssClasses.item}`);
 
+      /**
+       * Target item would be deepest child of the previous item or previous item itself
+       */
       targetItem = childrenOfPreviousItem[childrenOfPreviousItem.length - 1] || previousItem;
     } else {
       targetItem = parentItem;
@@ -812,7 +799,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Get current item content
      */
-    const currentItemContent = currentItem.querySelector(`.${DefaultListCssClasses.itemContent}`)?.innerHTML ?? '';
+    const currentItemContent = this.renderer.getItemContent(item);
 
     /**
      * Get the target item content element
@@ -824,15 +811,15 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Get target item content element
      */
-    const targetItemContent = targetItem.querySelector<HTMLElement>(`.${DefaultListCssClasses.itemContent}`);
+    const targetItemContentElement = targetItem.querySelector<HTMLElement>(`.${DefaultListCssClasses.itemContent}`);
 
     /**
      * Set a new place for caret
      */
-    if (!targetItemContent) {
+    if (!targetItemContentElement) {
       return;
     }
-    focus(targetItemContent, false);
+    focus(targetItemContentElement, false);
 
     /**
      * Save the caret position
@@ -842,12 +829,12 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Update target item content by merging with current item html content
      */
-    targetItemContent.insertAdjacentHTML('beforeend', currentItemContent);
+    targetItemContentElement.insertAdjacentHTML('beforeend', currentItemContent);
 
     /**
      * Get child list of the currentItem
      */
-    const currentItemChildrenList = this.getChildItems(currentItem);
+    const currentItemChildrenList = this.getChildItems(item);
 
     /**
      * Check that current item has any children
@@ -856,7 +843,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       /**
        * Remove current item element
        */
-      currentItem.remove();
+      item.remove();
 
       /**
        * Restore the caret position
@@ -882,7 +869,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Remove current item element
      */
-    currentItem.remove();
+    item.remove();
 
     /**
      * Restore the caret position
@@ -992,7 +979,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param {boolean} atStart - where to set focus: at the start or at the end
    * @returns {void}
    */
-  focusItem(item: Element, atStart: boolean = true): void {
+  focusItem(item: ListItemElement, atStart: boolean = true): void {
     const itemContent = item.querySelector<HTMLElement>(
       `.${DefaultListCssClasses.itemContent}`
     );
@@ -1005,7 +992,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Get out from List Tool by Enter on the empty last item
-   *
+   * @param index - optional parameter represents index, where would be inseted default block
    * @returns {void}
    */
   getOutOfList(index?: number): void {
@@ -1022,5 +1009,25 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     this.currentItem?.remove();
     this.api.caret.setToBlock(newBlock);
+  }
+
+  /**
+   * Method that calls render function of the renderer with a necessary item meta cast
+   * @param item - item to be rendered
+   * @returns html element of the rendered item
+   */
+  renderItem(itemContent: ListItem['content'], meta?: ListItem['meta']): HTMLElement {
+    const itemMeta = meta ?? this.renderer.composeDefaultMeta();
+
+    switch (true) {
+      case this.renderer instanceof OrderedListRenderer:
+        return this.renderer.renderItem(itemContent, itemMeta as OrderedListItemMeta);
+
+      case this.renderer instanceof UnorderedListRenderer:
+        return this.renderer.renderItem(itemContent, itemMeta as UnorderedListItemMeta);
+
+      default:
+        return this.renderer.renderItem(itemContent, itemMeta as ChecklistItemMeta);
+    }
   }
 }

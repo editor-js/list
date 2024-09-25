@@ -94,9 +94,17 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
 
   /**
    * Returns item meta, for ordered list
-   * @returns Item meta object
+   * @returns item meta object
    */
   getItemMeta(): OrderedListItemMeta  {
     return {}
+  }
+
+  /**
+   * Returns default item meta used on creation of the new item
+   * @returns item meta object
+   */
+  composeDefaultMeta(): OrderedListItemMeta {
+    return {};
   }
 }

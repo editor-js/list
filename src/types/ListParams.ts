@@ -49,3 +49,8 @@ export interface NestedListConfig {
    */
   defaultStyle?: ListDataStyle;
 }
+
+/**
+ * Type that represents element of the list item
+ */
+export type ListItemElement = HTMLElement;
