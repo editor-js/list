@@ -1,20 +1,20 @@
 /**
  * Get all siblings before passed element, or after it
  */
-export function getSiblings(element: HTMLElement, afterCurrentElement: boolean = true): Element[] | null {
+export function getSiblings(element: HTMLElement, direction: 'after' | 'before' = 'after'): Element[] | null {
   const siblings: Element[] = [];
 
   let nextElementSibling: HTMLElement;
 
   function getNextElementSibling(element: HTMLElement): HTMLElement{
     /**
-     * Get first sibling element respectfully to passed afterCurrentElement
+     * Get first sibling element respectfully to passed direction
      */
-    switch (afterCurrentElement) {
-      case true:
+    switch (direction) {
+      case 'after':
         return element.nextElementSibling as HTMLElement;
 
-      case false:
+      case 'before':
         return element.previousElementSibling as HTMLElement;
     }
   }
