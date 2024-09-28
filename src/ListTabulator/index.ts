@@ -1,7 +1,8 @@
 import { OrderedListRenderer } from "../ListRenderer/OrderedListRenderer";
 import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
 import { NestedListConfig, ListData, ListDataStyle } from "../types/ListParams"
-import { ListItem, ListItemElement } from "../types/ListParams";
+import { ListItem } from "../types/ListParams";
+import type { ItemElement, ItemContentElement, ItemChildWrapperElement } from "../types/Elements";
 import { isHtmlElement } from '../utils/type-guards';
 import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput, save as saveCaret } from '@editorjs/caret';
 import { DefaultListCssClasses } from "../ListRenderer";
@@ -11,6 +12,13 @@ import { ListParams } from "..";
 import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/ItemMeta";
 import type { ListRenderer } from '../types/ListRenderer'
 import { getSiblings } from '../utils/getSiblings';
+import { getChildItems } from '../utils/getChildItems';
+import { isLastItem } from "../utils/isLastItem";
+import { itemHasSublist } from "../utils/itemHasSublist";
+import { getItemChildWrapper } from "../utils/getItemChildWrapper";
+import { removeChildWrapperIfEmpty } from "../utils/removeChildWrapperIfEmpty";
+import { getItemContentElement } from "../utils/getItemContentElement";
+
 
 /**
  * Class that is responsible for list tabulation
@@ -49,14 +57,14 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Wrapper of the whole list
    */
-  listWrapper: HTMLElement | undefined;
+  listWrapper: ItemChildWrapperElement | undefined;
 
   /**
    * Returns current List item by the caret position
    *
    * @returns {Element}
    */
-  get currentItem(): HTMLElement | null {
+  get currentItem(): ItemElement | null {
     const selection = window.getSelection();
 
     if (!selection) {
@@ -89,33 +97,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     this.block = block;
 
     this.renderer = renderer;
-  }
-
-  /**
-   * Get all child items of the passed list item
-   */
-  private getChildItems(element: HTMLElement): ListItemElement[] | null {
-    let itemChildWrapper: HTMLElement = element;
-
-    /**
-     * If passed element is list item than get item's child wrapper
-     */
-    if (element.classList.contains(DefaultListCssClasses.item)) {
-      itemChildWrapper = element.querySelector(`.${DefaultListCssClasses.itemChildren}`) as HTMLElement;
-    }
-
-    /**
-     * Check if itemChildWrapper is not null
-     */
-    if (itemChildWrapper === null) {
-      return null;
-    }
-
-    /**
-     * Filter child items of the curret child item wrapper
-     * In case that child could be not only list item
-     */
-    return Array.from(itemChildWrapper.querySelectorAll(`:scope > .${DefaultListCssClasses.item}`))
   }
 
   /**
@@ -178,30 +159,28 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @returns {void}
    */
   appendItems(items: ListItem[], parentElement: Element): void {
-    if (this.renderer !== undefined) {
-      items.forEach((item) => {
-        const itemEl = this.renderItem(item.content, item.meta);
+    items.forEach((item) => {
+      const itemEl = this.renderItem(item.content, item.meta);
 
-        parentElement.appendChild(itemEl);
+      parentElement.appendChild(itemEl);
+
+      /**
+       * Check if there are child items
+       */
+      if (item.items.length) {
+        const sublistWrapper = this.renderer?.renderWrapper(false);
 
         /**
-         * Check if there are child items
+         * Recursively render child items, it will increase currentLevel varible
+         * after filling level with items we will need to decrease currentLevel
          */
-        if (item.items.length) {
-          const sublistWrapper = this.renderer?.renderWrapper(false);
+        this.appendItems(item.items, sublistWrapper!);
 
-          /**
-           * Recursively render child items, it will increase currentLevel varible
-           * after filling level with items we will need to decrease currentLevel
-           */
-          this.appendItems(item.items, sublistWrapper!);
-
-          if (itemEl) {
-            itemEl.appendChild(sublistWrapper!);
-          }
+        if (itemEl) {
+          itemEl.appendChild(sublistWrapper!);
         }
-      });
-    }
+      }
+    });
   }
 
   /**
@@ -209,7 +188,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param wrapper - optional argument wrapper
    * @returns whole list saved data if wrapper not passes, otherwise will return data of the passed wrapper
    */
-  save(wrapper?: HTMLElement): ListData {
+  save(wrapper?: ItemChildWrapperElement): ListData {
     const listWrapper = wrapper ?? this.listWrapper;
 
     /**
@@ -218,13 +197,15 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * @param {Element} parent - where to find items
      * @returns {ListItem[]}
      */
-    const getItems = (parent: Element): ListItem[] => {
-      const children = Array.from(
-        parent.querySelectorAll(`:scope > .${DefaultListCssClasses.item}`)
-      );
+    const getItems = (parent: ItemChildWrapperElement): ListItem[] => {
+      const children = getChildItems(parent);
+
+      if (children === null) {
+        return [];
+      }
 
       return children.map((el) => {
-        const subItemsWrapper = el.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+        const subItemsWrapper = getItemChildWrapper(el)
         const content = this.renderer!.getItemContent(el);
         const meta = this.renderer!.getItemMeta(el);
         const subItems = subItemsWrapper ? getItems(subItemsWrapper) : [];
@@ -265,10 +246,15 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @public
    */
   merge(data: ListData): void {
-    const items = this.block.holder.querySelectorAll(`.${DefaultListCssClasses.item}`);
+    console.log('holder', this.block.holder);
 
-    const deepestBlockItem = items[items.length - 1] as HTMLElement;
-    const deepestBlockItemContent = deepestBlockItem.querySelector(`.${DefaultListCssClasses.itemContent}`) as HTMLElement;
+    /**
+     * Get list of all levels children of the previous item
+     */
+    const items = this.block.holder.querySelectorAll<ItemElement>(`.${DefaultListCssClasses.item}`);
+
+    const deepestBlockItem = items[items.length - 1];
+    const deepestBlockItemContent = getItemContentElement(deepestBlockItem);
 
     if (deepestBlockItem === null || deepestBlockItemContent === null) {
       return;
@@ -288,7 +274,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    const firstLevelItems = this.getChildItems(this.listWrapper);
+    const firstLevelItems = getChildItems(this.listWrapper);
 
     if (firstLevelItems === null) {
       return;
@@ -302,7 +288,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Get child items wrapper of the last item
      */
-    let lastFirstLevelItemChildWrapper = lastFirstLevelItem.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+    let lastFirstLevelItemChildWrapper = getItemChildWrapper(lastFirstLevelItem);
 
     /**
      * Get first item of the list to be merged with current one
@@ -441,15 +427,12 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       ? this.renderer?.getItemContent(currentItem).trim().length === 0
       : true;
     const isFirstLevelItem = currentItem.parentNode === this.listWrapper;
-    const isLastItem = currentItem.nextElementSibling === null;
-    const hasSublist = currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`) !== null;
-
 
     /**
      * On Enter in the last empty item, get out of list
      */
     if (isFirstLevelItem && isEmpty) {
-      if (isLastItem && !hasSublist) {
+      if (!isLastItem(currentItem) && !itemHasSublist(currentItem)) {
         this.getOutOfList();
 
         return;
@@ -545,7 +528,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    *
    * @returns {void}
    */
-  unshiftItem(item: ListItemElement): void {
+  unshiftItem(item: ItemElement): void {
     if (!item.parentNode) {
       return;
     }
@@ -553,7 +536,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    const parentItem = item.parentNode.closest(`.${DefaultListCssClasses.item}`);
+    const parentItem = item.parentNode.closest<ItemElement>(`.${DefaultListCssClasses.item}`);
 
     /**
      * If item in the first-level list then no need to do anything
@@ -562,34 +545,34 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    let currentItemChildWrapper = item.querySelector(`.${DefaultListCssClasses.itemChildren}`);
+    let currentItemChildWrapper = getItemChildWrapper(item);
 
     if (item.parentElement === null) {
       return;
     }
 
-    const siblings = getSiblings(item as HTMLElement);
+    const siblings = getSiblings(item);
+
 
     /**
-     * If current item has no childs, than render child wrapper
-     * After that trailing siblings would be appended to the child wrapper
+     * If item has any siblings, they should be appended to item child wrapper
      */
-    if (currentItemChildWrapper === null) {
-      currentItemChildWrapper = this.renderer!.renderWrapper(false);
-    }
+    if (siblings !== null) {
+      /**
+       * Render child wrapper if it does no exist
+       */
+      if (currentItemChildWrapper === null) {
+        currentItemChildWrapper = this.renderer!.renderWrapper(false);
+      }
 
-    siblings?.forEach((sibling) => {
-      currentItemChildWrapper.appendChild(sibling);
-    })
+      /**
+       * Append siblings to item child wrapper
+       */
+      siblings.forEach((sibling) => {
+        currentItemChildWrapper!.appendChild(sibling);
+      })
 
-    /**
-     * Check that we have any trailing items appended to the currentItemWrapper
-     * If currentItemWrapper has no child items, than remove currentItemWrapper
-     */
-    if (currentItemChildWrapper.childElementCount !== 0) {
       item.appendChild(currentItemChildWrapper);
-    } else {
-      currentItemChildWrapper.remove();
     }
 
     const restore = saveCaret();
@@ -601,26 +584,21 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * If previous parent's children list is now empty, remove it.
      */
-    const prevParentChildrenList = parentItem.querySelector(
-      `.${DefaultListCssClasses.itemChildren}`
-    );
-    if (!prevParentChildrenList) {
+    const parentItemChildWrapper = getItemChildWrapper(parentItem);
+
+    if (!parentItemChildWrapper) {
       return;
     }
-    const isPrevParentChildrenEmpty =
-      prevParentChildrenList.children.length === 0;
 
-    if (isPrevParentChildrenEmpty) {
-      prevParentChildrenList.remove();
-    }
+    removeChildWrapperIfEmpty(parentItemChildWrapper);
   }
 
   /**
    * Method that is used for list splitting and moving trailing items to the new separated list
    * @param item - current item html element
    */
-  splitList(item: ListItemElement): void {
-    const currentItemChildrenList = this.getChildItems(item);
+  splitList(item: ItemElement): void {
+    const currentItemChildrenList = getChildItems(item);
 
     /**
      * First child item should be unshifted because separated list should start
@@ -684,14 +662,14 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Method that is used for splitting item content and moving trailing content to the new sibling item
    * @param currentItem - current item html element
    */
-  splitItem(currentItem: ListItemElement): void {
+  splitItem(currentItem: ItemElement): void {
     const [ currentNode, offset ] = getCaretNodeAndOffset();
 
     if ( currentNode === null ) {
       return;
     }
 
-    const currentItemContent = currentItem.querySelector<HTMLElement>(`.${DefaultListCssClasses.itemContent}`);
+    const currentItemContent = getItemContentElement(currentItem);
 
     let endingHTML: string;
 
@@ -708,10 +686,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       endingHTML = getContenteditableSlice(currentItemContent, currentNode, offset, 'right', true);
     }
 
-    const itemChildren = currentItem?.querySelector(
-      `.${DefaultListCssClasses.itemChildren}`
-    );
-
+    const itemChildren = getItemChildWrapper(currentItem)
     /**
      * Create the new list item
      */
@@ -738,7 +713,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Current item children would not change nesting level
    * @param currentItem - current item html element
    */
-  mergeItemWithPrevious(item: ListItemElement): void {
+  mergeItemWithPrevious(item: ItemElement): void {
     const previousItem = item.previousElementSibling;
 
     const currentItemParentNode = item.parentNode;
@@ -753,7 +728,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    const parentItem = currentItemParentNode.closest<ListItemElement>(`.${DefaultListCssClasses.item}`);
+    const parentItem = currentItemParentNode.closest<ItemElement>(`.${DefaultListCssClasses.item}`);
 
     /**
      * Check that current item has any previous siblings to be merged with
@@ -772,7 +747,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Lets compute the item which will be merged with current item text
      */
-    let targetItem: ListItemElement | null;
+    let targetItem: ItemElement | null;
 
     /**
      * If there is a previous item then we get a deepest item in its sublists
@@ -783,7 +758,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       /**
        * Get list of all levels children of the previous item
        */
-      const childrenOfPreviousItem = previousItem.querySelectorAll<ListItemElement>(`.${DefaultListCssClasses.item}`);
+      const childrenOfPreviousItem = previousItem.querySelectorAll<ItemElement>(`.${DefaultListCssClasses.item}`);
 
       /**
        * Target item would be deepest child of the previous item or previous item itself
@@ -808,7 +783,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Get target item content element
      */
-    const targetItemContentElement = targetItem.querySelector<HTMLElement>(`.${DefaultListCssClasses.itemContent}`);
+    const targetItemContentElement = getItemContentElement(targetItem);
 
     /**
      * Set a new place for caret
@@ -831,7 +806,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Get child list of the currentItem
      */
-    const currentItemChildrenList = this.getChildItems(item);
+    const currentItemChildrenList = getChildItems(item);
 
     /**
      * Check that current item has any children
@@ -857,7 +832,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      */
     const targetForChildItems = previousItem ? previousItem : parentItem!;
 
-    const targetChildWrapper = targetForChildItems.querySelector(`.${DefaultListCssClasses.itemChildren}`) ?? this.renderer.renderWrapper(false);
+    const targetChildWrapper = getItemChildWrapper(targetForChildItems) ?? this.renderer.renderWrapper(false);
 
     currentItemChildrenList.forEach(childItem => {
       targetChildWrapper.appendChild(childItem);
@@ -910,9 +885,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    const prevItemChildrenList = prevItem.querySelector(
-      `.${DefaultListCssClasses.itemChildren}`
-    );
+    const prevItemChildrenList = getItemChildWrapper(prevItem);
 
     const restore = saveCaret();
 
@@ -930,7 +903,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       /**
        * Get all current item child to be moved to previous nesting level
        */
-      const currentItemChildrenList = this.getChildItems(currentItem);
+      const currentItemChildrenList = getChildItems(currentItem);
 
       /**
        * Move current item sublists one level back
@@ -952,7 +925,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       /**
        * Get all current item child to be moved to previous nesting level
        */
-      const currentItemChildrenList = this.getChildItems(currentItem);
+      const currentItemChildrenList = getChildItems(currentItem);
 
       /**
        * Move current item sublists one level back
@@ -976,10 +949,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param {boolean} atStart - where to set focus: at the start or at the end
    * @returns {void}
    */
-  focusItem(item: ListItemElement, atStart: boolean = true): void {
-    const itemContent = item.querySelector<HTMLElement>(
-      `.${DefaultListCssClasses.itemContent}`
-    );
+  focusItem(item: ItemElement, atStart: boolean = true): void {
+    const itemContent = getItemContentElement(item);
+
     if (!itemContent) {
       return;
     }
@@ -1013,7 +985,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param item - item to be rendered
    * @returns html element of the rendered item
    */
-  renderItem(itemContent: ListItem['content'], meta?: ListItem['meta']): HTMLElement {
+  renderItem(itemContent: ListItem['content'], meta?: ListItem['meta']): ItemElement {
     const itemMeta = meta ?? this.renderer.composeDefaultMeta();
 
     switch (true) {
