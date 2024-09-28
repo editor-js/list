@@ -1,4 +1,4 @@
-import type { API, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
+import type { API, BlockAPI, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
 import type {
   BlockToolConstructorOptions,
   TunesMenuConfig,
@@ -6,6 +6,8 @@ import type {
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
 import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/ListParams';
 import ListTabulator from './ListTabulator';
+import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
+import { ListRenderer } from './types/ListRenderer';
 
 /**
  * Build styles
@@ -71,20 +73,12 @@ export default class NestedList {
   set listStyle(style: ListDataStyle) {
     this.data.style = style;
 
-    /**
-     * Create new instance of list
-     */
-    this.list = new ListTabulator(
-      {
-        data: this.data,
-        api: this.api,
-        readOnly: this.readOnly,
-        config: this.config,
-      },
-      this.listStyle
-    );
+    this.changeTabulatorByStyle(style);
 
-    const newListElement = this.list.render()
+    /**
+     * Create new list element
+     */
+    const newListElement = this.list!.render()
 
     this.listElement?.replaceWith(newListElement);
 
@@ -104,7 +98,7 @@ export default class NestedList {
   /**
    * Tool's configuration
    */
-  private config?: NestedListConfig;
+  private config: NestedListConfig;
 
   /**
    * Default list style
@@ -117,9 +111,14 @@ export default class NestedList {
   private data: ListData;
 
   /**
+   * Editor block api
+   */
+  private block: BlockAPI;
+
+  /**
    * Class that is responsible for list complete list rendering and saving
    */
-  list: ListTabulator | undefined;
+  list: ListTabulator<ListRenderer> | undefined;
 
   /**
    * Main constant wrapper of the whole list
@@ -136,10 +135,11 @@ export default class NestedList {
    * @param {object} params.api - Editor.js API
    * @param {boolean} params.readOnly - read-only mode flag
    */
-  constructor({ data, config, api, readOnly }: ListParams) {
+  constructor({ data, config, api, readOnly, block }: ListParams) {
     this.api = api;
     this.readOnly = readOnly;
     this.config = config;
+    this.block = block;
 
     /**
      * Set the default list style from the config or presetted 'ordered'.
@@ -152,6 +152,8 @@ export default class NestedList {
     };
 
     this.data = data && Object.keys(data).length ? data : initialData;
+
+    this.changeTabulatorByStyle(this.defaultListStyle);
   }
 
   /**
@@ -159,16 +161,7 @@ export default class NestedList {
    * @returns rendered list wrapper with all contents
    */
   render() {
-    this.list = new ListTabulator({
-      data: this.data,
-      readOnly: this.readOnly,
-      api: this.api,
-      config: this.config,
-    },
-    this.listStyle
-  );
-
-    this.listElement = this.list.render();
+    this.listElement = this.list!.render();
 
     return this.listElement;
   }
@@ -181,6 +174,10 @@ export default class NestedList {
     this.data = this.list!.save();
 
     return this.data
+  }
+
+  merge(data: ListData) {
+    this.list!.merge(data);
   }
 
   /**
@@ -218,6 +215,53 @@ export default class NestedList {
         this.listStyle = tune.name;
       },
     }));
+  }
+
+  /**
+   * This method allows changing
+   * @param style
+   */
+  changeTabulatorByStyle(style: ListDataStyle) {
+    switch (this.listStyle) {
+      case 'ordered':
+        this.list = new ListTabulator<OrderedListRenderer>({
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        new OrderedListRenderer(this.readOnly, this.config),
+      );
+
+      break;
+
+      case 'unordered':
+        this.list = new ListTabulator<UnorderedListRenderer>({
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        new UnorderedListRenderer(this.readOnly, this.config),
+      );
+
+      break;
+
+      case 'checklist':
+        this.list = new ListTabulator<CheckListRenderer>({
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        new CheckListRenderer(this.readOnly, this.config),
+      );
+
+      break;
+    }
   }
 
   /**

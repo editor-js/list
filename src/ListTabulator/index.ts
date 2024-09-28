@@ -1,32 +1,33 @@
-import { CheckListRenderer } from "../ListRenderer/ChecklistRenderer";
 import { OrderedListRenderer } from "../ListRenderer/OrderedListRenderer";
 import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
 import { NestedListConfig, ListData, ListDataStyle } from "../types/ListParams"
 import { ListItem } from "../types/ListParams";
+import type { ItemElement, ItemContentElement, ItemChildWrapperElement } from "../types/Elements";
 import { isHtmlElement } from '../utils/type-guards';
-import Caret from '../utils/Caret';
+import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput, save as saveCaret } from '@editorjs/caret';
 import { DefaultListCssClasses } from "../ListRenderer";
-import * as Dom from '../utils/Dom'
 import type { PasteEvent } from '../types';
-import type { API, PasteConfig } from '@editorjs/editorjs';
+import type { API, BlockAPI, PasteConfig } from '@editorjs/editorjs';
 import { ListParams } from "..";
 import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/ItemMeta";
-
-type ListRendererTypes = OrderedListRenderer | UnorderedListRenderer | CheckListRenderer;
+import type { ListRenderer } from '../types/ListRenderer'
+import { getSiblings } from '../utils/getSiblings';
+import { getChildItems } from '../utils/getChildItems';
+import { isLastItem } from "../utils/isLastItem";
+import { itemHasSublist } from "../utils/itemHasSublist";
+import { getItemChildWrapper } from "../utils/getItemChildWrapper";
+import { removeChildWrapperIfEmpty } from "../utils/removeChildWrapperIfEmpty";
+import { getItemContentElement } from "../utils/getItemContentElement";
+import { focusItem } from "../utils/focusItem";
 
 /**
  * Class that is responsible for list tabulation
  */
-export default class ListTabulator {
+export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * The Editor.js API
    */
   private api: API;
-
-  /**
-   * Caret helper
-   */
-  private caret: Caret;
 
   /**
    * Is NestedList Tool read-only option
@@ -44,31 +45,26 @@ export default class ListTabulator {
   private data: ListData;
 
   /**
-   * Current level of nesting for dynamyc updates
+   * Editor block api
    */
-  private currentLevel: number;
-
-  /**
-   * Style of the nested list
-   */
-  style: ListDataStyle;
+  private block: BlockAPI;
 
   /**
    * Rendered list of items
    */
-  list: ListRendererTypes | undefined;
+  renderer: Renderer;
 
   /**
    * Wrapper of the whole list
    */
-  listWrapper: HTMLElement | undefined;
+  listWrapper: ItemChildWrapperElement | undefined;
 
   /**
    * Returns current List item by the caret position
    *
    * @returns {Element}
    */
-  get currentItem(): Element | null {
+  get currentItem(): ItemElement | null {
     const selection = window.getSelection();
 
     if (!selection) {
@@ -90,21 +86,17 @@ export default class ListTabulator {
       return null;
     }
 
-    return currentNode.closest(DefaultListCssClasses.item);
+    return currentNode.closest(`.${DefaultListCssClasses.item}`);
   }
 
-  constructor({data, config, api, readOnly}: ListParams, style: ListDataStyle) {
+  constructor({data, config, api, readOnly, block}: ListParams, renderer: Renderer) {
     this.config = config;
     this.data = data;
-    this.style = style;
     this.readOnly = readOnly;
     this.api = api;
-    this.currentLevel = 0;
+    this.block = block;
 
-    /**
-     * Instantiate caret helper
-     */
-    this.caret = new Caret();
+    this.renderer = renderer;
   }
 
   /**
@@ -112,19 +104,7 @@ export default class ListTabulator {
    * @returns Filled with content wrapper element of the list
    */
   render() {
-    switch (this.style) {
-      case 'ordered':
-        this.list = new OrderedListRenderer(this.readOnly, this.config);
-        break
-      case 'unordered':
-        this.list = new UnorderedListRenderer(this.readOnly, this.config);
-        break
-      case 'checklist':
-        this.list = new CheckListRenderer(this.readOnly, this.config);
-        break
-    }
-
-    this.listWrapper = this.list.renderWrapper(this.currentLevel);
+    this.listWrapper = this.renderer.renderWrapper(true);
 
     // fill with data
     if (this.data.items.length) {
@@ -178,69 +158,51 @@ export default class ListTabulator {
    * @param {Element} parentItem - where to append
    * @returns {void}
    */
-  appendItems(items: ListItem[], parentItem: Element): void {
-    /**
-     * Update current nesting level
-     */
-    this.currentLevel += 1;
+  appendItems(items: ListItem[], parentElement: Element): void {
+    items.forEach((item) => {
+      const itemEl = this.renderItem(item.content, item.meta);
 
-    if (this.list !== undefined) {
-      items.forEach((item) => {
-        let itemEl: Element;
+      parentElement.appendChild(itemEl);
 
-        if (this.list instanceof OrderedListRenderer) {
-          itemEl = this.list!.renderItem(item.content, item.meta as OrderedListItemMeta);
-        }
-        else if (this.list instanceof UnorderedListRenderer) {
-          itemEl = this.list!.renderItem(item.content, item.meta as UnorderedListItemMeta);
-        }
-        else {
-          itemEl = this.list!.renderItem(item.content, item.meta as ChecklistItemMeta);
-        }
-
-        parentItem.appendChild(itemEl);
+      /**
+       * Check if there are child items
+       */
+      if (item.items.length) {
+        const sublistWrapper = this.renderer?.renderWrapper(false);
 
         /**
-         * Check if there are child items
+         * Recursively render child items
          */
-        if (item.items.length) {
-          const sublistWrapper = this.list?.renderWrapper(this.currentLevel);
+        this.appendItems(item.items, sublistWrapper!);
 
-          /**
-           * Recursively render child items, it will increase currentLevel varible
-           * after filling level with items we will need to decrease currentLevel
-           */
-          this.appendItems(item.items, sublistWrapper!);
-          this.currentLevel -= 1;
-
-          if (itemEl) {
-            itemEl.appendChild(sublistWrapper!);
-          }
+        if (itemEl) {
+          itemEl.appendChild(sublistWrapper!);
         }
-      });
-    }
+      }
+    });
   }
 
   /**
    * Function that is responsible for list content saving
-   * @returns saved list data
+   * @param wrapper - optional argument wrapper
+   * @returns whole list saved data if wrapper not passes, otherwise will return data of the passed wrapper
    */
-  save(): ListData {
+  save(wrapper?: ItemChildWrapperElement): ListData {
+    const listWrapper = wrapper ?? this.listWrapper;
+
     /**
      * The method for recursive collecting of the child items
      *
      * @param {Element} parent - where to find items
      * @returns {ListItem[]}
      */
-    const getItems = (parent: Element): ListItem[] => {
-      const children = Array.from(
-        parent.querySelectorAll(`:scope > .${DefaultListCssClasses.item}`)
-      );
+    const getItems = (parent: ItemChildWrapperElement): ListItem[] => {
+      const children = getChildItems(parent);
 
       return children.map((el) => {
-        const subItemsWrapper = el.querySelector(`.${DefaultListCssClasses.itemChildren}`);
-        const content = this.list!.getItemContent(el);
-        const meta = this.list!.getItemMeta(el);
+        const subItemsWrapper = getItemChildWrapper(el)
+        const content = this.renderer!.getItemContent(el);
+        const meta = this.renderer!.getItemMeta(el);
         const subItems = subItemsWrapper ? getItems(subItemsWrapper) : [];
 
         return {
@@ -253,7 +215,7 @@ export default class ListTabulator {
 
     return {
       style: this.data.style,
-      items: this.listWrapper ? getItems(this.listWrapper) : [],
+      items: listWrapper ? getItems(listWrapper) : [],
     };
   }
 
@@ -266,6 +228,90 @@ export default class ListTabulator {
     return {
       tags: ['OL', 'UL', 'LI'],
     };
+  }
+
+  /**
+   * Method that specified hot to merge two List blocks.
+   * Called by Editor.js by backspace at the beginning of the Block
+   *
+   * Content of the first item of the next List would be merged with deepest item in current list
+   * Other items of the next List would be appended to the current list without any changes in nesting levels
+   *
+   * @param {ListData} data - data of the second list to be merged with current
+   * @public
+   */
+  merge(data: ListData): void {
+    /**
+     * Get list of all levels children of the previous item
+     */
+    const items = this.block.holder.querySelectorAll<ItemElement>(`.${DefaultListCssClasses.item}`);
+
+    const deepestBlockItem = items[items.length - 1];
+    const deepestBlockItemContentElement = getItemContentElement(deepestBlockItem);
+
+    if (deepestBlockItem === null || deepestBlockItemContentElement === null) {
+      return;
+    }
+
+    focus(deepestBlockItemContentElement);
+
+    const restore = saveCaret();
+    /**
+     * Insert trailing html to the deepest block item content
+     */
+    deepestBlockItemContentElement.insertAdjacentHTML('beforeend', data.items[0].content);
+
+    restore();
+
+    if (this.listWrapper === undefined) {
+      return;
+    }
+
+    const firstLevelItems = getChildItems(this.listWrapper);
+
+    if (firstLevelItems.length === 0) {
+      return;
+    }
+
+    /**
+     * Get last item of the first level of the list
+     */
+    const lastFirstLevelItem = firstLevelItems[firstLevelItems.length - 1];
+
+    /**
+     * Get child items wrapper of the last item
+     */
+    let lastFirstLevelItemChildWrapper = getItemChildWrapper(lastFirstLevelItem);
+
+    /**
+     * Get first item of the list to be merged with current one
+     */
+    const firstItem = data.items.shift();
+
+    /**
+     * Check that first item exists
+     */
+    if (firstItem === undefined) {
+      return;
+    }
+
+    /**
+     * Append child items of the first element
+     */
+    if (firstItem.items.length !== 0) {
+      /**
+       * Render child wrapper of the last item if it does not exist
+       */
+      if (lastFirstLevelItemChildWrapper === null) {
+        lastFirstLevelItemChildWrapper = this.renderer.renderWrapper(false);
+      }
+
+      this.appendItems(firstItem.items, lastFirstLevelItemChildWrapper);
+    }
+
+    if (data.items.length > 0) {
+      this.appendItems(data.items, this.listWrapper);
+    }
   }
 
   /**
@@ -366,64 +412,49 @@ export default class ListTabulator {
     if (event.isComposing) {
       return;
     }
+    if (currentItem === null) {
+      return;
+    }
+
+    const isEmpty = currentItem
+      ? this.renderer?.getItemContent(currentItem).trim().length === 0
+      : true;
+    const isFirstLevelItem = currentItem.parentNode === this.listWrapper;
 
     /**
      * On Enter in the last empty item, get out of list
      */
-    const isEmpty = currentItem
-      ? this.list?.getItemContent(currentItem).trim().length === 0
-      : true;
-    const isFirstLevelItem = currentItem?.parentNode === this.listWrapper;
-    const isLastItem = currentItem?.nextElementSibling === null;
+    if (isFirstLevelItem && isEmpty) {
+      if (isLastItem(currentItem) && !itemHasSublist(currentItem)) {
+        this.getOutOfList();
 
-    if (isFirstLevelItem && isLastItem && isEmpty) {
-      this.getOutOfList();
+        return;
+      }
+      /**
+       * If enter is pressed in the сenter of the list item we should split it
+       */
+      else {
+        this.splitList(currentItem);
 
-      return;
-    } else if (isLastItem && isEmpty) {
-      this.unshiftItem();
+        return;
+      }
+    }
+    /**
+     * If currnet item is empty and is in the middle of the list
+     * And if current item is not on the first level
+     * Then unshift current item
+     */
+    else if (isEmpty) {
+      this.unshiftItem(currentItem);
 
       return;
     }
-
     /**
-     * On other Enters, get content from caret till the end of the block
-     * And move it to the new item
+     * If current item is not empty than split current item
      */
-    const endingFragment = Caret.extractFragmentFromCaretPositionTillTheEnd();
-    if (!endingFragment) {
-      return;
+    else {
+      this.splitItem(currentItem);
     }
-    const endingHTML = Dom.fragmentToString(endingFragment);
-    const itemChildren = currentItem?.querySelector(
-      `.${DefaultListCssClasses.itemChildren}`
-    );
-
-    /**
-     * Create the new list item
-     */
-    const itemEl = this.list!.renderItem(endingHTML, { checked: false });
-
-    /**
-     * Check if child items exist
-     *
-     * @type {boolean}
-     */
-    const childrenExist =
-      itemChildren &&
-      Array.from(itemChildren.querySelectorAll(`.${DefaultListCssClasses.item}`)).length > 0;
-
-    /**
-     * If item has children, prepend to them
-     * Otherwise, insert the new item after current
-     */
-    if (childrenExist) {
-      itemChildren.prepend(itemEl);
-    } else {
-      currentItem?.after(itemEl);
-    }
-
-    this.focusItem(itemEl);
   }
 
   /**
@@ -432,11 +463,17 @@ export default class ListTabulator {
    * @param {KeyboardEvent} event - keydown
    */
   backspace(event: KeyboardEvent): void {
+    const currentItem = this.currentItem;
+
+    if (currentItem === null) {
+      return;
+    }
+
     /**
      * Caret is not at start of the item
      * Then backspace button should remove letter as usual
      */
-    if (!Caret.isAtStart()) {
+    if (!isCaretAtStartOfInput(currentItem)) {
       return;
     }
 
@@ -445,198 +482,7 @@ export default class ListTabulator {
      */
     event.preventDefault();
 
-    const currentItem = this.currentItem;
-    if (!currentItem) {
-      return;
-    }
-    const previousItem = currentItem.previousSibling;
-    if (!currentItem.parentNode) {
-      return;
-    }
-    if (!isHtmlElement(currentItem.parentNode)) {
-      return;
-    }
-    const parentItem = currentItem.parentNode.closest(`.${DefaultListCssClasses.item}`);
-
-    /**
-     * Do nothing with the first item in the first-level list.
-     * No previous sibling means that this is the first item in the list.
-     * No parent item means that this is a first-level list.
-     *
-     * Before:
-     * 1. |Hello
-     * 2. World!
-     *
-     * After:
-     * 1. |Hello
-     * 2. World!
-     *
-     * If it this item and the while list is empty then editor.js should
-     * process this behaviour and remove the block completely
-     *
-     * Before:
-     * 1. |
-     *
-     * After: block has been removed
-     *
-     */
-    if (!previousItem && !parentItem) {
-      return;
-    }
-
-    // make sure previousItem is an HTMLElement
-    if (previousItem && !isHtmlElement(previousItem)) {
-      return;
-    }
-
-    /**
-     * Prevent editor.js behaviour
-     */
-    event.stopPropagation();
-
-    /**
-     * Lets compute the item which will be merged with current item text
-     */
-    let targetItem: Element | null;
-
-    /**
-     * If there is a previous item then we get a deepest item in its sublists
-     *
-     * Otherwise we will use the parent item
-     */
-    if (previousItem) {
-      const childrenOfPreviousItem = previousItem.querySelectorAll(
-        `.${DefaultListCssClasses.item}`
-      );
-
-      targetItem = Array.from(childrenOfPreviousItem).pop() || previousItem;
-    } else {
-      targetItem = parentItem;
-    }
-
-    /**
-     * Get content from caret till the end of the block to move it to the new item
-     */
-    const endingFragment = Caret.extractFragmentFromCaretPositionTillTheEnd();
-    if (!endingFragment) {
-      return;
-    }
-    const endingHTML = Dom.fragmentToString(endingFragment);
-
-    /**
-     * Get the target item content element
-     */
-    if (!targetItem) {
-      return;
-    }
-    const targetItemContent = targetItem.querySelector<HTMLElement>(
-      `.${DefaultListCssClasses.itemContent}`
-    );
-
-    /**
-     * Set a new place for caret
-     */
-    if (!targetItemContent) {
-      return;
-    }
-    Caret.focus(targetItemContent, false);
-
-    /**
-     * Save the caret position
-     */
-    this.caret.save();
-
-    /**
-     * Update target item content by merging with current item html content
-     */
-    targetItemContent.insertAdjacentHTML('beforeend', endingHTML);
-
-    /**
-     * Get the sublist first-level items for current item
-     */
-    let currentItemSublistItems: NodeListOf<Element> | Element[] =
-      currentItem.querySelectorAll(
-        `.${DefaultListCssClasses.itemChildren} > .${DefaultListCssClasses.item}`
-      );
-
-    /**
-     * Create an array from current item sublist items
-     */
-    currentItemSublistItems = Array.from(currentItemSublistItems);
-
-    /**
-     * Filter items for sublist first-level
-     * No need to move deeper items
-     */
-    currentItemSublistItems = currentItemSublistItems.filter((node) => {
-      // make sure node.parentNode is an HTMLElement
-      if (!node.parentNode) {
-        return false;
-      }
-      if (!isHtmlElement(node.parentNode)) {
-        return false;
-      }
-      return node.parentNode.closest(`.${DefaultListCssClasses.item}`) === currentItem;
-    });
-
-    /**
-     * Reverse the array to insert items
-     */
-    currentItemSublistItems.reverse().forEach((item) => {
-      /**
-       * Check if we need to save the indent for current item children
-       *
-       * If this is the first item in the list then place its children to the same level as currentItem.
-       * Same as shift+tab for all of these children.
-       *
-       * If there is a previous sibling then place children right after target item
-       */
-      if (!previousItem) {
-        /**
-         * The first item in the list
-         *
-         * Before:
-         * 1. Hello
-         *   1.1. |My
-         *     1.1.1. Wonderful
-         *     1.1.2. World
-         *
-         * After:
-         * 1. Hello|My
-         *   1.1. Wonderful
-         *   1.2. World
-         */
-        currentItem.after(item);
-      } else {
-        /**
-         * Not the first item
-         *
-         * Before:
-         * 1. Hello
-         *   1.1. My
-         *   1.2. |Dear
-         *     1.2.1. Wonderful
-         *     1.2.2. World
-         *
-         * After:
-         * 1. Hello
-         *   1.1. My|Dear
-         *   1.2. Wonderful
-         *   1.3. World
-         */
-        targetItem.after(item);
-      }
-    });
-
-    /**
-     * Remove current item element
-     */
-    currentItem.remove();
-
-    /**
-     * Restore the caret position
-     */
-    this.caret.restore();
+    this.mergeItemWithPrevious(currentItem);
   }
 
 
@@ -658,30 +504,32 @@ export default class ListTabulator {
     event.preventDefault();
 
     /**
+     * Check that current item exists
+     */
+    if (this.currentItem === null) {
+      return;
+    }
+
+    /**
      * Move item from current list to parent list
      */
-    this.unshiftItem();
+    this.unshiftItem(this.currentItem);
   }
 
-
   /**
-   * Decrease indentation of the current item
+   * Decrease indentation of the passed item
    *
    * @returns {void}
    */
-  unshiftItem(): void {
-    const currentItem = this.currentItem;
-    if (!currentItem) {
+  unshiftItem(item: ItemElement): void {
+    if (!item.parentNode) {
       return;
     }
-    if (!currentItem.parentNode) {
-      return;
-    }
-    if (!isHtmlElement(currentItem.parentNode)) {
+    if (!isHtmlElement(item.parentNode)) {
       return;
     }
 
-    const parentItem = currentItem.parentNode.closest(`.${DefaultListCssClasses.item}`);
+    const parentItem = item.parentNode.closest<ItemElement>(`.${DefaultListCssClasses.item}`);
 
     /**
      * If item in the first-level list then no need to do anything
@@ -690,29 +538,327 @@ export default class ListTabulator {
       return;
     }
 
-    this.caret.save();
+    let currentItemChildWrapper = getItemChildWrapper(item);
 
-    parentItem.after(currentItem);
+    if (item.parentElement === null) {
+      return;
+    }
 
-    this.caret.restore();
+    const siblings = getSiblings(item);
+
+
+    /**
+     * If item has any siblings, they should be appended to item child wrapper
+     */
+    if (siblings !== null) {
+      /**
+       * Render child wrapper if it does no exist
+       */
+      if (currentItemChildWrapper === null) {
+        currentItemChildWrapper = this.renderer!.renderWrapper(false);
+      }
+
+      /**
+       * Append siblings to item child wrapper
+       */
+      siblings.forEach((sibling) => {
+        currentItemChildWrapper!.appendChild(sibling);
+      })
+
+      item.appendChild(currentItemChildWrapper);
+    }
+
+    const restore = saveCaret();
+
+    parentItem.after(item);
+
+    restore();
 
     /**
      * If previous parent's children list is now empty, remove it.
      */
-    const prevParentChildrenList = parentItem.querySelector(
-      `.${DefaultListCssClasses.itemChildren}`
-    );
-    if (!prevParentChildrenList) {
+    const parentItemChildWrapper = getItemChildWrapper(parentItem);
+
+    if (!parentItemChildWrapper) {
       return;
     }
-    const isPrevParentChildrenEmpty =
-      prevParentChildrenList.children.length === 0;
 
-    if (isPrevParentChildrenEmpty) {
-      prevParentChildrenList.remove();
-    }
+    removeChildWrapperIfEmpty(parentItemChildWrapper);
   }
 
+  /**
+   * Method that is used for list splitting and moving trailing items to the new separated list
+   * @param item - current item html element
+   */
+  splitList(item: ItemElement): void {
+    const currentItemChildrenList = getChildItems(item);
+
+    /**
+     * First child item should be unshifted because separated list should start
+     * with item with first nesting level
+     */
+    if (currentItemChildrenList.length !== 0) {
+      const firstChildItem = currentItemChildrenList[0];
+
+      this.unshiftItem(firstChildItem);
+    }
+
+    /**
+     * Get trailing siblings of the current item
+     */
+    const newListItems = getSiblings(item);
+
+    if (newListItems === null) {
+      return;
+    }
+
+    /**
+     * Render new wrapper for list that would be separated
+     */
+    const newListWrapper = this.renderer!.renderWrapper(true);
+
+    /**
+     * Append new list wrapper with trailing elements
+     */
+    newListItems.forEach((item) => {
+      newListWrapper.appendChild(item);
+    })
+
+    const newListContent = this.save(newListWrapper);
+
+    /**
+     * Get current list block index
+     */
+    const currentBlock = this.block;
+
+    const currentBlockIndex = this.api.blocks.getCurrentBlockIndex()
+
+    /**
+     * Insert separated list with trailing items
+     */
+    this.api.blocks.insert(currentBlock?.name, newListContent, this.config, currentBlockIndex + 1);
+
+    /**
+     * Insert paragraph
+     */
+    this.getOutOfList(currentBlockIndex + 1);
+
+    /**
+     * Remove temporary new list wrapper used for content save
+     */
+    newListWrapper.remove();
+  }
+
+  /**
+   * Method that is used for splitting item content and moving trailing content to the new sibling item
+   * @param currentItem - current item html element
+   */
+  splitItem(currentItem: ItemElement): void {
+    const [ currentNode, offset ] = getCaretNodeAndOffset();
+
+    if ( currentNode === null ) {
+      return;
+    }
+
+    const currentItemContent = getItemContentElement(currentItem);
+
+    let endingHTML: string;
+
+    /**
+     * If current item has no content, we should pass an empty string to the next created list item
+     */
+    if (currentItemContent === null) {
+      endingHTML = '';
+    } else {
+      /**
+       * On other Enters, get content from caret till the end of the block
+       * And move it to the new item
+       */
+      endingHTML = getContenteditableSlice(currentItemContent, currentNode, offset, 'right', true);
+    }
+
+    const itemChildren = getItemChildWrapper(currentItem)
+    /**
+     * Create the new list item
+     */
+    const itemEl = this.renderItem(endingHTML);
+
+    /**
+     * Move new item after current
+     */
+    currentItem?.after(itemEl);
+
+    /**
+     * If current item has children, move them to the new item
+     */
+    if (itemChildren) {
+      itemEl.appendChild(itemChildren);
+    }
+
+    focusItem(itemEl);
+  }
+
+  /**
+   * Method that is used for merging current item with previous one
+   * Content of the current item would be appended to the previous item
+   * Current item children would not change nesting level
+   * @param currentItem - current item html element
+   */
+  mergeItemWithPrevious(item: ItemElement): void {
+    const previousItem = item.previousElementSibling;
+
+    const currentItemParentNode = item.parentNode;
+
+    /**
+     * Check that parent node of the current element exists
+     */
+    if (currentItemParentNode === null) {
+      return;
+    }
+    if (!isHtmlElement(currentItemParentNode)) {
+      return;
+    }
+
+    const parentItem = currentItemParentNode.closest<ItemElement>(`.${DefaultListCssClasses.item}`);
+
+    /**
+     * Check that current item has any previous siblings to be merged with
+     */
+    if (!previousItem && !parentItem) {
+      return;
+    }
+
+    /**
+     * Make sure previousItem is an HTMLElement
+     */
+    if (previousItem && !isHtmlElement(previousItem)) {
+      return;
+    }
+
+    /**
+     * Lets compute the item which will be merged with current item text
+     */
+    let targetItem: ItemElement | null;
+
+    /**
+     * If there is a previous item then we get a deepest item in its sublists
+     *
+     * Otherwise we will use the parent item
+     */
+    if (previousItem) {
+      /**
+       * Get list of all levels children of the previous item
+       */
+      const childrenOfPreviousItem = getChildItems(previousItem, false);
+
+      /**
+       * Target item would be deepest child of the previous item or previous item itself
+       */
+      if (childrenOfPreviousItem.length !== 0 && childrenOfPreviousItem.length !== 0) {
+        targetItem = childrenOfPreviousItem[childrenOfPreviousItem.length - 1];
+      } else {
+        targetItem = previousItem;
+      }
+    } else {
+      targetItem = parentItem;
+    }
+
+    /**
+     * Get current item content
+     */
+    const currentItemContent = this.renderer.getItemContent(item);
+
+    /**
+     * Get the target item content element
+     */
+    if (!targetItem) {
+      return;
+    }
+
+    /**
+     * Get target item content element
+     */
+    const targetItemContentElement = getItemContentElement(targetItem);
+
+    /**
+     * Set a new place for caret
+     */
+    if (!targetItemContentElement) {
+      return;
+    }
+    focus(targetItemContentElement, false);
+
+    /**
+     * Save the caret position
+     */
+    const restore = saveCaret();
+
+    /**
+     * Update target item content by merging with current item html content
+     */
+    targetItemContentElement.insertAdjacentHTML('beforeend', currentItemContent);
+
+    /**
+     * Get child list of the currentItem
+     */
+    const currentItemChildrenList = getChildItems(item);
+
+    /**
+     * Check that current item has any children
+     */
+    if (currentItemChildrenList.length === 0) {
+      /**
+       * Remove current item element
+       */
+      item.remove();
+
+      /**
+       * Restore the caret position
+       */
+      restore();
+
+      return;
+    }
+
+    /**
+     * Get target for child list of the currentItem
+     * Note that previous item and parent item could not be null at the same time
+     * This case is checked before
+     */
+    const targetForChildItems = previousItem ? previousItem : parentItem!;
+
+    const targetChildWrapper = getItemChildWrapper(targetForChildItems) ?? this.renderer.renderWrapper(false);
+
+    /**
+     * Add child current item children to the target childWrapper
+     */
+    if (previousItem) {
+      currentItemChildrenList.forEach(childItem => {
+        targetChildWrapper.appendChild(childItem);
+      })
+    } else {
+      currentItemChildrenList.forEach(childItem => {
+        targetChildWrapper.prepend(childItem);
+      })
+    }
+
+    /**
+     * If we created new wrapper, then append childWrapper to the target item
+     */
+    if (getItemChildWrapper(targetForChildItems) === null) {
+      targetItem.appendChild(targetChildWrapper)
+    }
+
+    /**
+     * Remove current item element
+     */
+    item.remove();
+
+    /**
+     * Restore the caret position
+     */
+    restore();
+  }
 
   /**
    * Add indentation to current item
@@ -735,93 +881,112 @@ export default class ListTabulator {
     if (!currentItem) {
       return;
     }
+
+    /**
+     * Check that the item has potential parent
+     * Previous sibling is potential parent in case of adding tab
+     * After adding tab current item would be moved to the previous sibling's child list
+     */
     const prevItem = currentItem.previousSibling;
-    if (!prevItem) {
+
+    if (prevItem === null) {
       return;
     }
     if (!isHtmlElement(prevItem)) {
       return;
     }
-    if (currentItem.querySelector(`.${DefaultListCssClasses.itemChildren}`) !== null) {
-      return;
-    }
-    const isFirstChild = !prevItem;
 
-    /**
-     * In the first item we should not handle Tabs (because there is no parent item above)
-     */
-    if (isFirstChild) {
-      return;
-    }
+    const prevItemChildrenList = getItemChildWrapper(prevItem);
 
-    const prevItemChildrenList = prevItem.querySelector(
-      `.${DefaultListCssClasses.itemChildren}`
-    );
-
-    this.caret.save();
+    const restore = saveCaret();
 
     /**
      * If prev item has child items, just append current to them
+     * Else render new child wrapper for previous item
      */
     if (prevItemChildrenList) {
       /**
-       * CurrentItem would not be removed soon (it should be cleared content and checkbox would be removed)
-       * after that elements with child items would be moveable too
+       * Previous item would be appended with current item and it's sublists
+       * After that sublists would be moved one level back
        */
-      currentItem.remove();
-      const newSublistItem = this.list!.renderItem(this.list!.getItemContent(currentItem), {checked: false});
-      prevItemChildrenList.appendChild(newSublistItem);
+      prevItemChildrenList.appendChild(currentItem);
+
+      /**
+       * Get all current item child to be moved to previous nesting level
+       */
+      const currentItemChildrenList = getChildItems(currentItem);
+
+      /**
+       * Move current item sublists one level back
+       */
+      currentItemChildrenList.forEach((child) => {
+        prevItemChildrenList.appendChild(child);
+      })
     } else {
+      const prevItemChildrenListWrapper = this.renderer!.renderWrapper(false);
+
       /**
-       * CurrentItem would not be removed soon (it should be cleared content and checkbox would be removed)
-       * after that elements with child items would be moveable too
+       * Previous item would be appended with current item and it's sublists
+       * After that sublists would be moved one level back
        */
-      currentItem.remove();
+      prevItemChildrenListWrapper.appendChild(currentItem);
+
       /**
-       * If prev item has no child items
-       * - Create and append children wrapper to the previous item
-       * - Append current item to it
+       * Get all current item child to be moved to previous nesting level
        */
-      const sublistWrapper = this.list!.renderWrapper(1);
-      const newSublistItem = this.list!.renderItem(this.list!.getItemContent(currentItem), {checked: false});
+      const currentItemChildrenList = getChildItems(currentItem);
 
-      sublistWrapper.appendChild(newSublistItem);
+      /**
+       * Move current item sublists one level back
+       */
+      currentItemChildrenList.forEach((child) => {
+        prevItemChildrenListWrapper.appendChild(child);
+      })
 
-      console.log(prevItem, sublistWrapper)
-
-      prevItem?.appendChild(sublistWrapper);
+      prevItem.appendChild(prevItemChildrenListWrapper);
     }
 
-    this.caret.restore();
-  }
-
-  /**
-   * Sets focus to the item's content
-   *
-   * @param {Element} item - item (<li>) to select
-   * @param {boolean} atStart - where to set focus: at the start or at the end
-   * @returns {void}
-   */
-  focusItem(item: Element, atStart: boolean = true): void {
-    const itemContent = item.querySelector<HTMLElement>(
-      `.${DefaultListCssClasses.itemContent}`
-    );
-    if (!itemContent) {
-      return;
-    }
-
-    Caret.focus(itemContent, atStart);
+    restore();
   }
 
   /**
    * Get out from List Tool by Enter on the empty last item
-   *
+   * @param index - optional parameter represents index, where would be inseted default block
    * @returns {void}
    */
-    getOutOfList(): void {
-      this.currentItem?.remove();
+  getOutOfList(index?: number): void {
+    let newBlock;
 
-      this.api.blocks.insert();
-      this.api.caret.setToBlock(this.api.blocks.getCurrentBlockIndex());
+    /**
+     * Check that index passed
+     */
+    if (index !== undefined) {
+      newBlock = this.api.blocks.insert(undefined, undefined, undefined, index);
+    } else {
+      newBlock = this.api.blocks.insert();
     }
+
+    this.currentItem?.remove();
+    this.api.caret.setToBlock(newBlock);
+  }
+
+  /**
+   * Method that calls render function of the renderer with a necessary item meta cast
+   * @param item - item to be rendered
+   * @returns html element of the rendered item
+   */
+  renderItem(itemContent: ListItem['content'], meta?: ListItem['meta']): ItemElement {
+    const itemMeta = meta ?? this.renderer.composeDefaultMeta();
+
+    switch (true) {
+      case this.renderer instanceof OrderedListRenderer:
+        return this.renderer.renderItem(itemContent, itemMeta as OrderedListItemMeta);
+
+      case this.renderer instanceof UnorderedListRenderer:
+        return this.renderer.renderItem(itemContent, itemMeta as UnorderedListItemMeta);
+
+      default:
+        return this.renderer.renderItem(itemContent, itemMeta as ChecklistItemMeta);
+    }
+  }
 }

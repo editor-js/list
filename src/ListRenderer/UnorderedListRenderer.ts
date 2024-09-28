@@ -1,6 +1,6 @@
 import type { UnorderedListItemMeta } from "../types/ItemMeta";
 import { NestedListConfig } from "../types/ListParams";
-import * as Dom from '../utils/Dom';
+import * as Dom from '@editorjs/dom';
 import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListRenderer';
 import type { ListCssClasses } from './ListRenderer';
 
@@ -39,16 +39,16 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
 
   /**
    * Renders ol wrapper for list
-   * @param level - level of nesting (0 for the rool level)
+   * @param isRoot - boolean variable that represents level of the wrappre (root or childList)
    * @returns - created html ul element
    */
-  renderWrapper(level: number): HTMLUListElement {
+  renderWrapper(isRoot: boolean): HTMLUListElement {
     let wrapperElement: HTMLUListElement;
 
     /**
      * Check if it's root level
      */
-    if (level === 0) {
+    if (isRoot === true) {
       wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapper, UnorderedListRenderer.CSS.unorderedList]) as HTMLUListElement;
     } else {
       wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.unorderedList, UnorderedListRenderer.CSS.itemChildren]) as HTMLUListElement;
@@ -99,5 +99,12 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
    */
   getItemMeta(): UnorderedListItemMeta  {
     return {}
+  }
+
+  /**
+   * Returns default item meta used on creation of the new item
+   */
+  composeDefaultMeta(): UnorderedListItemMeta {
+    return {};
   }
 }

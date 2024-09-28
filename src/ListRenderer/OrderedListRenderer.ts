@@ -1,6 +1,6 @@
 import type { OrderedListItemMeta } from "../types/ItemMeta";
 import { NestedListConfig } from "../types/ListParams";
-import * as Dom from '../utils/Dom';
+import * as Dom from '@editorjs/dom';
 import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListRenderer';
 import type { ListCssClasses } from './ListRenderer';
 
@@ -39,16 +39,16 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
 
   /**
    * Renders ol wrapper for list
-   * @param level - level of nesting (0 for the rool level)
+   * @param isRoot - boolean variable that represents level of the wrappre (root or childList)
    * @returns - created html ol element
    */
-  renderWrapper(level: number): HTMLOListElement {
+  renderWrapper(isRoot: boolean): HTMLOListElement {
     let wrapperElement: HTMLOListElement;
 
     /**
      * Check if it's root level
      */
-    if (level === 0) {
+    if (isRoot === true) {
       wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapper, OrderedListRenderer.CSS.orderedList]) as HTMLOListElement;
     } else {
       wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.orderedList, OrderedListRenderer.CSS.itemChildren]) as HTMLOListElement;
@@ -94,9 +94,16 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
 
   /**
    * Returns item meta, for ordered list
-   * @returns Item meta object
+   * @returns item meta object
    */
   getItemMeta(): OrderedListItemMeta  {
     return {}
+  }
+
+  /**
+   * Returns default item meta used on creation of the new item
+   */
+  composeDefaultMeta(): OrderedListItemMeta {
+    return {};
   }
 }
