@@ -1,7 +1,10 @@
-import { ListItemChildWrapperElement } from "../types/Elements";
+import { ItemChildWrapperElement } from "../types/Elements";
 import { getChildItems } from "./getChildItems";
 
-export function removeChildWrapperIfEmpty(childWrapper: ListItemChildWrapperElement): void {
+/**
+ * Method that will remove passed child wrapper if it has no child items
+ */
+export function removeChildWrapperIfEmpty(childWrapper: ItemChildWrapperElement): void {
   if (getChildItems(childWrapper) === null) {
     childWrapper.remove();
   }
