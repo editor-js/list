@@ -199,10 +199,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     const getItems = (parent: ItemChildWrapperElement): ListItem[] => {
       const children = getChildItems(parent);
 
-      if (children === null) {
-        return [];
-      }
-
       return children.map((el) => {
         const subItemsWrapper = getItemChildWrapper(el)
         const content = this.renderer!.getItemContent(el);
@@ -273,7 +269,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const firstLevelItems = getChildItems(this.listWrapper);
 
-    if (firstLevelItems === null) {
+    if (firstLevelItems.length === 0) {
       return;
     }
 
@@ -601,7 +597,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * First child item should be unshifted because separated list should start
      * with item with first nesting level
      */
-    if (currentItemChildrenList !== null) {
+    if (currentItemChildrenList.length !== 0) {
       const firstChildItem = currentItemChildrenList[0];
 
       this.unshiftItem(firstChildItem);
@@ -758,7 +754,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       /**
        * Target item would be deepest child of the previous item or previous item itself
        */
-      if (childrenOfPreviousItem !== null && childrenOfPreviousItem.length !== 0) {
+      if (childrenOfPreviousItem.length !== 0 && childrenOfPreviousItem.length !== 0) {
         targetItem = childrenOfPreviousItem[childrenOfPreviousItem.length - 1];
       } else {
         targetItem = previousItem;
@@ -810,7 +806,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Check that current item has any children
      */
-    if (currentItemChildrenList == null) {
+    if (currentItemChildrenList.length === 0) {
       /**
        * Remove current item element
        */
@@ -923,11 +919,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       /**
        * Move current item sublists one level back
        */
-      if (currentItemChildrenList !== null) {
-        currentItemChildrenList.forEach((child) => {
-          prevItemChildrenList.appendChild(child);
-        })
-      }
+      currentItemChildrenList.forEach((child) => {
+        prevItemChildrenList.appendChild(child);
+      })
     } else {
       const prevItemChildrenListWrapper = this.renderer!.renderWrapper(false);
 
@@ -945,11 +939,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       /**
        * Move current item sublists one level back
        */
-      if (currentItemChildrenList !== null) {
-        currentItemChildrenList.forEach((child) => {
-          prevItemChildrenListWrapper.appendChild(child);
-        })
-      }
+      currentItemChildrenList.forEach((child) => {
+        prevItemChildrenListWrapper.appendChild(child);
+      })
 
       prevItem.appendChild(prevItemChildrenListWrapper);
     }

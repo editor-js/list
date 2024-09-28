@@ -6,7 +6,7 @@ import { ItemChildWrapperElement, ItemElement } from "../types/Elements";
  * @param element - element to get child items
  * @param firstLevelChildren - if method should return all level child items or only first level ones
  */
-export function getChildItems(element: ItemElement | ItemChildWrapperElement, firstLevelChildren: boolean = true): ItemElement[] | null {
+export function getChildItems(element: ItemElement | ItemChildWrapperElement, firstLevelChildren: boolean = true): ItemElement[] {
   let itemChildWrapper: HTMLElement = element;
 
   /**
@@ -20,7 +20,7 @@ export function getChildItems(element: ItemElement | ItemChildWrapperElement, fi
    * Check if itemChildWrapper is not null
    */
   if (itemChildWrapper === null) {
-    return null;
+    return [];
   }
 
   if (firstLevelChildren) {
