@@ -425,7 +425,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * On Enter in the last empty item, get out of list
      */
     if (isFirstLevelItem && isEmpty) {
-      if (!isLastItem(currentItem) && !itemHasSublist(currentItem)) {
+      if (isLastItem(currentItem) && !itemHasSublist(currentItem)) {
         this.getOutOfList();
 
         return;
