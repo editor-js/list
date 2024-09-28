@@ -18,7 +18,7 @@ import { itemHasSublist } from "../utils/itemHasSublist";
 import { getItemChildWrapper } from "../utils/getItemChildWrapper";
 import { removeChildWrapperIfEmpty } from "../utils/removeChildWrapperIfEmpty";
 import { getItemContentElement } from "../utils/getItemContentElement";
-
+import { focusItem } from "../utils/focusItem";
 
 /**
  * Class that is responsible for list tabulation
@@ -171,8 +171,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         const sublistWrapper = this.renderer?.renderWrapper(false);
 
         /**
-         * Recursively render child items, it will increase currentLevel varible
-         * after filling level with items we will need to decrease currentLevel
+         * Recursively render child items
          */
         this.appendItems(item.items, sublistWrapper!);
 
@@ -246,27 +245,25 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @public
    */
   merge(data: ListData): void {
-    console.log('holder', this.block.holder);
-
     /**
      * Get list of all levels children of the previous item
      */
     const items = this.block.holder.querySelectorAll<ItemElement>(`.${DefaultListCssClasses.item}`);
 
     const deepestBlockItem = items[items.length - 1];
-    const deepestBlockItemContent = getItemContentElement(deepestBlockItem);
+    const deepestBlockItemContentElement = getItemContentElement(deepestBlockItem);
 
-    if (deepestBlockItem === null || deepestBlockItemContent === null) {
+    if (deepestBlockItem === null || deepestBlockItemContentElement === null) {
       return;
     }
 
-    focus(deepestBlockItemContent);
+    focus(deepestBlockItemContentElement);
 
     const restore = saveCaret();
     /**
      * Insert trailing html to the deepest block item content
      */
-    deepestBlockItemContent.insertAdjacentHTML('beforeend', data.items[0].content);
+    deepestBlockItemContentElement.insertAdjacentHTML('beforeend', data.items[0].content);
 
     restore();
 
@@ -642,8 +639,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     /**
      * Insert separated list with trailing items
-     * Insertion will be applied after paragraph block inserted in getOutOfList method
-     * this is why we need to increase currentBlock index by 1 (current block index is index of the paragraph block)
      */
     this.api.blocks.insert(currentBlock?.name, newListContent, this.config, currentBlockIndex + 1);
 
@@ -704,7 +699,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       itemEl.appendChild(itemChildren);
     }
 
-    this.focusItem(itemEl);
+    focusItem(itemEl);
   }
 
   /**
@@ -758,12 +753,16 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       /**
        * Get list of all levels children of the previous item
        */
-      const childrenOfPreviousItem = previousItem.querySelectorAll<ItemElement>(`.${DefaultListCssClasses.item}`);
+      const childrenOfPreviousItem = getChildItems(previousItem, false);
 
       /**
        * Target item would be deepest child of the previous item or previous item itself
        */
-      targetItem = childrenOfPreviousItem[childrenOfPreviousItem.length - 1] || previousItem;
+      if (childrenOfPreviousItem !== null && childrenOfPreviousItem.length !== 0) {
+        targetItem = childrenOfPreviousItem[childrenOfPreviousItem.length - 1];
+      } else {
+        targetItem = previousItem;
+      }
     } else {
       targetItem = parentItem;
     }
@@ -834,9 +833,25 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const targetChildWrapper = getItemChildWrapper(targetForChildItems) ?? this.renderer.renderWrapper(false);
 
-    currentItemChildrenList.forEach(childItem => {
-      targetChildWrapper.appendChild(childItem);
-    })
+    /**
+     * Add child current item children to the target childWrapper
+     */
+    if (previousItem) {
+      currentItemChildrenList.forEach(childItem => {
+        targetChildWrapper.appendChild(childItem);
+      })
+    } else {
+      currentItemChildrenList.forEach(childItem => {
+        targetChildWrapper.prepend(childItem);
+      })
+    }
+
+    /**
+     * If we created new wrapper, then append childWrapper to the target item
+     */
+    if (getItemChildWrapper(targetForChildItems) === null) {
+      targetItem.appendChild(targetChildWrapper)
+    }
 
     /**
      * Remove current item element
@@ -940,23 +955,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     restore();
-  }
-
-  /**
-   * Sets focus to the item's content
-   *
-   * @param {Element} item - item (<li>) to select
-   * @param {boolean} atStart - where to set focus: at the start or at the end
-   * @returns {void}
-   */
-  focusItem(item: ItemElement, atStart: boolean = true): void {
-    const itemContent = getItemContentElement(item);
-
-    if (!itemContent) {
-      return;
-    }
-
-    focus(itemContent, atStart);
   }
 
   /**
