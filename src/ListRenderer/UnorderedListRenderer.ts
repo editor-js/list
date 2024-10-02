@@ -1,8 +1,8 @@
-import type { UnorderedListItemMeta } from "../types/ItemMeta";
-import { NestedListConfig } from "../types/ListParams";
+import type { UnorderedListItemMeta } from '../types/ItemMeta';
+import type { NestedListConfig } from '../types/ListParams';
 import * as Dom from '@editorjs/dom';
-import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListRenderer';
-import type { ListCssClasses } from './ListRenderer';
+import { DefaultListCssClasses, CssPrefix } from './ListRenderer';
+import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
 
 interface UnoderedListCssClasses extends ListCssClasses {
   unorderedList: string;
@@ -29,7 +29,7 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
     return {
       ...DefaultListCssClasses,
       unorderedList: `${CssPrefix}-unordered`,
-    }
+    };
   }
 
   constructor(readonly: boolean, config?: NestedListConfig) {
@@ -60,6 +60,7 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
   /**
    * Redners list item element
    * @param content - content of the list item
+   * @param meta
    * @returns - created html list item element
    */
   renderItem(content: string, meta: UnorderedListItemMeta): HTMLLIElement {
@@ -76,12 +77,12 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
 
   /**
    * Return the item content
-   *
-   * @param {Element} item - item wrapper (<li>)
-   * @returns {string}
+   * @param item - item wrapper (<li>)
+   * @returns
    */
   getItemContent(item: Element): string {
     const contentNode = item.querySelector(`.${UnorderedListRenderer.CSS.itemContent}`);
+
     if (!contentNode) {
       return '';
     }
@@ -97,8 +98,8 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
    * Returns item meta, for unordered list
    * @returns Item meta object
    */
-  getItemMeta(): UnorderedListItemMeta  {
-    return {}
+  getItemMeta(): UnorderedListItemMeta {
+    return {};
   }
 
   /**

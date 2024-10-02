@@ -1,12 +1,14 @@
 /**
  * Get all siblings before passed element, or after it
+ * @param element
+ * @param direction
  */
 export function getSiblings(element: HTMLElement, direction: 'after' | 'before' = 'after'): Element[] | null {
   const siblings: Element[] = [];
 
   let nextElementSibling: HTMLElement;
 
-  function getNextElementSibling(element: HTMLElement): HTMLElement{
+  function getNextElementSibling(element: HTMLElement): HTMLElement {
     /**
      * Get first sibling element respectfully to passed direction
      */

@@ -1,8 +1,8 @@
-import type { OrderedListItemMeta } from "../types/ItemMeta";
-import { NestedListConfig } from "../types/ListParams";
+import type { OrderedListItemMeta } from '../types/ItemMeta';
+import type { NestedListConfig } from '../types/ListParams';
 import * as Dom from '@editorjs/dom';
-import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListRenderer';
-import type { ListCssClasses } from './ListRenderer';
+import { DefaultListCssClasses, CssPrefix } from './ListRenderer';
+import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
 
 /**
  * CSS classes for the Ordered list
@@ -29,7 +29,7 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
     return {
       ...DefaultListCssClasses,
       orderedList: `${CssPrefix}-ordered`,
-    }
+    };
   }
 
   constructor(readonly: boolean, config?: NestedListConfig) {
@@ -56,9 +56,11 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
 
     return wrapperElement;
   }
+
   /**
    * Redners list item element
    * @param content - content of the list item
+   * @param meta
    * @returns - created html list item element
    */
   renderItem(content: string, meta: OrderedListItemMeta): HTMLLIElement {
@@ -75,12 +77,12 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
 
   /**
    * Return the item content
-   *
-   * @param {Element} item - item wrapper (<li>)
-   * @returns {string}
+   * @param item - item wrapper (<li>)
+   * @returns
    */
   getItemContent(item: Element): string {
     const contentNode = item.querySelector(`.${OrderedListRenderer.CSS.itemContent}`);
+
     if (!contentNode) {
       return '';
     }
@@ -96,8 +98,8 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
    * Returns item meta, for ordered list
    * @returns item meta object
    */
-  getItemMeta(): OrderedListItemMeta  {
-    return {}
+  getItemMeta(): OrderedListItemMeta {
+    return {};
   }
 
   /**

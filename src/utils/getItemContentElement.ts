@@ -1,5 +1,5 @@
-import { ItemContentElement, ItemElement } from "../types/Elements";
-import { DefaultListCssClasses } from "../ListRenderer";
+import type { ItemContentElement, ItemElement } from '../types/Elements';
+import { DefaultListCssClasses } from '../ListRenderer';
 
 /**
  * Returns content element of the passed item

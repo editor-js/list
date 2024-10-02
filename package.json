@@ -27,9 +27,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint src/ --quiet --ext .ts",
-    "lint:errors": "eslint src/ --quiet",
-    "lint:fix": "eslint src/ --fix"
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
   },
   "devDependencies": {
     "@editorjs/editorjs": "^2.29.1",
@@ -37,8 +36,9 @@
     "@typescript-eslint/parser": "^7.13.1",
     "@editorjs/caret": "^0.0.7",
     "@editorjs/dom": "^0.0.7",
-    "eslint": "^7.22.0",
-    "eslint-loader": "^4.0.2",
+    "eslint": "^9.2.0",
+    "eslint-config-codex": "^2.0.0",
+    "eslint-import-resolver-alias": "1.1.2",
     "postcss-nested": "^5.0.3",
     "postcss-nested-ancestors": "^2.0.0",
     "typescript": "^5.4.5",

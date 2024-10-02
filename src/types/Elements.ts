@@ -11,4 +11,4 @@ export type ItemChildWrapperElement = HTMLElement;
 /**
  * Type that represents content element of the item
  */
-export type ItemContentElement = HTMLElement
+export type ItemContentElement = HTMLElement;

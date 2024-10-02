@@ -1,9 +1,9 @@
-import { IconCheck } from '@codexteam/icons'
-import type { ChecklistItemMeta } from "../types/ItemMeta";
-import { NestedListConfig } from "../types/ListParams";
+import { IconCheck } from '@codexteam/icons';
+import type { ChecklistItemMeta } from '../types/ItemMeta';
+import type { NestedListConfig } from '../types/ListParams';
 import * as Dom from '@editorjs/dom';
-import { ListRendererInterface, DefaultListCssClasses, CssPrefix } from './ListRenderer';
-import type { ListCssClasses } from './ListRenderer';
+import { DefaultListCssClasses, CssPrefix } from './ListRenderer';
+import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
 
 interface ChecklistCssClasses extends ListCssClasses {
   checklist: string;
@@ -34,8 +34,8 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
       itemChecked: `${CssPrefix}__checkbox--checked`,
       noHover: `${CssPrefix}__checkbox--no-hover`,
       checkbox: `${CssPrefix}__checkbox-check`,
-      checkboxContainer: `${CssPrefix}__checkbox`
-    }
+      checkboxContainer: `${CssPrefix}__checkbox`,
+    };
   }
 
   constructor(readonly: boolean, config?: NestedListConfig) {
@@ -62,7 +62,8 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
        */
       wrapperElement.addEventListener('click', (event) => {
         const target = event.target as Element;
-        if (target){
+
+        if (target) {
           const checkbox = target.closest(`.${CheckListRenderer.CSS.checkboxContainer}`);
 
           if (checkbox && checkbox.contains(target)) {
@@ -80,9 +81,10 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
   /**
    * Redners list item element
    * @param content - content of the list item
+   * @param meta
    * @returns - created html list item element
    */
-  renderItem(content: string, meta: ChecklistItemMeta ): HTMLLIElement {
+  renderItem(content: string, meta: ChecklistItemMeta): HTMLLIElement {
     const itemWrapper = Dom.make('li', [CheckListRenderer.CSS.item, CheckListRenderer.CSS.item]);
     const itemContent = Dom.make('div', CheckListRenderer.CSS.itemContent, {
       innerHTML: content,
@@ -107,11 +109,12 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
 
   /**
    * Return the item content
-   * @param {Element} item - item wrapper (<li>)
-   * @returns {string}
+   * @param item - item wrapper (<li>)
+   * @returns
    */
   getItemContent(item: Element): string {
     const contentNode = item.querySelector(`.${CheckListRenderer.CSS.itemContent}`);
+
     if (!contentNode) {
       return '';
     }
@@ -125,15 +128,15 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
 
   /**
    * Return meta object of certain element
-   * @param {Element} item - item of the list to get meta from
-   * @returns {ItemMeta} Item meta object
+   * @param item - item of the list to get meta from
+   * @returns Item meta object
    */
-  getItemMeta(item: Element): ChecklistItemMeta  {
+  getItemMeta(item: Element): ChecklistItemMeta {
     const checkbox = item.querySelector(`.${CheckListRenderer.CSS.checkboxContainer}`);
 
     return {
       checked: checkbox ? checkbox.classList.contains(CheckListRenderer.CSS.itemChecked) : false,
-    }
+    };
   }
 
   /**
@@ -145,26 +148,22 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
 
   /**
    * Toggle checklist item state
-   *
-   * @private
-   * @param {MouseEvent} event - click
-   * @returns {void}
+   * @param checkbox
+   * @param event - click
+   * @returns
    */
   private toggleCheckbox(checkbox: Element): void {
     checkbox.classList.toggle(CheckListRenderer.CSS.itemChecked);
     checkbox.classList.add(CheckListRenderer.CSS.noHover);
     checkbox.addEventListener('mouseleave', () => this.removeSpecialHoverBehavior(checkbox), { once: true });
-    }
+  }
 
   /**
    * Removes class responsible for special hover behavior on an item
-   *
-   * @private
-   * @param {Element} el - item wrapper
-   * @returns {Element}
+   * @param el - item wrapper
+   * @returns
    */
   private removeSpecialHoverBehavior(el: Element) {
     el.classList.remove(CheckListRenderer.CSS.noHover);
   }
 }
-

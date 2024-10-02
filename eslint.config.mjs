@@ -4,7 +4,7 @@ import { plugin as TsPlugin, parser as TsParser } from 'typescript-eslint';
 export default [
   ...CodeX,
   {
-    name: 'editorjs-table',
+    name: 'editorjs-nested-list',
     ignores: ['eslint.config.mjs'],
     plugins: {
       '@typescript-eslint': TsPlugin,
@@ -51,36 +51,6 @@ export default [
       '@typescript-eslint/no-unsafe-return': ['off'],
       '@typescript-eslint/no-unsafe-call': ['off'],
       '@typescript-eslint/no-unsafe-member-access': ['off'],
-      'jsdoc/require-param-type': ['off'],
-      'jsdoc/informative-docs': ['off'],
-      'jsdoc/require-jsdoc': ['off'],
-    },
-  },
-
-  /**
-   * This override of the options for vue files
-   */
-  {
-    languageOptions: {
-      parser: VueParser,
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-        extraFileExtensions: ['.vue'],
-        parser: TsParser,
-        sourceType: 'module',
-      },
-    },
-    rules: {
-      'n/no-missing-import': ['off'],
-      'n/no-unpublished-import': ['error', {
-        allowModules: ['vitest', 'postgres-migrations', 'eslint-import-resolver-alias', 'eslint-config-codex'],
-        ignoreTypeImport: true,
-      }],
-      'n/no-unsupported-features/node-builtins': ['error', {
-        version: '>=22.1.0',
-      }],
       'jsdoc/require-param-type': ['off'],
       'jsdoc/informative-docs': ['off'],
       'jsdoc/require-jsdoc': ['off'],
