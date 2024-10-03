@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "include": [
     "src/**/*.ts",
-    "vite.config.ts",
+    "vite.config.js",
     "eslint.config.mjs",
   ],
 }
