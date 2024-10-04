@@ -25,7 +25,6 @@ export type ListParams = BlockToolConstructorOptions<ListData, NestedListConfig>
 export default class NestedList {
   /**
    * Notify core that read-only mode is supported
-   * @returns
    */
   static get isReadOnlySupported(): boolean {
     return true;
@@ -33,7 +32,6 @@ export default class NestedList {
 
   /**
    * Allow to use native Enter behaviour
-   * @returns
    */
   static get enableLineBreaks(): boolean {
     return true;
@@ -43,7 +41,6 @@ export default class NestedList {
    * Get Tool toolbox settings
    * icon - Tool icon's SVG
    * title - title to show in toolbox
-   * @returns
    */
   static get toolbox(): ToolboxConfig {
     return {
@@ -54,7 +51,6 @@ export default class NestedList {
 
   /**
    * Get list style name
-   * @returns
    */
   get listStyle(): ListDataStyle {
     return this.data.style || this.defaultListStyle;

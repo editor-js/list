@@ -110,7 +110,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
   /**
    * Return the item content
    * @param item - item wrapper (<li>)
-   * @returns
+   * @returns - item content string
    */
   getItemContent(item: Element): string {
     const contentNode = item.querySelector(`.${CheckListRenderer.CSS.itemContent}`);
@@ -148,8 +148,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
 
   /**
    * Toggle checklist item state
-   * @param checkbox
-   * @returns
+   * @param checkbox - checkbox element to be toggled
    */
   private toggleCheckbox(checkbox: Element): void {
     checkbox.classList.toggle(CheckListRenderer.CSS.itemChecked);
@@ -160,9 +159,8 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
   /**
    * Removes class responsible for special hover behavior on an item
    * @param el - item wrapper
-   * @returns
    */
-  private removeSpecialHoverBehavior(el: Element) {
+  private removeSpecialHoverBehavior(el: Element): void {
     el.classList.remove(CheckListRenderer.CSS.noHover);
   }
 }

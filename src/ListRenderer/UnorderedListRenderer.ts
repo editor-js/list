@@ -78,7 +78,7 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
   /**
    * Return the item content
    * @param item - item wrapper (<li>)
-   * @returns
+   * @returns - item content string
    */
   getItemContent(item: Element): string {
     const contentNode = item.querySelector(`.${UnorderedListRenderer.CSS.itemContent}`);

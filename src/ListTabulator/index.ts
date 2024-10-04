@@ -189,7 +189,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * The method for recursive collecting of the child items
      * @param parent - where to find items
-     * @returns
      */
     const getItems = (parent: ItemChildWrapperElement): ListItem[] => {
       const children = getChildItems(parent);
@@ -327,7 +326,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Handle UL, OL and LI tags paste and returns List data
    * @param element - html element that contains whole list
-   * @returns
    */
   pasteHandler(element: PasteEvent['detail']['data']): ListData {
     const { tagName: tag } = element;
@@ -381,7 +379,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Handles Enter keypress
    * @param event - keydown
-   * @returns
    */
   enterPressed(event: KeyboardEvent): void {
     const currentItem = this.currentItem;
