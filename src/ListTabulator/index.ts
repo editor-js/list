@@ -2,14 +2,14 @@ import { OrderedListRenderer } from '../ListRenderer/OrderedListRenderer';
 import { UnorderedListRenderer } from '../ListRenderer/UnorderedListRenderer';
 import type { NestedListConfig, ListData, ListDataStyle } from '../types/ListParams';
 import type { ListItem } from '../types/ListParams';
-import type { ItemElement, ItemContentElement, ItemChildWrapperElement } from '../types/Elements';
+import type { ItemElement, ItemChildWrapperElement } from '../types/Elements';
 import { isHtmlElement } from '../utils/type-guards';
 import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput, save as saveCaret } from '@editorjs/caret';
 import { DefaultListCssClasses } from '../ListRenderer';
 import type { PasteEvent } from '../types';
 import type { API, BlockAPI, PasteConfig } from '@editorjs/editorjs';
 import type { ListParams } from '..';
-import type { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from '../types/ItemMeta';
+import type { ChecklistItemMeta } from '../types/ItemMeta';
 import type { ListRenderer } from '../types/ListRenderer';
 import { getSiblings } from '../utils/getSiblings';
 import { getChildItems } from '../utils/getChildItems';
@@ -60,8 +60,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   listWrapper: ItemChildWrapperElement | undefined;
 
   /**
-   * Returns current List item by the caret position
-   * @returns
+   * Getter method to get current item
+   * @returns current list item or null if caret position is not undefined
    */
   get currentItem(): ItemElement | null {
     const selection = window.getSelection();
@@ -102,7 +102,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Function that is responsible for rendering nested list with contents
    * @returns Filled with content wrapper element of the list
    */
-  render() {
+  render(): ItemChildWrapperElement {
     this.listWrapper = this.renderer.renderWrapper(true);
 
     // fill with data
@@ -151,11 +151,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Renders children list
-   * @param list - initialized ListRenderer instance
    * @param items - items data to append
-   * @param parentItem - where to append
-   * @param parentElement
-   * @returns
+   * @param parentElement - where to append passed items
    */
   appendItems(items: ListItem[], parentElement: Element): void {
     items.forEach((item) => {
@@ -329,7 +326,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Handle UL, OL and LI tags paste and returns List data
-   * @param element
+   * @param element - html element that contains whole list
    * @returns
    */
   pasteHandler(element: PasteEvent['detail']['data']): ListData {
@@ -480,7 +477,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Reduce indentation for current item
    * @param event - keydown
-   * @returns
    */
   shiftTab(event: KeyboardEvent): void {
     /**
@@ -508,8 +504,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Decrease indentation of the passed item
-   * @param item
-   * @returns
+   * @param item - list item to be unshifted
    */
   unshiftItem(item: ItemElement): void {
     if (!item.parentNode) {
@@ -691,8 +686,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Method that is used for merging current item with previous one
    * Content of the current item would be appended to the previous item
    * Current item children would not change nesting level
-   * @param currentItem - current item html element
-   * @param item
+   * @param item - current item html element
    */
   mergeItemWithPrevious(item: ItemElement): void {
     const previousItem = item.previousElementSibling;
@@ -941,7 +935,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Get out from List Tool by Enter on the empty last item
    * @param index - optional parameter represents index, where would be inseted default block
-   * @returns
    */
   getOutOfList(index?: number): void {
     let newBlock;
@@ -961,9 +954,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Method that calls render function of the renderer with a necessary item meta cast
-   * @param item - item to be rendered
-   * @param itemContent
-   * @param meta
+   * @param itemContent - content to be rendered in new item
+   * @param meta - meta used in list item rendering
    * @returns html element of the rendered item
    */
   renderItem(itemContent: ListItem['content'], meta?: ListItem['meta']): ItemElement {

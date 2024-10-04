@@ -60,10 +60,10 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
   /**
    * Redners list item element
    * @param content - content of the list item
-   * @param meta
+   * @param _meta - meta of the list item unused in rendering of the unordered list
    * @returns - created html list item element
    */
-  renderItem(content: string, meta: UnorderedListItemMeta): HTMLLIElement {
+  renderItem(content: string, _meta: UnorderedListItemMeta): HTMLLIElement {
     const itemWrapper = Dom.make('li', UnorderedListRenderer.CSS.item);
     const itemContent = Dom.make('div', UnorderedListRenderer.CSS.itemContent, {
       innerHTML: content,

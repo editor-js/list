@@ -60,10 +60,10 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
   /**
    * Redners list item element
    * @param content - content of the list item
-   * @param meta
+   * @param _meta - meta of the list item unused in rendering of the ordered list
    * @returns - created html list item element
    */
-  renderItem(content: string, meta: OrderedListItemMeta): HTMLLIElement {
+  renderItem(content: string, _meta: OrderedListItemMeta): HTMLLIElement {
     const itemWrapper = Dom.make('li', OrderedListRenderer.CSS.item);
     const itemContent = Dom.make('div', OrderedListRenderer.CSS.itemContent, {
       innerHTML: content,

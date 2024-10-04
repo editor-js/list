@@ -67,7 +67,7 @@ export default class NestedList {
   set listStyle(style: ListDataStyle) {
     this.data.style = style;
 
-    this.changeTabulatorByStyle(style);
+    this.changeTabulatorByStyle();
 
     /**
      * Create new list element
@@ -145,7 +145,7 @@ export default class NestedList {
 
     this.data = data && Object.keys(data).length ? data : initialData;
 
-    this.changeTabulatorByStyle(this.defaultListStyle);
+    this.changeTabulatorByStyle();
   }
 
   /**
@@ -208,10 +208,9 @@ export default class NestedList {
   }
 
   /**
-   * This method allows changing
-   * @param style
+   * This method allows changing tabulator respectfully to passed style
    */
-  changeTabulatorByStyle(style: ListDataStyle) {
+  changeTabulatorByStyle() {
     switch (this.listStyle) {
       case 'ordered':
         this.list = new ListTabulator<OrderedListRenderer>({
@@ -266,8 +265,8 @@ export default class NestedList {
 
   /**
    * Convert from list to text for conversionConfig
-   * @param data
-   * @returns
+   * @param data - current data of the list
+   * @returns - string of the recursively merged contents of the items of the list
    */
   static joinRecursive(data: ListData | ListItem): string {
     return data.items

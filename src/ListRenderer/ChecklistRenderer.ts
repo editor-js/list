@@ -81,7 +81,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
   /**
    * Redners list item element
    * @param content - content of the list item
-   * @param meta
+   * @param meta - meta of the list item used in rendering of the checklist
    * @returns - created html list item element
    */
   renderItem(content: string, meta: ChecklistItemMeta): HTMLLIElement {
@@ -149,7 +149,6 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
   /**
    * Toggle checklist item state
    * @param checkbox
-   * @param event - click
    * @returns
    */
   private toggleCheckbox(checkbox: Element): void {
