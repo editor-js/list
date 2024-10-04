@@ -3,10 +3,11 @@ import type { ItemChildWrapperElement, ItemElement } from '../types/Elements';
 
 /**
  * Get child items of the passed element
- * @param element - element to get child items
+ * @param element - child items would be got from this element
  * @param firstLevelChildren - if method should return all level child items or only first level ones
  */
-export function getChildItems(element: ItemElement, firstLevelChildren: boolean = true): ItemElement[] {
+// eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+export function getChildItems(element: ItemElement | ItemChildWrapperElement, firstLevelChildren: boolean = true): ItemElement[] {
   let itemChildWrapper: HTMLElement = element;
 
   /**

@@ -6,6 +6,9 @@ export interface PasteEvent extends CustomEvent {
    * Pasted element
    */
   detail: {
+    /**
+     * Supported elements fir the paste event
+     */
     data: HTMLUListElement | HTMLOListElement | HTMLLIElement;
   };
 }

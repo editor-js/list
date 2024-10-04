@@ -5,6 +5,7 @@ export default [
   ...CodeX,
   {
     name: 'editorjs-nested-list',
+    ignores: ['vite.config.js'],
     plugins: {
       '@typescript-eslint': TsPlugin,
     },
@@ -28,10 +29,13 @@ export default [
         ignoreTypeImport: true,
       }],
       'n/no-unsupported-features/node-builtins': ['error', {
-        version: '>=20.11.1',
+        version: '>=22.1.0',
       }],
       'n/no-extraneous-import': ['error', {
         allowModules: ['typescript-eslint'],
+      }],
+      '@typescript-eslint/no-empty-object-type': ['error', {
+        allowInterfaces: 'always',
       }],
     },
   },
