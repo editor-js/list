@@ -8,16 +8,21 @@ export function getSiblings(element: HTMLElement, direction: 'after' | 'before' 
 
   let nextElementSibling: HTMLElement;
 
-  function getNextElementSibling(element: HTMLElement): HTMLElement {
+  /**
+   * Method that is responsible for getting next element sibling responsible to the direction variable
+   * @param el - current element
+   * @returns HTML element of the sibling
+   */
+  function getNextElementSibling(el: HTMLElement): HTMLElement {
     /**
      * Get first sibling element respectfully to passed direction
      */
     switch (direction) {
       case 'after':
-        return element.nextElementSibling as HTMLElement;
+        return el.nextElementSibling as HTMLElement;
 
       case 'before':
-        return element.previousElementSibling as HTMLElement;
+        return el.previousElementSibling as HTMLElement;
     }
   }
 

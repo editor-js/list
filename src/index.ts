@@ -26,14 +26,14 @@ export default class NestedList {
   /**
    * Notify core that read-only mode is supported
    */
-  static get isReadOnlySupported(): boolean {
+  public static get isReadOnlySupported(): boolean {
     return true;
   }
 
   /**
    * Allow to use native Enter behaviour
    */
-  static get enableLineBreaks(): boolean {
+  public static get enableLineBreaks(): boolean {
     return true;
   }
 
@@ -42,7 +42,7 @@ export default class NestedList {
    * icon - Tool icon's SVG
    * title - title to show in toolbox
    */
-  static get toolbox(): ToolboxConfig {
+  public static get toolbox(): ToolboxConfig {
     return {
       icon: IconListNumbered,
       title: 'List',
@@ -50,9 +50,56 @@ export default class NestedList {
   }
 
   /**
+   * On paste sanitzation config. Allow only tags that are allowed in the Tool.
+   * @returns - paste config object used in editor
+   */
+  public static get pasteConfig(): PasteConfig {
+    return {
+      tags: ['OL', 'UL', 'LI'],
+    };
+  }
+
+  /**
+   * Convert from text to list with import and export list to text
+   */
+  public static get conversionConfig(): {
+    /**
+     * Method that is responsible for conversion from data to string
+     * @param data - current list data
+     * @returns - contents string formed from list data
+     */
+    export: (data: ListData) => string;
+
+    /**
+     * Method that is responsible for conversion from string to data
+     * @param content - contents string
+     * @returns - list data formed from contents string
+     */
+    import: (content: string) => ListData;
+  } {
+    return {
+      export: (data) => {
+        return NestedList.joinRecursive(data);
+      },
+      import: (content) => {
+        return {
+          items: [
+            {
+              content,
+              meta: {},
+              items: [],
+            },
+          ],
+          style: 'unordered',
+        };
+      },
+    };
+  }
+
+  /**
    * Get list style name
    */
-  get listStyle(): ListDataStyle {
+  private get listStyle(): ListDataStyle {
     return this.data.style || this.defaultListStyle;
   }
 
@@ -60,7 +107,7 @@ export default class NestedList {
    * Set list style
    * @param style - new style to set
    */
-  set listStyle(style: ListDataStyle) {
+  private set listStyle(style: ListDataStyle) {
     this.data.style = style;
 
     this.changeTabulatorByStyle();
@@ -91,7 +138,7 @@ export default class NestedList {
   private config: NestedListConfig;
 
   /**
-   * Default list style
+   * Default list style formes as passed default list style from config or 'ordered' as default
    */
   private defaultListStyle?: NestedListConfig['defaultStyle'];
 
@@ -106,14 +153,14 @@ export default class NestedList {
   private block: BlockAPI;
 
   /**
-   * Class that is responsible for list complete list rendering and saving
+   * Class that is responsible for complete list rendering and saving
    */
-  list: ListTabulator<ListRenderer> | undefined;
+  private list: ListTabulator<ListRenderer> | undefined;
 
   /**
    * Main constant wrapper of the whole list
    */
-  listElement: HTMLElement | undefined;
+  private listElement: HTMLElement | undefined;
 
   /**
    * Render plugin`s main Element and fill it with saved data
@@ -139,16 +186,27 @@ export default class NestedList {
       items: [],
     };
 
-    this.data = data && Object.keys(data).length ? data : initialData;
+    this.data = Object.keys(data).length ? data : initialData;
 
     this.changeTabulatorByStyle();
+  }
+
+  /**
+   * Convert from list to text for conversionConfig
+   * @param data - current data of the list
+   * @returns - string of the recursively merged contents of the items of the list
+   */
+  private static joinRecursive(data: ListData | ListItem): string {
+    return data.items
+      .map(item => `${item.content} ${NestedList.joinRecursive(item)}`)
+      .join('');
   }
 
   /**
    * Function that is responsible for content rendering
    * @returns rendered list wrapper with all contents
    */
-  render() {
+  public render(): HTMLElement {
     this.listElement = this.list!.render();
 
     return this.listElement;
@@ -158,13 +216,17 @@ export default class NestedList {
    * Function that is responsible for content saving
    * @returns formatted content used in editor
    */
-  save() {
+  public save(): ListData {
     this.data = this.list!.save();
 
     return this.data;
   }
 
-  merge(data: ListData) {
+  /**
+   * Function that is responsible for mergind two lists into one
+   * @param data - data of the next standing list, that should be merged with current
+   */
+  public merge(data: ListData): void {
     this.list!.merge(data);
   }
 
@@ -172,7 +234,7 @@ export default class NestedList {
    * Creates Block Tune allowing to change the list style
    * @returns array of tune configs
    */
-  renderSettings(): TunesMenuConfig {
+  public renderSettings(): TunesMenuConfig {
     const tunes = [
       {
         name: 'unordered' as const,
@@ -206,7 +268,7 @@ export default class NestedList {
   /**
    * This method allows changing tabulator respectfully to passed style
    */
-  changeTabulatorByStyle() {
+  private changeTabulatorByStyle(): void {
     switch (this.listStyle) {
       case 'ordered':
         this.list = new ListTabulator<OrderedListRenderer>({
@@ -247,52 +309,5 @@ export default class NestedList {
 
         break;
     }
-  }
-
-  /**
-   * On paste sanitzation config. Allow only tags that are allowed in the Tool.
-   * @returns - paste config.
-   */
-  static get pasteConfig(): PasteConfig {
-    return {
-      tags: ['OL', 'UL', 'LI'],
-    };
-  }
-
-  /**
-   * Convert from list to text for conversionConfig
-   * @param data - current data of the list
-   * @returns - string of the recursively merged contents of the items of the list
-   */
-  static joinRecursive(data: ListData | ListItem): string {
-    return data.items
-      .map(item => `${item.content} ${NestedList.joinRecursive(item)}`)
-      .join('');
-  }
-
-  /**
-   * Convert from text to list with import and export list to text
-   */
-  static get conversionConfig(): {
-    export: (data: ListData) => string;
-    import: (content: string) => ListData;
-  } {
-    return {
-      export: (data) => {
-        return NestedList.joinRecursive(data);
-      },
-      import: (content) => {
-        return {
-          items: [
-            {
-              content,
-              meta: {},
-              items: [],
-            },
-          ],
-          style: 'unordered',
-        };
-      },
-    };
   }
 }
