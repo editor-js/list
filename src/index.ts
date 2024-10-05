@@ -196,7 +196,7 @@ export default class NestedList {
    * @param data - current data of the list
    * @returns - string of the recursively merged contents of the items of the list
    */
-  public static joinRecursive(data: ListData | ListItem): string {
+  private static joinRecursive(data: ListData | ListItem): string {
     return data.items
       .map(item => `${item.content} ${NestedList.joinRecursive(item)}`)
       .join('');
