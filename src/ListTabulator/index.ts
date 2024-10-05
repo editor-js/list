@@ -89,7 +89,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
-   * Render plugin`s main Element and fill it with saved data
+   * Assign all passed params and renderer to relevant class properties
    * @param params - tool constructor options
    * @param params.data - previously saved data
    * @param params.config - user config for Tool
