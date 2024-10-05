@@ -1,7 +1,6 @@
-module.exports = {
-    plugins: [
-      require('postcss-nested-ancestors'),
-      require('postcss-nested'),
-    ],
-  };
-  
+export const plugins = [
+  // eslint-disable-next-line no-undef
+  require('postcss-nested-ancestors'),
+  // eslint-disable-next-line no-undef
+  require('postcss-nested'),
+];

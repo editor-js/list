@@ -3,6 +3,8 @@
   "include": [
     "src/**/*.ts",
     "vite.config.js",
+    "postcss.config.js",
+    "**/json-preview.js",
     "eslint.config.mjs",
   ],
 }

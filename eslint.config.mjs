@@ -4,8 +4,29 @@ import { plugin as TsPlugin, parser as TsParser } from 'typescript-eslint';
 export default [
   ...CodeX,
   {
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.eslint.json',
+        ecmaVersion: 2022,
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      'n/no-extraneous-import': ['error', {
+        allowModules: ['typescript-eslint'],
+      }],
+      '@typescript-eslint/no-unused-vars': ['error', {
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+      }],
+    },
+  },
+  {
     name: 'editorjs-nested-list',
-    ignores: ['vite.config.js'],
+    ignores: ['vite.config.js', 'eslint.config.mjs', 'postcss.config.js', '**/json-preview.js'],
     plugins: {
       '@typescript-eslint': TsPlugin,
     },
@@ -30,9 +51,6 @@ export default [
       }],
       'n/no-unsupported-features/node-builtins': ['error', {
         version: '>=22.1.0',
-      }],
-      'n/no-extraneous-import': ['error', {
-        allowModules: ['typescript-eslint'],
       }],
       '@typescript-eslint/no-empty-object-type': ['error', {
         allowInterfaces: 'always',
