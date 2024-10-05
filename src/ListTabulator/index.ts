@@ -527,11 +527,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       item.appendChild(currentItemChildWrapper);
     }
 
-    const restore = saveCaret();
-
     parentItem.after(item);
 
-    restore();
+    focusItem(item, false);
 
     /**
      * If previous parent's children list is now empty, remove it.
