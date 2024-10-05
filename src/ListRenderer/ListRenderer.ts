@@ -1,4 +1,3 @@
-
 /**
  * Default css prefix for list
  */
@@ -12,7 +11,7 @@ export const DefaultListCssClasses = {
   item: `${CssPrefix}__item`,
   itemContent: `${CssPrefix}__item-content`,
   itemChildren: `${CssPrefix}__item-children`,
-}
+};
 
 /**
  * Interface that represents default list css classes

@@ -1,13 +1,13 @@
 import type { API, BlockAPI, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
 import type {
   BlockToolConstructorOptions,
-  TunesMenuConfig,
+  TunesMenuConfig
 } from '@editorjs/editorjs/types/tools';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
-import { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/ListParams';
+import type { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/ListParams';
 import ListTabulator from './ListTabulator';
 import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
-import { ListRenderer } from './types/ListRenderer';
+import type { ListRenderer } from './types/ListRenderer';
 
 /**
  * Build styles
@@ -25,8 +25,6 @@ export type ListParams = BlockToolConstructorOptions<ListData, NestedListConfig>
 export default class NestedList {
   /**
    * Notify core that read-only mode is supported
-   *
-   * @returns {boolean}
    */
   static get isReadOnlySupported(): boolean {
     return true;
@@ -34,9 +32,6 @@ export default class NestedList {
 
   /**
    * Allow to use native Enter behaviour
-   *
-   * @returns {boolean}
-   * @public
    */
   static get enableLineBreaks(): boolean {
     return true;
@@ -46,8 +41,6 @@ export default class NestedList {
    * Get Tool toolbox settings
    * icon - Tool icon's SVG
    * title - title to show in toolbox
-   *
-   * @returns {ToolboxConfig}
    */
   static get toolbox(): ToolboxConfig {
     return {
@@ -58,8 +51,6 @@ export default class NestedList {
 
   /**
    * Get list style name
-   *
-   * @returns {string}
    */
   get listStyle(): ListDataStyle {
     return this.data.style || this.defaultListStyle;
@@ -67,18 +58,17 @@ export default class NestedList {
 
   /**
    * Set list style
-   *
-   * @param {ListDataStyle} style - new style to set
+   * @param style - new style to set
    */
   set listStyle(style: ListDataStyle) {
     this.data.style = style;
 
-    this.changeTabulatorByStyle(style);
+    this.changeTabulatorByStyle();
 
     /**
      * Create new list element
      */
-    const newListElement = this.list!.render()
+    const newListElement = this.list!.render();
 
     this.listElement?.replaceWith(newListElement);
 
@@ -125,15 +115,13 @@ export default class NestedList {
    */
   listElement: HTMLElement | undefined;
 
-
   /**
    * Render plugin`s main Element and fill it with saved data
-   *
-   * @param {object} params - tool constructor options
-   * @param {ListData} params.data - previously saved data
-   * @param {object} params.config - user config for Tool
-   * @param {object} params.api - Editor.js API
-   * @param {boolean} params.readOnly - read-only mode flag
+   * @param params - tool constructor options
+   * @param params.data - previously saved data
+   * @param params.config - user config for Tool
+   * @param params.api - Editor.js API
+   * @param params.readOnly - read-only mode flag
    */
   constructor({ data, config, api, readOnly, block }: ListParams) {
     this.api = api;
@@ -153,7 +141,7 @@ export default class NestedList {
 
     this.data = data && Object.keys(data).length ? data : initialData;
 
-    this.changeTabulatorByStyle(this.defaultListStyle);
+    this.changeTabulatorByStyle();
   }
 
   /**
@@ -173,7 +161,7 @@ export default class NestedList {
   save() {
     this.data = this.list!.save();
 
-    return this.data
+    return this.data;
   }
 
   merge(data: ListData) {
@@ -182,9 +170,7 @@ export default class NestedList {
 
   /**
    * Creates Block Tune allowing to change the list style
-   *
-   * @public
-   * @returns {Array} array of tune configs
+   * @returns array of tune configs
    */
   renderSettings(): TunesMenuConfig {
     const tunes = [
@@ -202,10 +188,10 @@ export default class NestedList {
         name: 'checklist' as const,
         label: this.api.i18n.t('Checklist'),
         icon: IconChecklist,
-      }
+      },
     ];
 
-    return tunes.map((tune) => ({
+    return tunes.map(tune => ({
       name: tune.name,
       icon: tune.icon,
       label: tune.label,
@@ -218,10 +204,9 @@ export default class NestedList {
   }
 
   /**
-   * This method allows changing
-   * @param style
+   * This method allows changing tabulator respectfully to passed style
    */
-  changeTabulatorByStyle(style: ListDataStyle) {
+  changeTabulatorByStyle() {
     switch (this.listStyle) {
       case 'ordered':
         this.list = new ListTabulator<OrderedListRenderer>({
@@ -231,10 +216,10 @@ export default class NestedList {
           config: this.config,
           block: this.block,
         },
-        new OrderedListRenderer(this.readOnly, this.config),
-      );
+        new OrderedListRenderer(this.readOnly, this.config)
+        );
 
-      break;
+        break;
 
       case 'unordered':
         this.list = new ListTabulator<UnorderedListRenderer>({
@@ -244,10 +229,10 @@ export default class NestedList {
           config: this.config,
           block: this.block,
         },
-        new UnorderedListRenderer(this.readOnly, this.config),
-      );
+        new UnorderedListRenderer(this.readOnly, this.config)
+        );
 
-      break;
+        break;
 
       case 'checklist':
         this.list = new ListTabulator<CheckListRenderer>({
@@ -257,17 +242,16 @@ export default class NestedList {
           config: this.config,
           block: this.block,
         },
-        new CheckListRenderer(this.readOnly, this.config),
-      );
+        new CheckListRenderer(this.readOnly, this.config)
+        );
 
-      break;
+        break;
     }
   }
 
   /**
    * On paste sanitzation config. Allow only tags that are allowed in the Tool.
-   *
-   * @returns {PasteConfig} - paste config.
+   * @returns - paste config.
    */
   static get pasteConfig(): PasteConfig {
     return {
@@ -277,13 +261,12 @@ export default class NestedList {
 
   /**
    * Convert from list to text for conversionConfig
-   *
-   * @param {ListData} data
-   * @returns {string}
+   * @param data - current data of the list
+   * @returns - string of the recursively merged contents of the items of the list
    */
   static joinRecursive(data: ListData | ListItem): string {
     return data.items
-      .map((item) => `${item.content} ${NestedList.joinRecursive(item)}`)
+      .map(item => `${item.content} ${NestedList.joinRecursive(item)}`)
       .join('');
   }
 

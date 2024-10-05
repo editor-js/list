@@ -1,12 +1,12 @@
-import { DefaultListCssClasses } from "../ListRenderer";
-import { ItemChildWrapperElement, ItemElement } from "../types/Elements";
+import { DefaultListCssClasses } from '../ListRenderer';
+import type { ItemChildWrapperElement, ItemElement } from '../types/Elements';
 
 /**
  * Get child items of the passed element
  * @param element - element to get child items
  * @param firstLevelChildren - if method should return all level child items or only first level ones
  */
-export function getChildItems(element: ItemElement | ItemChildWrapperElement, firstLevelChildren: boolean = true): ItemElement[] {
+export function getChildItems(element: ItemElement, firstLevelChildren: boolean = true): ItemElement[] {
   let itemChildWrapper: HTMLElement = element;
 
   /**
@@ -28,12 +28,12 @@ export function getChildItems(element: ItemElement | ItemChildWrapperElement, fi
      * Filter first level child items of the curret child item wrapper
      * In case that child could be not only list item
      */
-    return Array.from(itemChildWrapper.querySelectorAll(`:scope > .${DefaultListCssClasses.item}`))
+    return Array.from(itemChildWrapper.querySelectorAll(`:scope > .${DefaultListCssClasses.item}`));
   } else {
     /**
      * Filter all levels child items of the current child item wrapper
      * In case that child could be not only list item
      */
-    return Array.from(itemChildWrapper.querySelectorAll(`.${DefaultListCssClasses.item}`))
+    return Array.from(itemChildWrapper.querySelectorAll(`.${DefaultListCssClasses.item}`));
   }
 }

@@ -1,24 +1,24 @@
-import { OrderedListRenderer } from "../ListRenderer/OrderedListRenderer";
-import { UnorderedListRenderer } from "../ListRenderer/UnorderedListRenderer";
-import { NestedListConfig, ListData, ListDataStyle } from "../types/ListParams"
-import { ListItem } from "../types/ListParams";
-import type { ItemElement, ItemContentElement, ItemChildWrapperElement } from "../types/Elements";
+import { OrderedListRenderer } from '../ListRenderer/OrderedListRenderer';
+import { UnorderedListRenderer } from '../ListRenderer/UnorderedListRenderer';
+import type { NestedListConfig, ListData, ListDataStyle } from '../types/ListParams';
+import type { ListItem } from '../types/ListParams';
+import type { ItemElement, ItemChildWrapperElement } from '../types/Elements';
 import { isHtmlElement } from '../utils/type-guards';
 import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput, save as saveCaret } from '@editorjs/caret';
-import { DefaultListCssClasses } from "../ListRenderer";
+import { DefaultListCssClasses } from '../ListRenderer';
 import type { PasteEvent } from '../types';
 import type { API, BlockAPI, PasteConfig } from '@editorjs/editorjs';
-import { ListParams } from "..";
-import { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from "../types/ItemMeta";
-import type { ListRenderer } from '../types/ListRenderer'
+import type { ListParams } from '..';
+import type { ChecklistItemMeta } from '../types/ItemMeta';
+import type { ListRenderer } from '../types/ListRenderer';
 import { getSiblings } from '../utils/getSiblings';
 import { getChildItems } from '../utils/getChildItems';
-import { isLastItem } from "../utils/isLastItem";
-import { itemHasSublist } from "../utils/itemHasSublist";
-import { getItemChildWrapper } from "../utils/getItemChildWrapper";
-import { removeChildWrapperIfEmpty } from "../utils/removeChildWrapperIfEmpty";
-import { getItemContentElement } from "../utils/getItemContentElement";
-import { focusItem } from "../utils/focusItem";
+import { isLastItem } from '../utils/isLastItem';
+import { itemHasSublist } from '../utils/itemHasSublist';
+import { getItemChildWrapper } from '../utils/getItemChildWrapper';
+import { removeChildWrapperIfEmpty } from '../utils/removeChildWrapperIfEmpty';
+import { getItemContentElement } from '../utils/getItemContentElement';
+import { focusItem } from '../utils/focusItem';
 
 /**
  * Class that is responsible for list tabulation
@@ -60,9 +60,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   listWrapper: ItemChildWrapperElement | undefined;
 
   /**
-   * Returns current List item by the caret position
-   *
-   * @returns {Element}
+   * Getter method to get current item
+   * @returns current list item or null if caret position is not undefined
    */
   get currentItem(): ItemElement | null {
     const selection = window.getSelection();
@@ -89,7 +88,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     return currentNode.closest(`.${DefaultListCssClasses.item}`);
   }
 
-  constructor({data, config, api, readOnly, block}: ListParams, renderer: Renderer) {
+  constructor({ data, config, api, readOnly, block }: ListParams, renderer: Renderer) {
     this.config = config;
     this.data = data;
     this.readOnly = readOnly;
@@ -103,7 +102,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Function that is responsible for rendering nested list with contents
    * @returns Filled with content wrapper element of the list
    */
-  render() {
+  render(): ItemChildWrapperElement {
     this.listWrapper = this.renderer.renderWrapper(true);
 
     // fill with data
@@ -118,7 +117,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
             items: [],
           },
         ],
-        this.listWrapper,
+        this.listWrapper
       );
     }
 
@@ -152,11 +151,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Renders children list
-   *
-   * @param list - initialized ListRenderer instance
-   * @param {ListItem[]} items - items data to append
-   * @param {Element} parentItem - where to append
-   * @returns {void}
+   * @param items - items data to append
+   * @param parentElement - where to append passed items
    */
   appendItems(items: ListItem[], parentElement: Element): void {
     items.forEach((item) => {
@@ -173,10 +169,10 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         /**
          * Recursively render child items
          */
-        this.appendItems(item.items, sublistWrapper!);
+        this.appendItems(item.items, sublistWrapper);
 
         if (itemEl) {
-          itemEl.appendChild(sublistWrapper!);
+          itemEl.appendChild(sublistWrapper);
         }
       }
     });
@@ -192,17 +188,15 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     /**
      * The method for recursive collecting of the child items
-     *
-     * @param {Element} parent - where to find items
-     * @returns {ListItem[]}
+     * @param parent - where to find items
      */
     const getItems = (parent: ItemChildWrapperElement): ListItem[] => {
       const children = getChildItems(parent);
 
       return children.map((el) => {
-        const subItemsWrapper = getItemChildWrapper(el)
-        const content = this.renderer!.getItemContent(el);
-        const meta = this.renderer!.getItemMeta(el);
+        const subItemsWrapper = getItemChildWrapper(el);
+        const content = this.renderer.getItemContent(el);
+        const meta = this.renderer.getItemMeta(el);
         const subItems = subItemsWrapper ? getItems(subItemsWrapper) : [];
 
         return {
@@ -221,8 +215,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * On paste sanitzation config. Allow only tags that are allowed in the Tool.
-   *
-   * @returns {PasteConfig} - paste config.
+   * @returns - paste config.
    */
   static get pasteConfig(): PasteConfig {
     return {
@@ -236,9 +229,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    *
    * Content of the first item of the next List would be merged with deepest item in current list
    * Other items of the next List would be appended to the current list without any changes in nesting levels
-   *
-   * @param {ListData} data - data of the second list to be merged with current
-   * @public
+   * @param data - data of the second list to be merged with current
    */
   merge(data: ListData): void {
     /**
@@ -256,6 +247,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     focus(deepestBlockItemContentElement);
 
     const restore = saveCaret();
+
     /**
      * Insert trailing html to the deepest block item content
      */
@@ -316,8 +308,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * On paste callback that is fired from Editor.
-   *
-   * @param {PasteEvent} event - event with pasted data
+   * @param event - event with pasted data
    */
   onPaste(event: PasteEvent): void {
     const list = event.detail.data;
@@ -334,9 +325,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Handle UL, OL and LI tags paste and returns List data
-   *
-   * @param {HTMLUListElement|HTMLOListElement|HTMLLIElement} element
-   * @returns {ListData}
+   * @param element - html element that contains whole list
    */
   pasteHandler(element: PasteEvent['detail']['data']): ListData {
     const { tagName: tag } = element;
@@ -389,9 +378,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Handles Enter keypress
-   *
-   * @param {KeyboardEvent} event - keydown
-   * @returns {void}
+   * @param event - keydown
    */
   enterPressed(event: KeyboardEvent): void {
     const currentItem = this.currentItem;
@@ -459,8 +446,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Handle backspace
-   *
-   * @param {KeyboardEvent} event - keydown
+   * @param event - keydown
    */
   backspace(event: KeyboardEvent): void {
     const currentItem = this.currentItem;
@@ -485,12 +471,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     this.mergeItemWithPrevious(currentItem);
   }
 
-
   /**
    * Reduce indentation for current item
-   *
-   * @param {KeyboardEvent} event - keydown
-   * @returns {void}
+   * @param event - keydown
    */
   shiftTab(event: KeyboardEvent): void {
     /**
@@ -518,8 +501,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Decrease indentation of the passed item
-   *
-   * @returns {void}
+   * @param item - list item to be unshifted
    */
   unshiftItem(item: ItemElement): void {
     if (!item.parentNode) {
@@ -546,7 +528,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const siblings = getSiblings(item);
 
-
     /**
      * If item has any siblings, they should be appended to item child wrapper
      */
@@ -555,7 +536,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
        * Render child wrapper if it does no exist
        */
       if (currentItemChildWrapper === null) {
-        currentItemChildWrapper = this.renderer!.renderWrapper(false);
+        currentItemChildWrapper = this.renderer.renderWrapper(false);
       }
 
       /**
@@ -563,7 +544,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
        */
       siblings.forEach((sibling) => {
         currentItemChildWrapper!.appendChild(sibling);
-      })
+      });
 
       item.appendChild(currentItemChildWrapper);
     }
@@ -615,14 +596,14 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Render new wrapper for list that would be separated
      */
-    const newListWrapper = this.renderer!.renderWrapper(true);
+    const newListWrapper = this.renderer.renderWrapper(true);
 
     /**
      * Append new list wrapper with trailing elements
      */
     newListItems.forEach((item) => {
       newListWrapper.appendChild(item);
-    })
+    });
 
     const newListContent = this.save(newListWrapper);
 
@@ -631,7 +612,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      */
     const currentBlock = this.block;
 
-    const currentBlockIndex = this.api.blocks.getCurrentBlockIndex()
+    const currentBlockIndex = this.api.blocks.getCurrentBlockIndex();
 
     /**
      * Insert separated list with trailing items
@@ -654,9 +635,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param currentItem - current item html element
    */
   splitItem(currentItem: ItemElement): void {
-    const [ currentNode, offset ] = getCaretNodeAndOffset();
+    const [currentNode, offset] = getCaretNodeAndOffset();
 
-    if ( currentNode === null ) {
+    if (currentNode === null) {
       return;
     }
 
@@ -677,7 +658,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       endingHTML = getContenteditableSlice(currentItemContent, currentNode, offset, 'right', true);
     }
 
-    const itemChildren = getItemChildWrapper(currentItem)
+    const itemChildren = getItemChildWrapper(currentItem);
     /**
      * Create the new list item
      */
@@ -702,7 +683,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Method that is used for merging current item with previous one
    * Content of the current item would be appended to the previous item
    * Current item children would not change nesting level
-   * @param currentItem - current item html element
+   * @param item - current item html element
    */
   mergeItemWithPrevious(item: ItemElement): void {
     const previousItem = item.previousElementSibling;
@@ -833,20 +814,20 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * Add child current item children to the target childWrapper
      */
     if (previousItem) {
-      currentItemChildrenList.forEach(childItem => {
+      currentItemChildrenList.forEach((childItem) => {
         targetChildWrapper.appendChild(childItem);
-      })
+      });
     } else {
-      currentItemChildrenList.forEach(childItem => {
+      currentItemChildrenList.forEach((childItem) => {
         targetChildWrapper.prepend(childItem);
-      })
+      });
     }
 
     /**
      * If we created new wrapper, then append childWrapper to the target item
      */
     if (getItemChildWrapper(targetForChildItems) === null) {
-      targetItem.appendChild(targetChildWrapper)
+      targetItem.appendChild(targetChildWrapper);
     }
 
     /**
@@ -862,8 +843,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Add indentation to current item
-   *
-   * @param {KeyboardEvent} event - keydown
+   * @param event - keydown
    */
   addTab(event: KeyboardEvent): void {
     /**
@@ -921,9 +901,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
        */
       currentItemChildrenList.forEach((child) => {
         prevItemChildrenList.appendChild(child);
-      })
+      });
     } else {
-      const prevItemChildrenListWrapper = this.renderer!.renderWrapper(false);
+      const prevItemChildrenListWrapper = this.renderer.renderWrapper(false);
 
       /**
        * Previous item would be appended with current item and it's sublists
@@ -941,7 +921,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
        */
       currentItemChildrenList.forEach((child) => {
         prevItemChildrenListWrapper.appendChild(child);
-      })
+      });
 
       prevItem.appendChild(prevItemChildrenListWrapper);
     }
@@ -952,7 +932,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Get out from List Tool by Enter on the empty last item
    * @param index - optional parameter represents index, where would be inseted default block
-   * @returns {void}
    */
   getOutOfList(index?: number): void {
     let newBlock;
@@ -972,7 +951,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Method that calls render function of the renderer with a necessary item meta cast
-   * @param item - item to be rendered
+   * @param itemContent - content to be rendered in new item
+   * @param meta - meta used in list item rendering
    * @returns html element of the rendered item
    */
   renderItem(itemContent: ListItem['content'], meta?: ListItem['meta']): ItemElement {
@@ -980,10 +960,10 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     switch (true) {
       case this.renderer instanceof OrderedListRenderer:
-        return this.renderer.renderItem(itemContent, itemMeta as OrderedListItemMeta);
+        return this.renderer.renderItem(itemContent, itemMeta);
 
       case this.renderer instanceof UnorderedListRenderer:
-        return this.renderer.renderItem(itemContent, itemMeta as UnorderedListItemMeta);
+        return this.renderer.renderItem(itemContent, itemMeta);
 
       default:
         return this.renderer.renderItem(itemContent, itemMeta as ChecklistItemMeta);

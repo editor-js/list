@@ -1,5 +1,5 @@
-import { ItemChildWrapperElement, ItemElement } from "../types/Elements";
-import { DefaultListCssClasses } from "../ListRenderer";
+import type { ItemChildWrapperElement, ItemElement } from '../types/Elements';
+import { DefaultListCssClasses } from '../ListRenderer';
 
 /**
  * Returns child wrapper element of the passed item
