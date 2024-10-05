@@ -854,8 +854,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const prevItemChildrenList = getItemChildWrapper(prevItem);
 
-    const restore = saveCaret();
-
     /**
      * If prev item has child items, just append current to them
      * Else render new child wrapper for previous item
@@ -902,7 +900,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       prevItem.appendChild(prevItemChildrenListWrapper);
     }
 
-    restore();
+    focusItem(currentItem, false);
   }
 
   /**
