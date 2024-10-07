@@ -4,7 +4,13 @@ import * as Dom from '@editorjs/dom';
 import { DefaultListCssClasses, CssPrefix } from './ListRenderer';
 import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
 
+/**
+ * Interface that represents all list used only in unordered list rendering
+ */
 interface UnoderedListCssClasses extends ListCssClasses {
+  /**
+   * CSS class of the unordered list
+   */
   unorderedList: string;
 }
 
@@ -25,13 +31,18 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
   /**
    * Getter for all CSS classes used in unordered list rendering
    */
-  static get CSS(): UnoderedListCssClasses {
+  private static get CSS(): UnoderedListCssClasses {
     return {
       ...DefaultListCssClasses,
       unorderedList: `${CssPrefix}-unordered`,
     };
   }
 
+  /**
+   * Assign passed readonly mode and config to relevant class properties
+   * @param readonly - read-only mode flag
+   * @param config - user config for Tool
+   */
   constructor(readonly: boolean, config?: NestedListConfig) {
     this.config = config;
     this.readOnly = readonly;
@@ -42,7 +53,7 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
    * @param isRoot - boolean variable that represents level of the wrappre (root or childList)
    * @returns - created html ul element
    */
-  renderWrapper(isRoot: boolean): HTMLUListElement {
+  public renderWrapper(isRoot: boolean): HTMLUListElement {
     let wrapperElement: HTMLUListElement;
 
     /**
@@ -59,11 +70,11 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
 
   /**
    * Redners list item element
-   * @param content - content of the list item
+   * @param content - content used in list item rendering
    * @param _meta - meta of the list item unused in rendering of the unordered list
    * @returns - created html list item element
    */
-  renderItem(content: string, _meta: UnorderedListItemMeta): HTMLLIElement {
+  public renderItem(content: string, _meta: UnorderedListItemMeta): HTMLLIElement {
     const itemWrapper = Dom.make('li', UnorderedListRenderer.CSS.item);
     const itemContent = Dom.make('div', UnorderedListRenderer.CSS.itemContent, {
       innerHTML: content,
@@ -80,7 +91,7 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
    * @param item - item wrapper (<li>)
    * @returns - item content string
    */
-  getItemContent(item: Element): string {
+  public getItemContent(item: Element): string {
     const contentNode = item.querySelector(`.${UnorderedListRenderer.CSS.itemContent}`);
 
     if (!contentNode) {
@@ -98,14 +109,14 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
    * Returns item meta, for unordered list
    * @returns Item meta object
    */
-  getItemMeta(): UnorderedListItemMeta {
+  public getItemMeta(): UnorderedListItemMeta {
     return {};
   }
 
   /**
    * Returns default item meta used on creation of the new item
    */
-  composeDefaultMeta(): UnorderedListItemMeta {
+  public composeDefaultMeta(): UnorderedListItemMeta {
     return {};
   }
 }

@@ -5,9 +5,12 @@ import { DefaultListCssClasses, CssPrefix } from './ListRenderer';
 import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
 
 /**
- * CSS classes for the Ordered list
+ * Interface that represents all list used only in unordered list rendering
  */
 interface OrderedListCssClasses extends ListCssClasses {
+  /**
+   * CSS class of the ordered list
+   */
   orderedList: string;
 }
 
@@ -25,13 +28,21 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
    */
   private readOnly: boolean;
 
-  static get CSS(): OrderedListCssClasses {
+  /**
+   * Getter for all CSS classes used in unordered list rendering
+   */
+  private static get CSS(): OrderedListCssClasses {
     return {
       ...DefaultListCssClasses,
       orderedList: `${CssPrefix}-ordered`,
     };
   }
 
+  /**
+   * Assign passed readonly mode and config to relevant class properties
+   * @param readonly - read-only mode flag
+   * @param config - user config for Tool
+   */
   constructor(readonly: boolean, config?: NestedListConfig) {
     this.config = config;
     this.readOnly = readonly;
@@ -42,7 +53,7 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
    * @param isRoot - boolean variable that represents level of the wrappre (root or childList)
    * @returns - created html ol element
    */
-  renderWrapper(isRoot: boolean): HTMLOListElement {
+  public renderWrapper(isRoot: boolean): HTMLOListElement {
     let wrapperElement: HTMLOListElement;
 
     /**
@@ -59,11 +70,11 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
 
   /**
    * Redners list item element
-   * @param content - content of the list item
+   * @param content - content used in list item rendering
    * @param _meta - meta of the list item unused in rendering of the ordered list
    * @returns - created html list item element
    */
-  renderItem(content: string, _meta: OrderedListItemMeta): HTMLLIElement {
+  public renderItem(content: string, _meta: OrderedListItemMeta): HTMLLIElement {
     const itemWrapper = Dom.make('li', OrderedListRenderer.CSS.item);
     const itemContent = Dom.make('div', OrderedListRenderer.CSS.itemContent, {
       innerHTML: content,
@@ -80,7 +91,7 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
    * @param item - item wrapper (<li>)
    * @returns - item content string
    */
-  getItemContent(item: Element): string {
+  public getItemContent(item: Element): string {
     const contentNode = item.querySelector(`.${OrderedListRenderer.CSS.itemContent}`);
 
     if (!contentNode) {
@@ -98,14 +109,14 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
    * Returns item meta, for ordered list
    * @returns item meta object
    */
-  getItemMeta(): OrderedListItemMeta {
+  public getItemMeta(): OrderedListItemMeta {
     return {};
   }
 
   /**
    * Returns default item meta used on creation of the new item
    */
-  composeDefaultMeta(): OrderedListItemMeta {
+  public composeDefaultMeta(): OrderedListItemMeta {
     return {};
   }
 }

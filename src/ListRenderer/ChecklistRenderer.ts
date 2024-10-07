@@ -5,11 +5,33 @@ import * as Dom from '@editorjs/dom';
 import { DefaultListCssClasses, CssPrefix } from './ListRenderer';
 import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
 
+/**
+ * Interface that represents all list used only in unordered list rendering
+ */
 interface ChecklistCssClasses extends ListCssClasses {
+  /**
+   * CSS class of the checklist
+   */
   checklist: string;
+
+  /**
+   * CSS class of the checked checkbox
+   */
   itemChecked: string;
+
+  /**
+   * CSS class for the special hover behavior of the checkboc
+   */
   noHover: string;
+
+  /**
+   * CSS class of the checkbox
+   */
   checkbox: string;
+
+  /**
+   * CSS class of the checkbox container
+   */
   checkboxContainer: string;
 }
 
@@ -27,7 +49,10 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
    */
   private readOnly: boolean;
 
-  static get CSS(): ChecklistCssClasses {
+  /**
+   * Getter for all CSS classes used in unordered list rendering
+   */
+  private static get CSS(): ChecklistCssClasses {
     return {
       ...DefaultListCssClasses,
       checklist: `${CssPrefix}-checklist`,
@@ -38,6 +63,11 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
     };
   }
 
+  /**
+   * Assign passed readonly mode and config to relevant class properties
+   * @param readonly - read-only mode flag
+   * @param config - user config for Tool
+   */
   constructor(readonly: boolean, config?: NestedListConfig) {
     this.config = config;
     this.readOnly = readonly;
@@ -48,7 +78,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
    * @param isRoot - boolean variable that represents level of the wrappre (root or childList)
    * @returns - created html ul element
    */
-  renderWrapper(isRoot: boolean): HTMLUListElement {
+  public renderWrapper(isRoot: boolean): HTMLUListElement {
     let wrapperElement: HTMLUListElement;
 
     /**
@@ -61,7 +91,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
        * Delegate clicks from wrapper to items
        */
       wrapperElement.addEventListener('click', (event) => {
-        const target = event.target as Element;
+        const target = event.target as Element | null;
 
         if (target) {
           const checkbox = target.closest(`.${CheckListRenderer.CSS.checkboxContainer}`);
@@ -80,11 +110,11 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
 
   /**
    * Redners list item element
-   * @param content - content of the list item
+   * @param content - content used in list item rendering
    * @param meta - meta of the list item used in rendering of the checklist
    * @returns - created html list item element
    */
-  renderItem(content: string, meta: ChecklistItemMeta): HTMLLIElement {
+  public renderItem(content: string, meta: ChecklistItemMeta): HTMLLIElement {
     const itemWrapper = Dom.make('li', [CheckListRenderer.CSS.item, CheckListRenderer.CSS.item]);
     const itemContent = Dom.make('div', CheckListRenderer.CSS.itemContent, {
       innerHTML: content,
@@ -94,7 +124,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
     const checkbox = Dom.make('span', CheckListRenderer.CSS.checkbox);
     const checkboxContainer = Dom.make('div', CheckListRenderer.CSS.checkboxContainer);
 
-    if (meta && meta.checked === true) {
+    if (meta.checked === true) {
       checkboxContainer.classList.add(CheckListRenderer.CSS.itemChecked);
     }
 
@@ -112,7 +142,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
    * @param item - item wrapper (<li>)
    * @returns - item content string
    */
-  getItemContent(item: Element): string {
+  public getItemContent(item: Element): string {
     const contentNode = item.querySelector(`.${CheckListRenderer.CSS.itemContent}`);
 
     if (!contentNode) {
@@ -128,10 +158,10 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
 
   /**
    * Return meta object of certain element
-   * @param item - item of the list to get meta from
+   * @param item - will be returned meta information of this item
    * @returns Item meta object
    */
-  getItemMeta(item: Element): ChecklistItemMeta {
+  public getItemMeta(item: Element): ChecklistItemMeta {
     const checkbox = item.querySelector(`.${CheckListRenderer.CSS.checkboxContainer}`);
 
     return {
@@ -142,7 +172,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
   /**
    * Returns default item meta used on creation of the new item
    */
-  composeDefaultMeta(): ChecklistItemMeta {
+  public composeDefaultMeta(): ChecklistItemMeta {
     return { checked: false };
   }
 

@@ -52,18 +52,18 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Rendered list of items
    */
-  renderer: Renderer;
+  private renderer: Renderer;
 
   /**
    * Wrapper of the whole list
    */
-  listWrapper: ItemChildWrapperElement | undefined;
+  private listWrapper: ItemChildWrapperElement | undefined;
 
   /**
    * Getter method to get current item
    * @returns current list item or null if caret position is not undefined
    */
-  get currentItem(): ItemElement | null {
+  private get currentItem(): ItemElement | null {
     const selection = window.getSelection();
 
     if (!selection) {
@@ -88,6 +88,15 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     return currentNode.closest(`.${DefaultListCssClasses.item}`);
   }
 
+  /**
+   * Assign all passed params and renderer to relevant class properties
+   * @param params - tool constructor options
+   * @param params.data - previously saved data
+   * @param params.config - user config for Tool
+   * @param params.api - Editor.js API
+   * @param params.readOnly - read-only mode flag
+   * @param renderer - renderer instance initialized in tool class
+   */
   constructor({ data, config, api, readOnly, block }: ListParams, renderer: Renderer) {
     this.config = config;
     this.data = data;
@@ -102,7 +111,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Function that is responsible for rendering nested list with contents
    * @returns Filled with content wrapper element of the list
    */
-  render(): ItemChildWrapperElement {
+  public render(): ItemChildWrapperElement {
     this.listWrapper = this.renderer.renderWrapper(true);
 
     // fill with data
@@ -150,40 +159,11 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
-   * Renders children list
-   * @param items - items data to append
-   * @param parentElement - where to append passed items
-   */
-  appendItems(items: ListItem[], parentElement: Element): void {
-    items.forEach((item) => {
-      const itemEl = this.renderItem(item.content, item.meta);
-
-      parentElement.appendChild(itemEl);
-
-      /**
-       * Check if there are child items
-       */
-      if (item.items.length) {
-        const sublistWrapper = this.renderer?.renderWrapper(false);
-
-        /**
-         * Recursively render child items
-         */
-        this.appendItems(item.items, sublistWrapper);
-
-        if (itemEl) {
-          itemEl.appendChild(sublistWrapper);
-        }
-      }
-    });
-  }
-
-  /**
    * Function that is responsible for list content saving
    * @param wrapper - optional argument wrapper
    * @returns whole list saved data if wrapper not passes, otherwise will return data of the passed wrapper
    */
-  save(wrapper?: ItemChildWrapperElement): ListData {
+  public save(wrapper?: ItemChildWrapperElement): ListData {
     const listWrapper = wrapper ?? this.listWrapper;
 
     /**
@@ -215,9 +195,10 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * On paste sanitzation config. Allow only tags that are allowed in the Tool.
-   * @returns - paste config.
+   * @returns - config that determines tags supposted by paste handler
+   * @todo - refactor and move to nested list instance
    */
-  static get pasteConfig(): PasteConfig {
+  public static get pasteConfig(): PasteConfig {
     return {
       tags: ['OL', 'UL', 'LI'],
     };
@@ -231,7 +212,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Other items of the next List would be appended to the current list without any changes in nesting levels
    * @param data - data of the second list to be merged with current
    */
-  merge(data: ListData): void {
+  public merge(data: ListData): void {
     /**
      * Get list of all levels children of the previous item
      */
@@ -309,8 +290,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * On paste callback that is fired from Editor.
    * @param event - event with pasted data
+   * @todo - refactor and move to nested list instance
    */
-  onPaste(event: PasteEvent): void {
+  public onPaste(event: PasteEvent): void {
     const list = event.detail.data;
 
     this.data = this.pasteHandler(list);
@@ -326,8 +308,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Handle UL, OL and LI tags paste and returns List data
    * @param element - html element that contains whole list
+   * @todo - refactor and move to nested list instance
    */
-  pasteHandler(element: PasteEvent['detail']['data']): ListData {
+  public pasteHandler(element: PasteEvent['detail']['data']): ListData {
     const { tagName: tag } = element;
     let style: ListDataStyle = 'unordered';
     let tagToSearch: string;
@@ -360,7 +343,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         // get subitems.
         const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
         // get text content of the li element.
-        const content = child?.firstChild?.textContent || '';
+        const content = child.firstChild?.textContent ?? '';
 
         return {
           content,
@@ -380,7 +363,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Handles Enter keypress
    * @param event - keydown
    */
-  enterPressed(event: KeyboardEvent): void {
+  private enterPressed(event: KeyboardEvent): void {
     const currentItem = this.currentItem;
 
     /**
@@ -403,9 +386,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    const isEmpty = currentItem
-      ? this.renderer?.getItemContent(currentItem).trim().length === 0
-      : true;
+    const isEmpty = this.renderer?.getItemContent(currentItem).trim().length === 0;
     const isFirstLevelItem = currentItem.parentNode === this.listWrapper;
 
     /**
@@ -416,30 +397,27 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         this.getOutOfList();
 
         return;
-      }
-      /**
-       * If enter is pressed in the сenter of the list item we should split it
-       */
-      else {
+      } else {
+        /**
+         * If enter is pressed in the сenter of the list item we should split it
+         */
         this.splitList(currentItem);
 
         return;
       }
-    }
-    /**
-     * If currnet item is empty and is in the middle of the list
-     * And if current item is not on the first level
-     * Then unshift current item
-     */
-    else if (isEmpty) {
+    } else if (isEmpty) {
+      /**
+       * If currnet item is empty and is in the middle of the list
+       * And if current item is not on the first level
+       * Then unshift current item
+       */
       this.unshiftItem(currentItem);
 
       return;
-    }
-    /**
-     * If current item is not empty than split current item
-     */
-    else {
+    } else {
+      /**
+       * If current item is not empty than split current item
+       */
       this.splitItem(currentItem);
     }
   }
@@ -448,7 +426,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Handle backspace
    * @param event - keydown
    */
-  backspace(event: KeyboardEvent): void {
+  private backspace(event: KeyboardEvent): void {
     const currentItem = this.currentItem;
 
     if (currentItem === null) {
@@ -475,7 +453,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Reduce indentation for current item
    * @param event - keydown
    */
-  shiftTab(event: KeyboardEvent): void {
+  private shiftTab(event: KeyboardEvent): void {
     /**
      * Prevent editor.js behaviour
      */
@@ -503,7 +481,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Decrease indentation of the passed item
    * @param item - list item to be unshifted
    */
-  unshiftItem(item: ItemElement): void {
+  private unshiftItem(item: ItemElement): void {
     if (!item.parentNode) {
       return;
     }
@@ -571,7 +549,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Method that is used for list splitting and moving trailing items to the new separated list
    * @param item - current item html element
    */
-  splitList(item: ItemElement): void {
+  private splitList(item: ItemElement): void {
     const currentItemChildrenList = getChildItems(item);
 
     /**
@@ -601,8 +579,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Append new list wrapper with trailing elements
      */
-    newListItems.forEach((item) => {
-      newListWrapper.appendChild(item);
+    newListItems.forEach((newListItem) => {
+      newListWrapper.appendChild(newListItem);
     });
 
     const newListContent = this.save(newListWrapper);
@@ -634,7 +612,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Method that is used for splitting item content and moving trailing content to the new sibling item
    * @param currentItem - current item html element
    */
-  splitItem(currentItem: ItemElement): void {
+  private splitItem(currentItem: ItemElement): void {
     const [currentNode, offset] = getCaretNodeAndOffset();
 
     if (currentNode === null) {
@@ -685,7 +663,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Current item children would not change nesting level
    * @param item - current item html element
    */
-  mergeItemWithPrevious(item: ItemElement): void {
+  private mergeItemWithPrevious(item: ItemElement): void {
     const previousItem = item.previousElementSibling;
 
     const currentItemParentNode = item.parentNode;
@@ -845,7 +823,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Add indentation to current item
    * @param event - keydown
    */
-  addTab(event: KeyboardEvent): void {
+  private addTab(event: KeyboardEvent): void {
     /**
      * Prevent editor.js behaviour
      */
@@ -933,7 +911,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Get out from List Tool by Enter on the empty last item
    * @param index - optional parameter represents index, where would be inseted default block
    */
-  getOutOfList(index?: number): void {
+  private getOutOfList(index?: number): void {
     let newBlock;
 
     /**
@@ -955,7 +933,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param meta - meta used in list item rendering
    * @returns html element of the rendered item
    */
-  renderItem(itemContent: ListItem['content'], meta?: ListItem['meta']): ItemElement {
+  private renderItem(itemContent: ListItem['content'], meta?: ListItem['meta']): ItemElement {
     const itemMeta = meta ?? this.renderer.composeDefaultMeta();
 
     switch (true) {
@@ -968,5 +946,32 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       default:
         return this.renderer.renderItem(itemContent, itemMeta as ChecklistItemMeta);
     }
+  }
+
+  /**
+   * Renders children list
+   * @param items - list data used in item rendering
+   * @param parentElement - where to append passed items
+   */
+  private appendItems(items: ListItem[], parentElement: Element): void {
+    items.forEach((item) => {
+      const itemEl = this.renderItem(item.content, item.meta);
+
+      parentElement.appendChild(itemEl);
+
+      /**
+       * Check if there are child items
+       */
+      if (item.items.length) {
+        const sublistWrapper = this.renderer?.renderWrapper(false);
+
+        /**
+         * Recursively render child items
+         */
+        this.appendItems(item.items, sublistWrapper);
+
+        itemEl.appendChild(sublistWrapper);
+      }
+    });
   }
 }
