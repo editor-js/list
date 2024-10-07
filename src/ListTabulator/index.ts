@@ -742,11 +742,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     focus(targetItemContentElement, false);
 
     /**
-     * Save the caret position
-     */
-    // const restore = saveCaret();
-
-    /**
      * Update target item content by merging with current item html content
      */
     targetItemContentElement.insertAdjacentHTML('beforeend', currentItemContent);
