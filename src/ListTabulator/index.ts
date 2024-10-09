@@ -226,8 +226,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    focusItem(deepestBlockItem);
-
     /**
      * Insert trailing html to the deepest block item content
      */

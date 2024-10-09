@@ -31,10 +31,10 @@
     "lint:fix": "eslint --fix"
   },
   "devDependencies": {
-    "@editorjs/editorjs": "^2.29.1",
+    "@editorjs/editorjs": "^2.31.0-rc.1",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
-    "@editorjs/caret": "^0.0.7",
+    "@editorjs/caret": "^1.0.1",
     "@editorjs/dom": "^0.0.7",
     "eslint": "^9.2.0",
     "eslint-config-codex": "^2.0.0",
