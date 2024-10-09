@@ -4,7 +4,7 @@ import type { NestedListConfig, ListData, ListDataStyle } from '../types/ListPar
 import type { ListItem } from '../types/ListParams';
 import type { ItemElement, ItemChildWrapperElement } from '../types/Elements';
 import { isHtmlElement } from '../utils/type-guards';
-import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput } from '@editorjs/caret';
+import { getContenteditableSlice, getCaretNodeAndOffset, isCaretAtStartOfInput } from '@editorjs/caret';
 import { DefaultListCssClasses } from '../ListRenderer';
 import type { PasteEvent } from '../types';
 import type { API, BlockAPI, PasteConfig } from '@editorjs/editorjs';
@@ -69,6 +69,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     if (!selection) {
       return null;
     }
+
     let currentNode = selection.anchorNode;
 
     if (!currentNode) {
@@ -225,7 +226,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    focus(deepestBlockItemContentElement);
+    focusItem(deepestBlockItem);
 
     /**
      * Insert trailing html to the deepest block item content
@@ -554,6 +555,12 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       const firstChildItem = currentItemChildrenList[0];
 
       this.unshiftItem(firstChildItem);
+
+      /**
+       * If first child item was been unshifted, that caret would be set to the end of the first child item
+       * Then we should set caret to the actual current item
+       */
+      focusItem(item, false);
     }
 
     /**
@@ -729,6 +736,11 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
+     * Set caret to the end of the target item
+     */
+    focusItem(targetItem, false);
+
+    /**
      * Get target item content element
      */
     const targetItemContentElement = getItemContentElement(targetItem);
@@ -739,7 +751,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     if (!targetItemContentElement) {
       return;
     }
-    focus(targetItemContentElement, false);
 
     /**
      * Update target item content by merging with current item html content
