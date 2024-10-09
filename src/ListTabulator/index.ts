@@ -441,6 +441,11 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      */
     event.preventDefault();
 
+    /**
+     * Prevent Editor.js backspace handling
+     */
+    event.stopPropagation();
+
     this.mergeItemWithPrevious(currentItem);
   }
 
@@ -746,7 +751,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Set a new place for caret
      */
-    if (!targetItemContentElement) {
+    if (targetItemContentElement === null) {
       return;
     }
 
