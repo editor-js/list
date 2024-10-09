@@ -429,6 +429,17 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
+     * Check that current item is not first item of the list
+     * Otherwise Editor.js should handle merge
+     */
+    if (currentItem.parentNode !== this.listWrapper || currentItem.previousElementSibling !== null) {
+      /**
+       * Prevent Editor.js backspace handling
+       */
+      event.stopPropagation();
+    }
+
+    /**
      * Caret is not at start of the item
      * Then backspace button should remove letter as usual
      */
@@ -440,11 +451,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * Prevent default backspace behaviour
      */
     event.preventDefault();
-
-    /**
-     * Prevent Editor.js backspace handling
-     */
-    event.stopPropagation();
 
     this.mergeItemWithPrevious(currentItem);
   }
