@@ -135,7 +135,7 @@ export default class NestedList {
   /**
    * Tool's configuration
    */
-  private config: NestedListConfig;
+  private config: NestedListConfig | undefined;
 
   /**
    * Default list style formes as passed default list style from config or 'ordered' as default
