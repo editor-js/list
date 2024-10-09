@@ -4,7 +4,7 @@ import type { NestedListConfig, ListData, ListDataStyle } from '../types/ListPar
 import type { ListItem } from '../types/ListParams';
 import type { ItemElement, ItemChildWrapperElement } from '../types/Elements';
 import { isHtmlElement } from '../utils/type-guards';
-import { getContenteditableSlice, getCaretNodeAndOffset, focus, isCaretAtStartOfInput, save as saveCaret } from '@editorjs/caret';
+import { getContenteditableSlice, getCaretNodeAndOffset, isCaretAtStartOfInput } from '@editorjs/caret';
 import { DefaultListCssClasses } from '../ListRenderer';
 import type { PasteEvent } from '../types';
 import type { API, BlockAPI, PasteConfig } from '@editorjs/editorjs';
@@ -69,6 +69,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     if (!selection) {
       return null;
     }
+
     let currentNode = selection.anchorNode;
 
     if (!currentNode) {
@@ -225,16 +226,10 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       return;
     }
 
-    focus(deepestBlockItemContentElement);
-
-    const restore = saveCaret();
-
     /**
      * Insert trailing html to the deepest block item content
      */
     deepestBlockItemContentElement.insertAdjacentHTML('beforeend', data.items[0].content);
-
-    restore();
 
     if (this.listWrapper === undefined) {
       return;
@@ -434,6 +429,17 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
+     * Check that current item is not first item of the list
+     * Otherwise Editor.js should handle merge
+     */
+    if (currentItem.parentNode !== this.listWrapper || currentItem.previousElementSibling !== null) {
+      /**
+       * Prevent Editor.js backspace handling
+       */
+      event.stopPropagation();
+    }
+
+    /**
      * Caret is not at start of the item
      * Then backspace button should remove letter as usual
      */
@@ -527,11 +533,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       item.appendChild(currentItemChildWrapper);
     }
 
-    const restore = saveCaret();
-
     parentItem.after(item);
 
-    restore();
+    focusItem(item, false);
 
     /**
      * If previous parent's children list is now empty, remove it.
@@ -560,6 +564,12 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       const firstChildItem = currentItemChildrenList[0];
 
       this.unshiftItem(firstChildItem);
+
+      /**
+       * If first child item was been unshifted, that caret would be set to the end of the first child item
+       * Then we should set caret to the actual current item
+       */
+      focusItem(item, false);
     }
 
     /**
@@ -735,6 +745,11 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
+     * Set caret to the end of the target item
+     */
+    focusItem(targetItem, false);
+
+    /**
      * Get target item content element
      */
     const targetItemContentElement = getItemContentElement(targetItem);
@@ -742,15 +757,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Set a new place for caret
      */
-    if (!targetItemContentElement) {
+    if (targetItemContentElement === null) {
       return;
     }
-    focus(targetItemContentElement, false);
-
-    /**
-     * Save the caret position
-     */
-    const restore = saveCaret();
 
     /**
      * Update target item content by merging with current item html content
@@ -770,11 +779,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
        * Remove current item element
        */
       item.remove();
-
-      /**
-       * Restore the caret position
-       */
-      restore();
 
       return;
     }
@@ -812,11 +816,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * Remove current item element
      */
     item.remove();
-
-    /**
-     * Restore the caret position
-     */
-    restore();
   }
 
   /**
@@ -855,8 +854,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     const prevItemChildrenList = getItemChildWrapper(prevItem);
-
-    const restore = saveCaret();
 
     /**
      * If prev item has child items, just append current to them
@@ -904,7 +901,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       prevItem.appendChild(prevItemChildrenListWrapper);
     }
 
-    restore();
+    focusItem(currentItem, false);
   }
 
   /**
