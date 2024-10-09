@@ -33,12 +33,19 @@
   resolved "https://registry.yarnpkg.com/@codexteam/icons/-/icons-0.3.2.tgz#b7aed0ba7b344e07953101f5476cded570d4f150"
   integrity sha512-P1ep2fHoy0tv4wx85eic+uee5plDnZQ1Qa6gDfv7eHPkCXorMtVqJhzMb75o1izogh6G7380PqmFDXV3bW3Pig==
 
-"@editorjs/caret@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@editorjs/caret/-/caret-0.0.7.tgz#4197786834e51eea057c5af89c7383daf70fd8a0"
-  integrity sha512-xMTkSnqZXfAAtnf8JI3vV4L+MWdQpWGQ/x54Szj6ZuEIyk70d1XTAGU1eQvIU5i2CJeT5qDNnCk6+OXnFdFasg==
+"@editorjs/caret@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@editorjs/caret/-/caret-1.0.1.tgz#0d33ca67a2d29d09fdea10d3d30b660f0abc7cfd"
+  integrity sha512-yMewrc/dndBbgmluFory0GbVWXnD9rhcE/xgwM0ecHWQodyfY3ZIJLvSQhf+BbgncitMlUG/FYqjJCL2Axi4+g==
   dependencies:
-    "@editorjs/dom" "^0.0.7"
+    "@editorjs/dom" "^1.0.0"
+
+"@editorjs/caret@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@editorjs/caret/-/caret-1.0.2.tgz#8d7c90503caaff553d973968bb24c4ffe5d9a993"
+  integrity sha512-V1tmvNhTOLAHiJhZRtL26iKe0bs6tH+yWg6FO/v+ydsYbw16y4tMMDLhrgIcYppKmi7tt3t14prdrI1kUNPYcQ==
+  dependencies:
+    "@editorjs/dom" "^1.0.0"
 
 "@editorjs/dom@^0.0.7":
   version "0.0.7"
@@ -47,15 +54,29 @@
   dependencies:
     "@editorjs/helpers" "^0.0.7"
 
-"@editorjs/editorjs@^2.29.1":
-  version "2.30.5"
-  resolved "https://registry.yarnpkg.com/@editorjs/editorjs/-/editorjs-2.30.5.tgz#c1a6fc2b99f567a0271408c0edd51d3da21b4534"
-  integrity sha512-sE7m/UPbuf+nSGjv9cmWggFsfvtYlgEX7PCby2lZWvOsOLbRxuLT+ZYlwbWshD+8BFJwiAmBj9e+ScZcOjCzeg==
+"@editorjs/dom@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@editorjs/dom/-/dom-1.0.0.tgz#ddf7f17651a091570766c5fa44c89ecf8a183c82"
+  integrity sha512-P5qZaQaG8NQXm2XuEDlcfDm8S1Kvdegwf0E/ld2RnwZquY5l27hufaW57w0SikT75mscr+dARQ68Gx/xEQEUKw==
+  dependencies:
+    "@editorjs/helpers" "^1.0.0"
+
+"@editorjs/editorjs@^2.31.0-rc.1":
+  version "2.31.0-rc.1"
+  resolved "https://registry.yarnpkg.com/@editorjs/editorjs/-/editorjs-2.31.0-rc.1.tgz#9df90789b7084b7fc982a221e841098f7e1de35d"
+  integrity sha512-AZrw9jukRPKwAG5gQGb4eSp8Sc6rWUCrnMXMM6uf1yCyzx1piKuAMvHFGR5IIBHoa+7coy7kNyMwtGu9tjf+dg==
+  dependencies:
+    "@editorjs/caret" "^1.0.1"
 
 "@editorjs/helpers@^0.0.7":
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/@editorjs/helpers/-/helpers-0.0.7.tgz#2156ec7b60a133d1e1ff87c50eb09b95b0a40ce0"
   integrity sha512-jMFbtfWKip6mSS1Pyhr1ShyOfPKfxg1Z2ESRExyXJrwjWnPF7Xqipzsig8R6ZfJDXVnvhRcKNwQcHGQZuYMjkA==
+
+"@editorjs/helpers@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@editorjs/helpers/-/helpers-1.0.0.tgz#4b0e0868e51e2772a73212f4aac5aff553725894"
+  integrity sha512-ih4yCm+x+7X9XCn1zxfNous2LQX8ZYMyTHMLdgbyjBf0Opf8GdLxVjdzSjkA+0mUp1tUe3JgWW3FTisYcSnbQA==
 
 "@es-joy/jsdoccomment@~0.46.0":
   version "0.46.0"
