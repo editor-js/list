@@ -43,10 +43,29 @@ export default class NestedList {
    * title - title to show in toolbox
    */
   public static get toolbox(): ToolboxConfig {
-    return {
-      icon: IconListNumbered,
-      title: 'List',
-    };
+    return [
+      {
+        icon: IconListBulleted,
+        title: 'Unordered List',
+        data: {
+          style: 'unordered',
+        },
+      },
+      {
+        icon: IconListNumbered,
+        title: 'Ordered List',
+        data: {
+          style: 'ordered',
+        },
+      },
+      {
+        icon: IconChecklist,
+        title: 'Checklist',
+        data: {
+          style: 'checklist',
+        },
+      },
+    ];
   }
 
   /**
@@ -177,9 +196,9 @@ export default class NestedList {
     this.block = block;
 
     /**
-     * Set the default list style from the config or presetted 'ordered'.
+     * Set the default list style from the config or presetted 'unordered'.
      */
-    this.defaultListStyle = this.config?.defaultStyle || 'ordered';
+    this.defaultListStyle = this.config?.defaultStyle || 'unordered';
 
     const initialData = {
       style: this.defaultListStyle,
