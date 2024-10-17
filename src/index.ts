@@ -110,7 +110,6 @@ export default class NestedList {
               items: [],
             },
           ],
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           style: config?.defaultStyle !== undefined ? config.defaultStyle : 'unordered',
         };
       },
