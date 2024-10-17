@@ -95,7 +95,7 @@ export default class NestedList {
      * @param content - contents string
      * @returns - list data formed from contents string
      */
-    import: (content: string, config: ToolConfig) => ListData;
+    import: (content: string, config: ToolConfig<NestedListConfig>) => ListData;
   } {
     return {
       export: (data) => {
