@@ -1,6 +1,7 @@
 import type { API, BlockAPI, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
 import type {
   BlockToolConstructorOptions,
+  ToolConfig,
   TunesMenuConfig
 } from '@editorjs/editorjs/types/tools';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
@@ -94,13 +95,13 @@ export default class NestedList {
      * @param content - contents string
      * @returns - list data formed from contents string
      */
-    import: (content: string) => ListData;
+    import: (content: string, config: ToolConfig) => ListData;
   } {
     return {
       export: (data) => {
         return NestedList.joinRecursive(data);
       },
-      import: (content) => {
+      import: (content, config) => {
         return {
           items: [
             {
@@ -109,7 +110,8 @@ export default class NestedList {
               items: [],
             },
           ],
-          style: 'unordered',
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          style: config?.defaultStyle !== undefined ? config.defaultStyle : 'unordered',
         };
       },
     };
