@@ -61,10 +61,10 @@
   dependencies:
     "@editorjs/helpers" "^1.0.0"
 
-"@editorjs/editorjs@^2.31.0-rc.1":
-  version "2.31.0-rc.1"
-  resolved "https://registry.yarnpkg.com/@editorjs/editorjs/-/editorjs-2.31.0-rc.1.tgz#9df90789b7084b7fc982a221e841098f7e1de35d"
-  integrity sha512-AZrw9jukRPKwAG5gQGb4eSp8Sc6rWUCrnMXMM6uf1yCyzx1piKuAMvHFGR5IIBHoa+7coy7kNyMwtGu9tjf+dg==
+"@editorjs/editorjs@^2.31.0-rc.2":
+  version "2.31.0-rc.2"
+  resolved "https://registry.yarnpkg.com/@editorjs/editorjs/-/editorjs-2.31.0-rc.2.tgz#887852655f288a2b7f0d966962d4a1d041da07e4"
+  integrity sha512-KSB8B5PDtZ1Ea9flGGokgrfBh2ZproTCGwvt5n1CIGt/T2mmSPiYa4woVK0BP8MHbO/weACP2T02brPGNTQenA==
   dependencies:
     "@editorjs/caret" "^1.0.1"
 
