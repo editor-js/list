@@ -355,6 +355,14 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
+   *
+   * @param index
+   */
+  public changeStartWith(index: number): void {
+    this.listWrapper!.style.setProperty('counter-reset', `item ${index}`);
+  }
+
+  /**
    * Handles Enter keypress
    * @param event - keydown
    */

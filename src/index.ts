@@ -1,8 +1,8 @@
 import type { API, BlockAPI, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
 import type {
   BlockToolConstructorOptions,
-  ToolConfig,
-  TunesMenuConfig
+  MenuConfigItem,
+  ToolConfig
 } from '@editorjs/editorjs/types/tools';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
 import type { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/ListParams';
@@ -13,7 +13,9 @@ import type { ListRenderer } from './types/ListRenderer';
 /**
  * Build styles
  */
-import './../styles/index.pcss';
+import './../styles/list.pcss';
+import './../styles/input.pcss';
+import { renderStartWithElement } from './utils/renderStartWithElement';
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
@@ -254,35 +256,58 @@ export default class NestedList {
    * Creates Block Tune allowing to change the list style
    * @returns array of tune configs
    */
-  public renderSettings(): TunesMenuConfig {
-    const tunes = [
+  public renderSettings(): MenuConfigItem[] {
+    const startWithElement = renderStartWithElement((index: number) => this.list!.changeStartWith(index));
+
+    const defaultTunes: MenuConfigItem[] = [
       {
         name: 'unordered' as const,
         label: this.api.i18n.t('Unordered'),
         icon: IconListBulleted,
+        onActivate: () => {
+          this.listStyle = 'unordered';
+        },
       },
       {
         name: 'ordered' as const,
         label: this.api.i18n.t('Ordered'),
         icon: IconListNumbered,
+        onActivate: () => {
+          this.listStyle = 'ordered';
+        },
       },
       {
         name: 'checklist' as const,
         label: this.api.i18n.t('Checklist'),
         icon: IconChecklist,
+        onActivate: () => {
+          this.listStyle = 'checklist';
+        },
       },
     ];
 
-    return tunes.map(tune => ({
-      name: tune.name,
-      icon: tune.icon,
-      label: tune.label,
-      isActive: this.data.style === tune.name,
-      closeOnActivate: true,
-      onActivate: () => {
-        this.listStyle = tune.name;
+    const unorderedListTunes: MenuConfigItem[] = [
+      {
+        name: 'start with' as const,
+        label: this.api.i18n.t('Start with'),
+        children: {
+          items: [
+            {
+              name: 'start with input',
+              element: startWithElement,
+              // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
+              type: 'html',
+            },
+          ],
+        },
       },
-    }));
+    ];
+
+    if (this.listStyle === 'ordered') {
+      defaultTunes.push(...unorderedListTunes);
+    }
+
+    return defaultTunes;
   }
 
   /**
