@@ -24,7 +24,9 @@ export function renderStartWithElement(start: number | undefined, changeStartWit
      * so Tab in the last block will focus this hidden input if this property is not set)
      */
     tabIndex: -1,
-
+    /**
+     * Value of the start property, if it is not specified, then it is set to one
+     */
     value: start ?? 1,
   }) as HTMLInputElement;
 

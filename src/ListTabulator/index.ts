@@ -156,6 +156,13 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       );
     }
 
+    /**
+     * Set start property value from initial data
+     */
+    if (this.data.start !== undefined) {
+      this.changeStartWith(this.data.start);
+    }
+
     return this.listWrapper;
   }
 
@@ -364,7 +371,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param index - new value of the start property
    */
   public changeStartWith(index: number): void {
-    this.listWrapper!.style.setProperty('counter-reset', `item ${index}`);
+    this.listWrapper!.style.setProperty('counter-reset', `item ${index - 1}`);
 
     this.data.start = index;
   }
