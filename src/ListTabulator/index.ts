@@ -617,6 +617,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const newListContent = this.save(newListWrapper);
 
+    newListContent.start = this.data.style == 'ordered' ? 1 : undefined;
+
     /**
      * Get current list block index
      */
