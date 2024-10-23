@@ -197,11 +197,17 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const composedListItems = listWrapper ? getItems(listWrapper) : [];
 
-    const dataToSave = {
+    let dataToSave: ListData = {
       style: this.data.style,
-      start: this.data.style == 'ordered' ? this.data.start : undefined,
       items: composedListItems,
     };
+
+    if (this.data.style === 'ordered') {
+      dataToSave = {
+        start: this.data.start,
+        ...dataToSave,
+      };
+    }
 
     return dataToSave;
   }
