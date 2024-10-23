@@ -10,10 +10,10 @@ const css = {
 /**
  * Method that renders html element for popover start with item
  * @param start - current value of the start property, it displayes inside of the input by default
- * @param changeStartWith - method that will change start html attribute of the ordered list
+ * @param inputCallback - callback method that could change nested list attributes on input
  * @returns - rendered html element
  */
-export function renderStartWithElement(start: number | undefined, changeStartWith: (index: number) => void): HTMLElement {
+export function renderToolboxInput(start: number | undefined, inputCallback: (index: number) => void): HTMLElement {
   const startWithElementWrapper = Dom.make('div', css.wrapper);
 
   const input = Dom.make('input', css.input, {
@@ -63,7 +63,7 @@ export function renderStartWithElement(start: number | undefined, changeStartWit
       return;
     }
 
-    changeStartWith(Number(input.value));
+    inputCallback(Number(input.value));
   });
 
   return startWithElementWrapper;
