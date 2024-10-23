@@ -16,7 +16,12 @@ export interface ChecklistItemMeta extends ItemMeta {
 /**
  * Meta information of ordered list item
  */
-export interface OrderedListItemMeta extends ItemMeta {};
+export interface OrderedListItemMeta extends ItemMeta {
+  /**
+   * If passed, ordered list counters will start with this index
+   */
+  start?: number;
+};
 
 /**
  * Meta information of unordered list item

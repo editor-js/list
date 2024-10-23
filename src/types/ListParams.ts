@@ -17,6 +17,10 @@ export interface ListData {
    * list of first-level elements
    */
   items: ListItem[];
+  /**
+   * Start property used only in ordered list
+   */
+  start?: number;
 }
 
 /**

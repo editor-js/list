@@ -2,8 +2,9 @@ import { IconCheck } from '@codexteam/icons';
 import type { ChecklistItemMeta } from '../types/ItemMeta';
 import type { NestedListConfig } from '../types/ListParams';
 import * as Dom from '@editorjs/dom';
-import { DefaultListCssClasses, CssPrefix } from './ListRenderer';
+import { DefaultListCssClasses } from './ListRenderer';
 import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
+import { CssPrefix } from '../styles/CssPrefix';
 
 /**
  * Interface that represents all list used only in unordered list rendering

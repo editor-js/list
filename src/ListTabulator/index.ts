@@ -156,6 +156,13 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       );
     }
 
+    /**
+     * Set start property value from initial data
+     */
+    if (this.data.start !== undefined) {
+      this.changeStartWith(this.data.start);
+    }
+
     return this.listWrapper;
   }
 
@@ -188,10 +195,21 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       });
     };
 
-    return {
+    const composedListItems = listWrapper ? getItems(listWrapper) : [];
+
+    let dataToSave: ListData = {
       style: this.data.style,
-      items: listWrapper ? getItems(listWrapper) : [],
+      items: composedListItems,
     };
+
+    if (this.data.style === 'ordered') {
+      dataToSave = {
+        start: this.data.start,
+        ...dataToSave,
+      };
+    }
+
+    return dataToSave;
   }
 
   /**
@@ -352,6 +370,16 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     data.items = getPastedItems(element);
 
     return data;
+  }
+
+  /**
+   * Changes ordered list start property value
+   * @param index - new value of the start property
+   */
+  public changeStartWith(index: number): void {
+    this.listWrapper!.style.setProperty('counter-reset', `item ${index - 1}`);
+
+    this.data.start = index;
   }
 
   /**
@@ -594,6 +622,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     });
 
     const newListContent = this.save(newListWrapper);
+
+    newListContent.start = this.data.style == 'ordered' ? 1 : undefined;
 
     /**
      * Get current list block index
