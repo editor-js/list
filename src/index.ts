@@ -13,8 +13,8 @@ import type { ListRenderer } from './types/ListRenderer';
 /**
  * Build styles
  */
-import './../styles/list.pcss';
-import './../styles/input.pcss';
+import './styles/list.pcss';
+import './styles/input.pcss';
 import { renderStartWithElement } from './utils/renderStartWithElement';
 
 /**

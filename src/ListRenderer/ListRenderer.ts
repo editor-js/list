@@ -1,8 +1,4 @@
-/**
- * Default css prefix for list
- */
-export const CssPrefix = 'cdx-list';
-
+import { CssPrefix } from '../styles/CssPrefix';
 /**
  * CSS classes for the List Tool
  */

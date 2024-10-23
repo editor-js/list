@@ -1,5 +1,5 @@
 import * as Dom from '@editorjs/dom';
-import { CssPrefix } from '../ListRenderer';
+import { CssPrefix } from '../styles/CssPrefix';
 
 const css = {
   wrapper: `${CssPrefix}-start-with-field`,
