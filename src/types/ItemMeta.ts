@@ -18,7 +18,7 @@ export interface ChecklistItemMeta extends ItemMeta {
  */
 export interface OrderedListItemMeta extends ItemMeta {
   /**
-   * Ordered list counters should start with this index
+   * If passed, ordered list counters will start with this index
    */
   start?: number;
 };
