@@ -15,7 +15,7 @@ import type { ListRenderer } from './types/ListRenderer';
  */
 import './styles/list.pcss';
 import './styles/input.pcss';
-import { renderStartWithElement, renderToolboxInput } from './utils/renderToolboxInput';
+import { renderToolboxInput } from './utils/renderToolboxInput';
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
@@ -288,7 +288,17 @@ export default class NestedList {
     ];
 
     if (this.listStyle === 'ordered') {
-      const startWithElement = renderToolboxInput(this.data.start, (index: number) => this.changeStartWith(index));
+      const startWithElement = renderToolboxInput(
+        (index: number) => this.changeStartWith(index),
+        {
+          value: String(this.data.start ?? 1),
+          placeholder: '',
+          attributes: {
+            type: 'number',
+            step: '1',
+            required: 'true',
+          },
+        });
 
       const unorderedListTunes: MenuConfigItem[] = [
         {
