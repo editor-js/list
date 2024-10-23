@@ -188,10 +188,15 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       });
     };
 
-    return {
+    const composedListItems = listWrapper ? getItems(listWrapper) : [];
+
+    const dataToSave = {
       style: this.data.style,
-      items: listWrapper ? getItems(listWrapper) : [],
+      start: this.data.style == 'ordered' ? this.data.start : undefined,
+      items: composedListItems,
     };
+
+    return dataToSave;
   }
 
   /**
@@ -355,11 +360,13 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
-   *
-   * @param index
+   * Changes ordered list start property value
+   * @param index - new value of the start property
    */
   public changeStartWith(index: number): void {
     this.listWrapper!.style.setProperty('counter-reset', `item ${index}`);
+
+    this.data.start = index;
   }
 
   /**

@@ -257,7 +257,7 @@ export default class NestedList {
    * @returns array of tune configs
    */
   public renderSettings(): MenuConfigItem[] {
-    const startWithElement = renderStartWithElement((index: number) => this.list!.changeStartWith(index));
+    const startWithElement = renderStartWithElement(this.data.start, (index: number) => this.changeStartWith(index));
 
     const defaultTunes: MenuConfigItem[] = [
       {
@@ -308,6 +308,16 @@ export default class NestedList {
     }
 
     return defaultTunes;
+  }
+
+  /**
+   * Changes ordered list start property value
+   * @param index - new value of the start property
+   */
+  private changeStartWith(index: number): void {
+    this.list?.changeStartWith(index);
+
+    this.data.start = index;
   }
 
   /**

@@ -20,7 +20,7 @@ export interface OrderedListItemMeta extends ItemMeta {
   /**
    * Ordered list counters should start with this index
    */
-  start: number;
+  start?: number;
 };
 
 /**

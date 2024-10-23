@@ -9,10 +9,11 @@ const css = {
 
 /**
  * Method that renders html element for popover start with item
+ * @param start - current value of the start property, it displayes inside of the input by default
  * @param changeStartWith - method that will change start html attribute of the ordered list
  * @returns - rendered html element
  */
-export function renderStartWithElement(changeStartWith: (index: number) => void): HTMLElement {
+export function renderStartWithElement(start: number | undefined, changeStartWith: (index: number) => void): HTMLElement {
   const startWithElementWrapper = Dom.make('div', css.wrapper);
 
   const input = Dom.make('input', css.input, {
@@ -23,6 +24,8 @@ export function renderStartWithElement(changeStartWith: (index: number) => void)
      * so Tab in the last block will focus this hidden input if this property is not set)
      */
     tabIndex: -1,
+
+    value: start ?? 1,
   }) as HTMLInputElement;
 
   /**
