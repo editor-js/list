@@ -264,6 +264,7 @@ export default class NestedList {
         name: 'unordered' as const,
         label: this.api.i18n.t('Unordered'),
         icon: IconListBulleted,
+        closeOnActivate: true,
         onActivate: () => {
           this.listStyle = 'unordered';
         },
@@ -272,6 +273,7 @@ export default class NestedList {
         name: 'ordered' as const,
         label: this.api.i18n.t('Ordered'),
         icon: IconListNumbered,
+        closeOnActivate: true,
         onActivate: () => {
           this.listStyle = 'ordered';
         },
@@ -280,6 +282,7 @@ export default class NestedList {
         name: 'checklist' as const,
         label: this.api.i18n.t('Checklist'),
         icon: IconChecklist,
+        closeOnActivate: true,
         onActivate: () => {
           this.listStyle = 'checklist';
         },
