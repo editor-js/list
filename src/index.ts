@@ -257,8 +257,6 @@ export default class NestedList {
    * @returns array of tune configs
    */
   public renderSettings(): MenuConfigItem[] {
-    const startWithElement = renderStartWithElement(this.data.start, (index: number) => this.changeStartWith(index));
-
     const defaultTunes: MenuConfigItem[] = [
       {
         name: 'unordered' as const,
@@ -289,24 +287,26 @@ export default class NestedList {
       },
     ];
 
-    const unorderedListTunes: MenuConfigItem[] = [
-      {
-        name: 'start with' as const,
-        label: this.api.i18n.t('Start with'),
-        children: {
-          items: [
-            {
-              name: 'start with input',
-              element: startWithElement,
-              // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-              type: 'html',
-            },
-          ],
-        },
-      },
-    ];
-
     if (this.listStyle === 'ordered') {
+      const startWithElement = renderStartWithElement(this.data.start, (index: number) => this.changeStartWith(index));
+
+      const unorderedListTunes: MenuConfigItem[] = [
+        {
+          name: 'start with' as const,
+          label: this.api.i18n.t('Start with'),
+          children: {
+            items: [
+              {
+                name: 'start with input',
+                element: startWithElement,
+                // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
+                type: 'html',
+              },
+            ],
+          },
+        },
+      ];
+
       defaultTunes.push(...unorderedListTunes);
     }
 
