@@ -13,9 +13,9 @@ import type { ListRenderer } from './types/ListRenderer';
 /**
  * Build styles
  */
-import './../styles/list.pcss';
-import './../styles/input.pcss';
-import { renderStartWithElement } from './utils/renderStartWithElement';
+import './styles/list.pcss';
+import './styles/input.pcss';
+import { renderToolboxInput } from './utils/renderToolboxInput';
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
@@ -257,13 +257,12 @@ export default class NestedList {
    * @returns array of tune configs
    */
   public renderSettings(): MenuConfigItem[] {
-    const startWithElement = renderStartWithElement(this.data.start, (index: number) => this.changeStartWith(index));
-
     const defaultTunes: MenuConfigItem[] = [
       {
         name: 'unordered' as const,
         label: this.api.i18n.t('Unordered'),
         icon: IconListBulleted,
+        closeOnActivate: true,
         onActivate: () => {
           this.listStyle = 'unordered';
         },
@@ -272,6 +271,7 @@ export default class NestedList {
         name: 'ordered' as const,
         label: this.api.i18n.t('Ordered'),
         icon: IconListNumbered,
+        closeOnActivate: true,
         onActivate: () => {
           this.listStyle = 'ordered';
         },
@@ -280,30 +280,43 @@ export default class NestedList {
         name: 'checklist' as const,
         label: this.api.i18n.t('Checklist'),
         icon: IconChecklist,
+        closeOnActivate: true,
         onActivate: () => {
           this.listStyle = 'checklist';
         },
       },
     ];
 
-    const unorderedListTunes: MenuConfigItem[] = [
-      {
-        name: 'start with' as const,
-        label: this.api.i18n.t('Start with'),
-        children: {
-          items: [
-            {
-              name: 'start with input',
-              element: startWithElement,
-              // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-              type: 'html',
-            },
-          ],
-        },
-      },
-    ];
-
     if (this.listStyle === 'ordered') {
+      const startWithElement = renderToolboxInput(
+        (index: number) => this.changeStartWith(index),
+        {
+          value: String(this.data.start ?? 1),
+          placeholder: '',
+          attributes: {
+            type: 'number',
+            step: '1',
+            required: 'true',
+          },
+        });
+
+      const unorderedListTunes: MenuConfigItem[] = [
+        {
+          name: 'start with' as const,
+          label: this.api.i18n.t('Start with'),
+          children: {
+            items: [
+              {
+                name: 'start with input',
+                element: startWithElement,
+                // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
+                type: 'html',
+              },
+            ],
+          },
+        },
+      ];
+
       defaultTunes.push(...unorderedListTunes);
     }
 

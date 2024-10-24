@@ -225,11 +225,17 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const composedListItems = listWrapper ? getItems(listWrapper) : [];
 
-    const dataToSave = {
+    let dataToSave: ListData = {
       style: this.data.style,
-      start: this.data.style == 'ordered' ? this.data.start : undefined,
       items: composedListItems,
     };
+
+    if (this.data.style === 'ordered') {
+      dataToSave = {
+        start: this.data.start,
+        ...dataToSave,
+      };
+    }
 
     return dataToSave;
   }
@@ -644,6 +650,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     });
 
     const newListContent = this.save(newListWrapper);
+
+    newListContent.start = this.data.style == 'ordered' ? 1 : undefined;
 
     /**
      * Get current list block index

@@ -1,5 +1,25 @@
 import * as Dom from '@editorjs/dom';
-import { CssPrefix } from '../ListRenderer';
+import { CssPrefix } from '../styles/CssPrefix';
+
+/**
+ * Options used in input rendering
+ */
+interface InputOptions {
+  /**
+   * Placeholder, that will be displayed in input
+   */
+  placeholder: string;
+  /**
+   * Input will be rendered with this value inside
+   */
+  value?: string;
+  /**
+   * Html attributes, that would be added to the input element
+   */
+  attributes?: {
+    [key: string]: string;
+  };
+}
 
 const css = {
   wrapper: `${CssPrefix}-start-with-field`,
@@ -9,15 +29,19 @@ const css = {
 
 /**
  * Method that renders html element for popover start with item
- * @param start - current value of the start property, it displayes inside of the input by default
- * @param changeStartWith - method that will change start html attribute of the ordered list
+ * @param inputCallback - callback method that could change nested list attributes on input
+ * @param inputOptions - options used in input rendering
+ * @param inputOptions.value - input will be rendered with this value inside
+ * @param inputOptions.placeholder - placeholder, that will be displayed in input
+ * @param inputOptions.attributes - html attributes, that would be added to the input element
  * @returns - rendered html element
  */
-export function renderStartWithElement(start: number | undefined, changeStartWith: (index: number) => void): HTMLElement {
+export function renderToolboxInput(inputCallback: (index: number) => void,
+  { value, placeholder, attributes }: InputOptions): HTMLElement {
   const startWithElementWrapper = Dom.make('div', css.wrapper);
 
   const input = Dom.make('input', css.input, {
-    placeholder: 'List with start with',
+    placeholder,
     /**
      * Used to prevent focusing on the input by Tab key
      * (Popover in the Toolbar lays below the blocks,
@@ -27,15 +51,15 @@ export function renderStartWithElement(start: number | undefined, changeStartWit
     /**
      * Value of the start property, if it is not specified, then it is set to one
      */
-    value: start ?? 1,
+    value,
   }) as HTMLInputElement;
 
   /**
-   * Start with can take only integer numbers
+   * Add passed attributes to the input
    */
-  input.setAttribute('type', 'number');
-  input.setAttribute('pattern', '\d*');
-  input.setAttribute('required', 'true');
+  for (const attribute in attributes) {
+    input.setAttribute(attribute, attributes[attribute]);
+  }
 
   startWithElementWrapper.appendChild(input);
 
@@ -63,7 +87,7 @@ export function renderStartWithElement(start: number | undefined, changeStartWit
       return;
     }
 
-    changeStartWith(Number(input.value));
+    inputCallback(Number(input.value));
   });
 
   return startWithElementWrapper;
