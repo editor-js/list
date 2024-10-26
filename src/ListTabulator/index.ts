@@ -90,7 +90,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
-   *
+   * Method that returns nesting level of the current item, null if there is no selection
    */
   private get currentItemLevel(): number | null {
     const currentItem = this.currentItem;
