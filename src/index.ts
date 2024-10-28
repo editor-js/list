@@ -349,8 +349,6 @@ export default class NestedList {
           onActivate: () => {
             this.changeCounters(OlCounterTypesMap.get(counterType) as OlCounterType);
           },
-          // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-          type: 'default',
         });
       });
 
