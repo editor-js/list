@@ -1,4 +1,5 @@
 import type { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from './ItemMeta';
+import type { OlCounterType } from './OlCounterType';
 
 /**
  * list style to make list as ordered or unordered
@@ -18,14 +19,18 @@ export interface ListData {
    */
   items: ListItem[];
   /**
-   * Start property used only in ordered list
-   */
-  start?: number;
-  /**
    * Max level of the nesting in list
    * If nesting is not needed, it could be set to 1
    */
   maxLevel?: number;
+  /**
+   * Start property used only in ordered list
+   */
+  start?: number;
+  /**
+   * Counters type used only in ordered list
+   */
+  counterType?: OlCounterType;
 }
 
 /**

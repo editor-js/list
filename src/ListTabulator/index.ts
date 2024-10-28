@@ -19,6 +19,7 @@ import { getItemChildWrapper } from '../utils/getItemChildWrapper';
 import { removeChildWrapperIfEmpty } from '../utils/removeChildWrapperIfEmpty';
 import { getItemContentElement } from '../utils/getItemContentElement';
 import { focusItem } from '../utils/focusItem';
+import type { OlCounterType } from '../types/OlCounterType';
 
 /**
  * Class that is responsible for list tabulation
@@ -191,6 +192,13 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       this.changeStartWith(this.data.start);
     }
 
+    /**
+     * Set counterType value from initial data
+     */
+    if (this.data.counterType !== undefined) {
+      this.changeCounters(this.data.counterType);
+    }
+
     return this.listWrapper;
   }
 
@@ -233,6 +241,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     if (this.data.style === 'ordered') {
       dataToSave = {
         start: this.data.start,
+        counterType: this.data.counterType,
         ...dataToSave,
       };
     }
@@ -408,6 +417,16 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     this.listWrapper!.style.setProperty('counter-reset', `item ${index - 1}`);
 
     this.data.start = index;
+  }
+
+  /**
+   * Changes ordered list counterType property value
+   * @param counterType - new value of the counterType value
+   */
+  public changeCounters(counterType: OlCounterType): void {
+    this.listWrapper!.style.setProperty('--list-counter-type', counterType);
+
+    this.data.counterType = counterType;
   }
 
   /**
