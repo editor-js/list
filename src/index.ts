@@ -339,7 +339,7 @@ export default class NestedList {
       /**
        * For each counter type in OlCounterType create toolbox item
        */
-      OlCounterTypesMap.keys().forEach((counterType: string) => {
+      OlCounterTypesMap.keys().forEach((counterType) => {
         orderedListCountersTunes.children.items!.push({
           name: counterType,
           title: this.api.i18n.t(counterType),
