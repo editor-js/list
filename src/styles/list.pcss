@@ -3,7 +3,7 @@
   padding: 0;
   outline: none;
   counter-reset: item;
-  list-style: none;
+  --list-counter-type: numeric;
   --radius-border: 5px;
   --checkbox-background: #fff;
   --color-border: #C9C9C9;
@@ -46,7 +46,7 @@
   }
 
   &-ordered &__item::before {
-    content: counters(item, ".") ".";
+    content: counters(item, ".", var(--list-counter-type)) ".";
   }
 
   &-ordered {

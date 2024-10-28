@@ -9,13 +9,14 @@ import type { NestedListConfig, ListData, ListDataStyle, ListItem } from './type
 import ListTabulator from './ListTabulator';
 import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
 import type { ListRenderer } from './types/ListRenderer';
+import { renderToolboxInput } from './utils/renderToolboxInput';
+import { type OlCounterType, OlCounterTypesMap } from './types/OlCounterType';
 
 /**
  * Build styles
  */
 import './styles/list.pcss';
 import './styles/input.pcss';
-import { renderToolboxInput } from './utils/renderToolboxInput';
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
@@ -210,6 +211,13 @@ export default class NestedList {
 
     this.data = Object.keys(data).length ? data : initialData;
 
+    /**
+     * Assign default value of the property for the ordered list
+     */
+    if (this.listStyle === 'ordered' && this.data.countersType === undefined) {
+      this.data.countersType = 'numeric';
+    }
+
     this.changeTabulatorByStyle();
   }
 
@@ -263,6 +271,7 @@ export default class NestedList {
         label: this.api.i18n.t('Unordered'),
         icon: IconListBulleted,
         closeOnActivate: true,
+        isActive: this.listStyle == 'unordered',
         onActivate: () => {
           this.listStyle = 'unordered';
         },
@@ -272,6 +281,7 @@ export default class NestedList {
         label: this.api.i18n.t('Ordered'),
         icon: IconListNumbered,
         closeOnActivate: true,
+        isActive: this.listStyle == 'ordered',
         onActivate: () => {
           this.listStyle = 'ordered';
         },
@@ -281,6 +291,7 @@ export default class NestedList {
         label: this.api.i18n.t('Checklist'),
         icon: IconChecklist,
         closeOnActivate: true,
+        isActive: this.listStyle == 'checklist',
         onActivate: () => {
           this.listStyle = 'checklist';
         },
@@ -300,7 +311,7 @@ export default class NestedList {
           },
         });
 
-      const unorderedListTunes: MenuConfigItem[] = [
+      const orderedListTunes: MenuConfigItem[] = [
         {
           name: 'start with' as const,
           label: this.api.i18n.t('Start with'),
@@ -317,10 +328,45 @@ export default class NestedList {
         },
       ];
 
-      defaultTunes.push(...unorderedListTunes);
+      const orderedListCountersTunes: MenuConfigItem = {
+        name: 'counter types' as const,
+        label: this.api.i18n.t('Counters type'),
+        children: {
+          items: [],
+        },
+      };
+
+      /**
+       * For each counter type in OlCounterType create toolbox item
+       */
+      OlCounterTypesMap.keys().forEach((counterType: string) => {
+        orderedListCountersTunes.children.items!.push({
+          name: counterType,
+          title: this.api.i18n.t(counterType),
+          isActive: this.data.countersType === OlCounterTypesMap.get(counterType),
+          closeOnActivate: true,
+          onActivate: () => {
+            this.changeCounters(OlCounterTypesMap.get(counterType) as OlCounterType);
+          },
+          // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
+          type: 'default',
+        });
+      });
+
+      defaultTunes.push(...orderedListTunes, orderedListCountersTunes);
     }
 
     return defaultTunes;
+  }
+
+  /**
+   * Changes ordered list counterType property value
+   * @param counterType - new value of the counterType value
+   */
+  private changeCounters(counterType: OlCounterType): void {
+    this.list?.changeCounters(counterType);
+
+    this.data.countersType = counterType;
   }
 
   /**
