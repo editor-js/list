@@ -193,10 +193,10 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
-     * Set countersType value from initial data
+     * Set counterType value from initial data
      */
-    if (this.data.countersType !== undefined) {
-      this.changeCounters(this.data.countersType);
+    if (this.data.counterType !== undefined) {
+      this.changeCounters(this.data.counterType);
     }
 
     return this.listWrapper;
@@ -241,7 +241,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     if (this.data.style === 'ordered') {
       dataToSave = {
         start: this.data.start,
-        countersType: this.data.countersType,
+        counterType: this.data.counterType,
         ...dataToSave,
       };
     }
@@ -426,7 +426,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   public changeCounters(counterType: OlCounterType): void {
     this.listWrapper!.style.setProperty('--list-counter-type', counterType);
 
-    this.data.countersType = counterType;
+    this.data.counterType = counterType;
   }
 
   /**

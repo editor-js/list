@@ -30,7 +30,7 @@ export interface ListData {
   /**
    * Counters type used only in ordered list
    */
-  countersType?: OlCounterType;
+  counterType?: OlCounterType;
 }
 
 /**

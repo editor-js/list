@@ -214,8 +214,8 @@ export default class NestedList {
     /**
      * Assign default value of the property for the ordered list
      */
-    if (this.listStyle === 'ordered' && this.data.countersType === undefined) {
-      this.data.countersType = 'numeric';
+    if (this.listStyle === 'ordered' && this.data.counterType === undefined) {
+      this.data.counterType = 'numeric';
     }
 
     this.changeTabulatorByStyle();
@@ -343,7 +343,7 @@ export default class NestedList {
         orderedListCountersTunes.children.items!.push({
           name: counterType,
           title: this.api.i18n.t(counterType),
-          isActive: this.data.countersType === OlCounterTypesMap.get(counterType),
+          isActive: this.data.counterType === OlCounterTypesMap.get(counterType),
           closeOnActivate: true,
           onActivate: () => {
             this.changeCounters(OlCounterTypesMap.get(counterType) as OlCounterType);
@@ -366,7 +366,7 @@ export default class NestedList {
   private changeCounters(counterType: OlCounterType): void {
     this.list?.changeCounters(counterType);
 
-    this.data.countersType = counterType;
+    this.data.counterType = counterType;
   }
 
   /**
