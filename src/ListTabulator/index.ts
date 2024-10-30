@@ -857,6 +857,15 @@ export default class ListTabulator<Renderer extends ListRenderer> {
        */
       item.remove();
 
+      const targetItemChildWrapper = getItemChildWrapper(targetItem);
+
+      /**
+       * Remove target item child wrapper if it is empty
+       */
+      if (targetItemChildWrapper !== null) {
+        removeChildWrapperIfEmpty(targetItemChildWrapper);
+      }
+
       return;
     }
 
