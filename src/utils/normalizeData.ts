@@ -10,7 +10,7 @@ function instanceOfListData(data: ListData | OldListData): data is OldListData {
 }
 
 /**
- * Method that normalizes checks if passed data is related to the List tool and normalizes it
+ * Method that checks if passed data is related to the legacy format and normalizes it
  * @param data - data to be checked
  * @returns - normalized data, ready to be used by Nested List tool
  */
