@@ -6,7 +6,10 @@ import { getChildItems } from './getChildItems';
  * @param childWrapper - childWrapper to be removed if it is empty
  */
 export function removeChildWrapperIfEmpty(childWrapper: ItemChildWrapperElement): void {
-  if (getChildItems(childWrapper) === null) {
+  /**
+   * Check that there is at least one item
+   */
+  if (getChildItems(childWrapper).length === 0) {
     childWrapper.remove();
   }
 }

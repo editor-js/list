@@ -267,7 +267,6 @@ export default class NestedList {
   public renderSettings(): MenuConfigItem[] {
     const defaultTunes: MenuConfigItem[] = [
       {
-        name: 'unordered' as const,
         label: this.api.i18n.t('Unordered'),
         icon: IconListBulleted,
         closeOnActivate: true,
@@ -277,7 +276,6 @@ export default class NestedList {
         },
       },
       {
-        name: 'ordered' as const,
         label: this.api.i18n.t('Ordered'),
         icon: IconListNumbered,
         closeOnActivate: true,
@@ -287,7 +285,6 @@ export default class NestedList {
         },
       },
       {
-        name: 'checklist' as const,
         label: this.api.i18n.t('Checklist'),
         icon: IconChecklist,
         closeOnActivate: true,
@@ -313,12 +310,10 @@ export default class NestedList {
 
       const orderedListTunes: MenuConfigItem[] = [
         {
-          name: 'start with' as const,
           label: this.api.i18n.t('Start with'),
           children: {
             items: [
               {
-                name: 'start with input',
                 element: startWithElement,
                 // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
                 type: 'html',
@@ -329,7 +324,6 @@ export default class NestedList {
       ];
 
       const orderedListCountersTunes: MenuConfigItem = {
-        name: 'counter types' as const,
         label: this.api.i18n.t('Counters type'),
         children: {
           items: [],
@@ -342,15 +336,12 @@ export default class NestedList {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       OlCounterTypesMap.keys().forEach((counterType: string) => {
         orderedListCountersTunes.children.items!.push({
-          name: counterType,
           title: this.api.i18n.t(counterType),
           isActive: this.data.counterType === OlCounterTypesMap.get(counterType),
           closeOnActivate: true,
           onActivate: () => {
             this.changeCounters(OlCounterTypesMap.get(counterType) as OlCounterType);
           },
-          // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-          type: 'default',
         });
       });
 
