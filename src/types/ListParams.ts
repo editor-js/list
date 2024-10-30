@@ -4,7 +4,7 @@ import type { OlCounterType } from './OlCounterType';
 /**
  * list style to make list as ordered or unordered
  */
-export type NestedListDataStyle = 'ordered' | 'unordered' | 'checklist';
+export type ListDataStyle = 'ordered' | 'unordered' | 'checklist';
 
 /**
  * Interface that represents data of the Nested List tool
@@ -13,7 +13,7 @@ export interface ListData {
   /**
    * list type 'ordered' or 'unordered' or 'checklist'
    */
-  style: NestedListDataStyle;
+  style: ListDataStyle;
   /**
    * list of first-level elements
    */
@@ -75,5 +75,5 @@ export interface NestedListConfig {
    * default list style: ordered or unordered
    * default is unordered
    */
-  defaultStyle?: NestedListDataStyle;
+  defaultStyle?: ListDataStyle;
 }

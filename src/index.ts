@@ -5,7 +5,7 @@ import type {
   ToolConfig
 } from '@editorjs/editorjs/types/tools';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
-import type { NestedListConfig, ListData, NestedListDataStyle, ListItem, OldListData } from './types/ListParams';
+import type { NestedListConfig, ListData, ListDataStyle, ListItem, OldListData } from './types/ListParams';
 import ListTabulator from './ListTabulator';
 import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
 import type { ListRenderer } from './types/ListRenderer';
@@ -124,7 +124,7 @@ export default class NestedList {
   /**
    * Get list style name
    */
-  private get listStyle(): NestedListDataStyle {
+  private get listStyle(): ListDataStyle {
     return this.data.style || this.defaultListStyle;
   }
 
@@ -132,7 +132,7 @@ export default class NestedList {
    * Set list style
    * @param style - new style to set
    */
-  private set listStyle(style: NestedListDataStyle) {
+  private set listStyle(style: ListDataStyle) {
     this.data.style = style;
 
     this.changeTabulatorByStyle();

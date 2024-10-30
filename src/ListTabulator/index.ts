@@ -1,6 +1,6 @@
 import { OrderedListRenderer } from '../ListRenderer/OrderedListRenderer';
 import { UnorderedListRenderer } from '../ListRenderer/UnorderedListRenderer';
-import type { NestedListConfig, ListData, NestedListDataStyle } from '../types/ListParams';
+import type { NestedListConfig, ListData, ListDataStyle } from '../types/ListParams';
 import type { ListItem } from '../types/ListParams';
 import type { ItemElement, ItemChildWrapperElement } from '../types/Elements';
 import { isHtmlElement } from '../utils/type-guards';
@@ -362,7 +362,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    */
   public pasteHandler(element: PasteEvent['detail']['data']): ListData {
     const { tagName: tag } = element;
-    let style: NestedListDataStyle = 'unordered';
+    let style: ListDataStyle = 'unordered';
     let tagToSearch: string;
 
     // set list style and tag to search.
