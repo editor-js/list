@@ -129,7 +129,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    */
   constructor({ data, config, api, readOnly, block }: ListParams, renderer: Renderer) {
     this.config = config;
-    this.data = data as ListData;
+    this.data = data;
     this.readOnly = readOnly;
     this.api = api;
     this.block = block;
@@ -381,14 +381,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       style,
       items: [],
     };
-
-    /**
-     * Set default data attributes for ordered list on paste
-     */
-    if (style === 'ordered') {
-      data.counterType = 'numeric';
-      data.start = 1;
-    }
 
     // get pasted items from the html.
     const getPastedItems = (parent: Element): ListItem[] => {
