@@ -2,13 +2,18 @@
   margin: 0;
   padding: 0;
   outline: none;
+  display: grid;
   counter-reset: item;
+  gap: var(--spacing-s);
+  padding: var(--spacing-xs);
+  --spacing-s: 8px;
+  --spacing-xs: 6px;
   --list-counter-type: numeric;
   --radius-border: 5px;
   --checkbox-background: #fff;
   --color-border: #C9C9C9;
   --color-bg-checked: #369FFF;
-  --line-height: 1.6em;
+  --line-height: 145%;
   --color-bg-checked-hover: #0059AB;
   --color-tick: #fff;
   --size-checkbox: 1.2em;
@@ -21,10 +26,12 @@
     grid-template-areas:
       "checkbox content"
       ". child";
-    margin: 2px 0;
 
     &-children {
+      display: grid;
       grid-area: child;
+      gap: var(--spacing-s);
+      padding-top: var(--spacing-s);
     }
 
     [contenteditable]{
@@ -32,10 +39,10 @@
     }
 
     &-content {
-      margin-left: 8px;
       word-break: break-word;
       white-space: pre-wrap;
       grid-area: content;
+      padding-left: var(--spacing-s);
     }
 
     &::before {
