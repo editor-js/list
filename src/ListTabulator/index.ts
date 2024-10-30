@@ -849,7 +849,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     const currentItemChildrenList = getChildItems(item);
 
     /**
-     * Check that current item has any children
+     * If item has no children, just remove item
+     * Else children of the item should be prepended to the target item child list
      */
     if (currentItemChildrenList.length === 0) {
       /**
