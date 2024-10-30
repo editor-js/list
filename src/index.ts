@@ -5,7 +5,7 @@ import type {
   ToolConfig
 } from '@editorjs/editorjs/types/tools';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
-import type { NestedListConfig, ListData, ListDataStyle, ListItem } from './types/ListParams';
+import type { NestedListConfig, ListData, ListDataStyle, ListItem, OldListData } from './types/ListParams';
 import ListTabulator from './ListTabulator';
 import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
 import type { ListRenderer } from './types/ListRenderer';
@@ -18,11 +18,12 @@ import { type OlCounterType, OlCounterTypesMap } from './types/OlCounterType';
 import './styles/list.pcss';
 import './styles/input.pcss';
 import stripNumbers from './utils/stripNumbers';
+import normalizeData from './utils/normalizeData';
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
  */
-export type ListParams = BlockToolConstructorOptions<ListData, NestedListConfig>;
+export type ListParams = BlockToolConstructorOptions<ListData | OldListData, NestedListConfig>;
 
 /**
  * Default class of the component used in editor
@@ -210,7 +211,7 @@ export default class NestedList {
       items: [],
     };
 
-    this.data = Object.keys(data).length ? data : initialData;
+    this.data = Object.keys(data).length ? normalizeData(data) : initialData;
 
     /**
      * Assign default value of the property for the ordered list

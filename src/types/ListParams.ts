@@ -7,7 +7,7 @@ import type { OlCounterType } from './OlCounterType';
 export type ListDataStyle = 'ordered' | 'unordered' | 'checklist';
 
 /**
- * Output data
+ * Interface that represents data of the Nested List tool
  */
 export interface ListData {
   /**
@@ -31,6 +31,20 @@ export interface ListData {
    * Counters type used only in ordered list
    */
   counterType?: OlCounterType;
+}
+
+/**
+ * Interface that represents data of the List tool
+ */
+export interface OldListData {
+  /**
+   * Style of the List tool
+   */
+  style: 'ordered' | 'unordered';
+  /**
+   * Array of items of the List tool
+   */
+  items: string[];
 }
 
 /**
