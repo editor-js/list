@@ -9,7 +9,7 @@ export type NestedListDataStyle = 'ordered' | 'unordered' | 'checklist';
 /**
  * Interface that represents data of the Nested List tool
  */
-export interface NestedListData {
+export interface ListData {
   /**
    * list type 'ordered' or 'unordered' or 'checklist'
    */
@@ -17,7 +17,7 @@ export interface NestedListData {
   /**
    * list of first-level elements
    */
-  items: NestedListItem[];
+  items: ListItem[];
   /**
    * Max level of the nesting in list
    * If nesting is not needed, it could be set to 1
@@ -36,7 +36,7 @@ export interface NestedListData {
 /**
  * Interface that represents data of the List tool
  */
-export interface ListData {
+export interface OldListData {
   /**
    * Style of the List tool
    */
@@ -50,7 +50,7 @@ export interface ListData {
 /**
  * List item within the output data
  */
-export interface NestedListItem {
+export interface ListItem {
   /**
    * list item text content
    */
@@ -64,7 +64,7 @@ export interface NestedListItem {
   /**
    * sublist items
    */
-  items: NestedListItem[];
+  items: ListItem[];
 }
 
 /**

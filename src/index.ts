@@ -5,7 +5,7 @@ import type {
   ToolConfig
 } from '@editorjs/editorjs/types/tools';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
-import type { NestedListConfig, NestedListData, NestedListDataStyle, NestedListItem, ListData } from './types/ListParams';
+import type { NestedListConfig, ListData, NestedListDataStyle, ListItem, OldListData } from './types/ListParams';
 import ListTabulator from './ListTabulator';
 import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
 import type { ListRenderer } from './types/ListRenderer';
@@ -23,7 +23,7 @@ import normalizeData from './utils/normalizeData';
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
  */
-export type ListParams = BlockToolConstructorOptions<NestedListData | ListData, NestedListConfig>;
+export type ListParams = BlockToolConstructorOptions<ListData | OldListData, NestedListConfig>;
 
 /**
  * Default class of the component used in editor
@@ -93,14 +93,14 @@ export default class NestedList {
      * @param data - current list data
      * @returns - contents string formed from list data
      */
-    export: (data: NestedListData) => string;
+    export: (data: ListData) => string;
 
     /**
      * Method that is responsible for conversion from string to data
      * @param content - contents string
      * @returns - list data formed from contents string
      */
-    import: (content: string, config: ToolConfig<NestedListConfig>) => NestedListData;
+    import: (content: string, config: ToolConfig<NestedListConfig>) => ListData;
   } {
     return {
       export: (data) => {
@@ -170,7 +170,7 @@ export default class NestedList {
   /**
    * Tool's data
    */
-  private data: NestedListData;
+  private data: ListData;
 
   /**
    * Editor block api
@@ -228,7 +228,7 @@ export default class NestedList {
    * @param data - current data of the list
    * @returns - string of the recursively merged contents of the items of the list
    */
-  private static joinRecursive(data: NestedListData | NestedListItem): string {
+  private static joinRecursive(data: ListData | ListItem): string {
     return data.items
       .map(item => `${item.content} ${NestedList.joinRecursive(item)}`)
       .join('');
@@ -248,7 +248,7 @@ export default class NestedList {
    * Function that is responsible for content saving
    * @returns formatted content used in editor
    */
-  public save(): NestedListData {
+  public save(): ListData {
     this.data = this.list!.save();
 
     return this.data;
@@ -258,7 +258,7 @@ export default class NestedList {
    * Function that is responsible for mergind two lists into one
    * @param data - data of the next standing list, that should be merged with current
    */
-  public merge(data: NestedListData): void {
+  public merge(data: ListData): void {
     this.list!.merge(data);
   }
 

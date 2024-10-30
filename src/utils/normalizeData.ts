@@ -1,11 +1,11 @@
-import type { ListData, NestedListData, NestedListItem } from '../types/ListParams';
+import type { OldListData, ListData, ListItem } from '../types/ListParams';
 
 /**
  * Method that checks if data is related to the List or NestedListTool
  * @param data - data of the List or NestedListTool
  * @returns true if data related to the List tool, false if to Nested List tool
  */
-function instanceOfListData(data: NestedListData | ListData): data is ListData {
+function instanceOfListData(data: ListData | OldListData): data is OldListData {
   return (typeof data.items[0] === 'string');
 }
 
@@ -14,8 +14,8 @@ function instanceOfListData(data: NestedListData | ListData): data is ListData {
  * @param data - data to be checked
  * @returns - normalized data, ready to be used by Nested List tool
  */
-export default function normalizeData(data: NestedListData | ListData): NestedListData {
-  const normalizedDataItems: NestedListItem[] = [];
+export default function normalizeData(data: ListData | OldListData): ListData {
+  const normalizedDataItems: ListItem[] = [];
 
   if (instanceOfListData(data)) {
     data.items.forEach((item) => {
