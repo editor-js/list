@@ -3,8 +3,9 @@
   padding: 0;
   outline: none;
   display: grid;
-  gap: 8px;
   counter-reset: item;
+  gap: var(--spacing-s);
+  --spacing-s: 8px;
   --list-counter-type: numeric;
   --radius-border: 5px;
   --checkbox-background: #fff;
@@ -27,8 +28,8 @@
     &-children {
       display: grid;
       grid-area: child;
-      gap: 8px;
-      padding: 8px 0px 0px 0px;
+      gap: var(--spacing-s);
+      padding-top: var(--spacing-s);
     }
 
     [contenteditable]{
@@ -39,7 +40,7 @@
       word-break: break-word;
       white-space: pre-wrap;
       grid-area: content;
-      padding-left: 8px;
+      padding-left: var(--spacing-s);
     }
 
     &::before {
