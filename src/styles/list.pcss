@@ -2,6 +2,8 @@
   margin: 0;
   padding: 0;
   outline: none;
+  display: grid;
+  gap: 8px;
   counter-reset: item;
   --list-counter-type: numeric;
   --radius-border: 5px;
@@ -21,10 +23,12 @@
     grid-template-areas:
       "checkbox content"
       ". child";
-    margin: 2px 0;
 
     &-children {
+      display: grid;
       grid-area: child;
+      gap: 8px;
+      padding: 8px 0px 0px 0px;
     }
 
     [contenteditable]{
@@ -32,10 +36,10 @@
     }
 
     &-content {
-      margin-left: 8px;
       word-break: break-word;
       white-space: pre-wrap;
       grid-area: content;
+      padding-left: 8px;
     }
 
     &::before {
