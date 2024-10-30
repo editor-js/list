@@ -19,6 +19,7 @@ import './styles/list.pcss';
 import './styles/input.pcss';
 import stripNumbers from './utils/stripNumbers';
 import normalizeData from './utils/normalizeData';
+import type { PasteEvent } from './types';
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
@@ -350,6 +351,37 @@ export default class NestedList {
     }
 
     return defaultTunes;
+  }
+
+  /**
+   * On paste callback that is fired from Editor.
+   * @param event - event with pasted data
+   * @todo - refactor and move to nested list instance
+   */
+  public onPaste(event: PasteEvent): void {
+    const { tagName: tag } = event.detail.data;
+
+    switch (tag) {
+      case 'OL':
+        this.listStyle = 'ordered';
+        break;
+      case 'UL':
+      case 'LI':
+        this.listStyle = 'unordered';
+    }
+
+    this.list!.onPaste(event);
+  }
+
+  /**
+   * Handle UL, OL and LI tags paste and returns List data
+   * @param element - html element that contains whole list
+   * @todo - refactor and move to nested list instance
+   */
+  public pasteHandler(element: PasteEvent['detail']['data']): ListData {
+    const data = this.list!.pasteHandler(element);
+
+    return data;
   }
 
   /**
