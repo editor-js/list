@@ -613,15 +613,10 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     focusItem(item, false);
 
     /**
-     * If previous parent's children list is now empty, remove it.
+     * If parent item has empty child wrapper after unshifting of the current item, then we need to remove child wrapper
+     * This case could be reached if the only child item of the parent was unshifted
      */
-    const parentItemChildWrapper = getItemChildWrapper(parentItem);
-
-    if (!parentItemChildWrapper) {
-      return;
-    }
-
-    removeChildWrapperIfEmpty(parentItemChildWrapper);
+    removeChildWrapperIfEmpty(parentItem);
   }
 
   /**
@@ -857,6 +852,12 @@ export default class ListTabulator<Renderer extends ListRenderer> {
        */
       item.remove();
 
+      /**
+       * If target item has empty child wrapper after merge, we need to remove child wrapper
+       * This case could be reached if the only child item of the target was merged with target
+       */
+      removeChildWrapperIfEmpty(targetItem);
+
       return;
     }
 
@@ -991,6 +992,13 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
       prevItem.appendChild(prevItemChildrenListWrapper);
     }
+
+    /**
+     * Remove child wrapper of the current item if it is empty after adding the tab
+     * This case would be reached, because after adding tab current item will have same nesting level with children
+     * So its child wrapper would be empty
+     */
+    removeChildWrapperIfEmpty(currentItem);
 
     focusItem(currentItem, false);
   }
