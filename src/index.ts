@@ -75,7 +75,6 @@ export default class NestedList {
 
   /**
    * On paste sanitzation config. Allow only tags that are allowed in the Tool.
-   *
    * @returns - paste config object used in editor
    */
   public static get pasteConfig(): PasteConfig {
@@ -90,7 +89,6 @@ export default class NestedList {
   public static get conversionConfig(): {
     /**
      * Method that is responsible for conversion from data to string
-     *
      * @param data - current list data
      * @returns - contents string formed from list data
      */
@@ -98,12 +96,11 @@ export default class NestedList {
 
     /**
      * Method that is responsible for conversion from string to data
-     *
      * @param content - contents string
      * @returns - list data formed from contents string
      */
     import: (content: string, config: ToolConfig<NestedListConfig>) => ListData;
-    } {
+  } {
     return {
       export: (data) => {
         return NestedList.joinRecursive(data);
@@ -132,7 +129,6 @@ export default class NestedList {
 
   /**
    * Set list style
-   *
    * @param style - new style to set
    */
   private set listStyle(style: ListDataStyle) {
@@ -192,7 +188,6 @@ export default class NestedList {
 
   /**
    * Render plugin`s main Element and fill it with saved data
-   *
    * @param params - tool constructor options
    * @param params.data - previously saved data
    * @param params.config - user config for Tool
@@ -229,7 +224,6 @@ export default class NestedList {
 
   /**
    * Convert from list to text for conversionConfig
-   *
    * @param data - current data of the list
    * @returns - string of the recursively merged contents of the items of the list
    */
@@ -241,7 +235,6 @@ export default class NestedList {
 
   /**
    * Function that is responsible for content rendering
-   *
    * @returns rendered list wrapper with all contents
    */
   public render(): HTMLElement {
@@ -252,7 +245,6 @@ export default class NestedList {
 
   /**
    * Function that is responsible for content saving
-   *
    * @returns formatted content used in editor
    */
   public save(): ListData {
@@ -263,7 +255,6 @@ export default class NestedList {
 
   /**
    * Function that is responsible for mergind two lists into one
-   *
    * @param data - data of the next standing list, that should be merged with current
    */
   public merge(data: ListData): void {
@@ -272,7 +263,6 @@ export default class NestedList {
 
   /**
    * Creates Block Tune allowing to change the list style
-   *
    * @returns array of tune configs
    */
   public renderSettings(): MenuConfigItem[] {
@@ -343,7 +333,6 @@ export default class NestedList {
       /**
        * For each counter type in OlCounterType create toolbox item
        */
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
 
       OlCounterTypesMap.forEach((_, counterType: string) => {
         orderedListCountersTunes.children.items!.push({
@@ -364,7 +353,6 @@ export default class NestedList {
 
   /**
    * Changes ordered list counterType property value
-   *
    * @param counterType - new value of the counterType value
    */
   private changeCounters(counterType: OlCounterType): void {
@@ -375,7 +363,6 @@ export default class NestedList {
 
   /**
    * Changes ordered list start property value
-   *
    * @param index - new value of the start property
    */
   private changeStartWith(index: number): void {
