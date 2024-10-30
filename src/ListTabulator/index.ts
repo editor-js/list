@@ -992,6 +992,15 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       prevItem.appendChild(prevItemChildrenListWrapper);
     }
 
+    const currentItemChildWrapper = getItemChildWrapper(currentItem);
+
+    /**
+     * Remove child wrapper after moving all children
+     */
+    if (currentItemChildWrapper !== null) {
+      removeChildWrapperIfEmpty(currentItemChildWrapper);
+    }
+
     focusItem(currentItem, false);
   }
 
