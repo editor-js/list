@@ -19,6 +19,10 @@ interface InputOptions {
   attributes?: {
     [key: string]: string;
   };
+  /**
+   * Flag that represents special behavior that prevents you from entering anything other than numbers
+   */
+  sanitize?: (value: string) => string;
 }
 
 const css = {
@@ -36,8 +40,8 @@ const css = {
  * @param inputOptions.attributes - html attributes, that would be added to the input element
  * @returns - rendered html element
  */
-export function renderToolboxInput(inputCallback: (index: number) => void,
-  { value, placeholder, attributes }: InputOptions): HTMLElement {
+export function renderToolboxInput(inputCallback: (index: string) => void,
+  { value, placeholder, attributes, sanitize }: InputOptions): HTMLElement {
   const startWithElementWrapper = Dom.make('div', css.wrapper);
 
   const input = Dom.make('input', css.input, {
@@ -64,6 +68,13 @@ export function renderToolboxInput(inputCallback: (index: number) => void,
   startWithElementWrapper.appendChild(input);
 
   input.addEventListener('input', () => {
+    /**
+     * If input sanitizer specified, then sanitize input value
+     */
+    if (sanitize !== undefined) {
+      input.value = sanitize(input.value);
+    }
+
     const validInput = input.checkValidity();
 
     /**
@@ -87,7 +98,7 @@ export function renderToolboxInput(inputCallback: (index: number) => void,
       return;
     }
 
-    inputCallback(Number(input.value));
+    inputCallback(input.value);
   });
 
   return startWithElementWrapper;

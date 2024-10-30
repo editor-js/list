@@ -17,6 +17,7 @@ import { type OlCounterType, OlCounterTypesMap } from './types/OlCounterType';
  */
 import './styles/list.pcss';
 import './styles/input.pcss';
+import stripNumbers from './utils/stripNumbers';
 
 /**
  * Constructor Params for Nested List Tool, use to pass initial data and settings
@@ -297,15 +298,14 @@ export default class NestedList {
 
     if (this.listStyle === 'ordered') {
       const startWithElement = renderToolboxInput(
-        (index: number) => this.changeStartWith(index),
+        (index: string) => this.changeStartWith(Number(index)),
         {
           value: String(this.data.start ?? 1),
           placeholder: '',
           attributes: {
-            type: 'number',
-            step: '1',
             required: 'true',
           },
+          sanitize: input => stripNumbers(input),
         });
 
       const orderedListTunes: MenuConfigItem[] = [
@@ -333,8 +333,8 @@ export default class NestedList {
       /**
        * For each counter type in OlCounterType create toolbox item
        */
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      OlCounterTypesMap.keys().forEach((counterType: string) => {
+
+      OlCounterTypesMap.forEach((_, counterType: string) => {
         orderedListCountersTunes.children.items!.push({
           title: this.api.i18n.t(counterType),
           isActive: this.data.counterType === OlCounterTypesMap.get(counterType),
