@@ -1,7 +1,7 @@
 import { OrderedListRenderer } from '../ListRenderer/OrderedListRenderer';
 import { UnorderedListRenderer } from '../ListRenderer/UnorderedListRenderer';
-import type { NestedListConfig, ListData, ListDataStyle } from '../types/ListParams';
-import type { ListItem } from '../types/ListParams';
+import type { NestedListConfig, NestedListData, NestedListDataStyle } from '../types/ListParams';
+import type { NestedListItem } from '../types/ListParams';
 import type { ItemElement, ItemChildWrapperElement } from '../types/Elements';
 import { isHtmlElement } from '../utils/type-guards';
 import { getContenteditableSlice, getCaretNodeAndOffset, isCaretAtStartOfInput } from '@editorjs/caret';
@@ -43,7 +43,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Full content of the list
    */
-  private data: ListData;
+  private data: NestedListData;
 
   /**
    * Editor block api
@@ -207,14 +207,14 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param wrapper - optional argument wrapper
    * @returns whole list saved data if wrapper not passes, otherwise will return data of the passed wrapper
    */
-  public save(wrapper?: ItemChildWrapperElement): ListData {
+  public save(wrapper?: ItemChildWrapperElement): NestedListData {
     const listWrapper = wrapper ?? this.listWrapper;
 
     /**
      * The method for recursive collecting of the child items
      * @param parent - where to find items
      */
-    const getItems = (parent: ItemChildWrapperElement): ListItem[] => {
+    const getItems = (parent: ItemChildWrapperElement): NestedListItem[] => {
       const children = getChildItems(parent);
 
       return children.map((el) => {
@@ -233,7 +233,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const composedListItems = listWrapper ? getItems(listWrapper) : [];
 
-    let dataToSave: ListData = {
+    let dataToSave: NestedListData = {
       style: this.data.style,
       items: composedListItems,
     };
@@ -268,7 +268,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * Other items of the next List would be appended to the current list without any changes in nesting levels
    * @param data - data of the second list to be merged with current
    */
-  public merge(data: ListData): void {
+  public merge(data: NestedListData): void {
     /**
      * Get list of all levels children of the previous item
      */
@@ -360,9 +360,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param element - html element that contains whole list
    * @todo - refactor and move to nested list instance
    */
-  public pasteHandler(element: PasteEvent['detail']['data']): ListData {
+  public pasteHandler(element: PasteEvent['detail']['data']): NestedListData {
     const { tagName: tag } = element;
-    let style: ListDataStyle = 'unordered';
+    let style: NestedListDataStyle = 'unordered';
     let tagToSearch: string;
 
     // set list style and tag to search.
@@ -377,13 +377,13 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         tagToSearch = 'ul';
     }
 
-    const data: ListData = {
+    const data: NestedListData = {
       style,
       items: [],
     };
 
     // get pasted items from the html.
-    const getPastedItems = (parent: Element): ListItem[] => {
+    const getPastedItems = (parent: Element): NestedListItem[] => {
       // get first level li elements.
       const children = Array.from(parent.querySelectorAll(`:scope > li`));
 
@@ -1030,7 +1030,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param meta - meta used in list item rendering
    * @returns html element of the rendered item
    */
-  private renderItem(itemContent: ListItem['content'], meta?: ListItem['meta']): ItemElement {
+  private renderItem(itemContent: NestedListItem['content'], meta?: NestedListItem['meta']): ItemElement {
     const itemMeta = meta ?? this.renderer.composeDefaultMeta();
 
     switch (true) {
@@ -1050,7 +1050,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @param items - list data used in item rendering
    * @param parentElement - where to append passed items
    */
-  private appendItems(items: ListItem[], parentElement: Element): void {
+  private appendItems(items: NestedListItem[], parentElement: Element): void {
     items.forEach((item) => {
       const itemEl = this.renderItem(item.content, item.meta);
 

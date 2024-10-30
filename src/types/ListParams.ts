@@ -4,20 +4,20 @@ import type { OlCounterType } from './OlCounterType';
 /**
  * list style to make list as ordered or unordered
  */
-export type ListDataStyle = 'ordered' | 'unordered' | 'checklist';
+export type NestedListDataStyle = 'ordered' | 'unordered' | 'checklist';
 
 /**
- * Output data
+ * Interface that represents data of the Nested List tool
  */
-export interface ListData {
+export interface NestedListData {
   /**
    * list type 'ordered' or 'unordered' or 'checklist'
    */
-  style: ListDataStyle;
+  style: NestedListDataStyle;
   /**
    * list of first-level elements
    */
-  items: ListItem[];
+  items: NestedListItem[];
   /**
    * Max level of the nesting in list
    * If nesting is not needed, it could be set to 1
@@ -34,9 +34,23 @@ export interface ListData {
 }
 
 /**
+ * Interface that represents data of the List tool
+ */
+export interface ListData {
+  /**
+   * Style of the List tool
+   */
+  style: 'ordered' | 'unordered';
+  /**
+   * Array of items of the List tool
+   */
+  items: string[];
+}
+
+/**
  * List item within the output data
  */
-export interface ListItem {
+export interface NestedListItem {
   /**
    * list item text content
    */
@@ -50,7 +64,7 @@ export interface ListItem {
   /**
    * sublist items
    */
-  items: ListItem[];
+  items: NestedListItem[];
 }
 
 /**
@@ -61,5 +75,5 @@ export interface NestedListConfig {
    * default list style: ordered or unordered
    * default is unordered
    */
-  defaultStyle?: ListDataStyle;
+  defaultStyle?: NestedListDataStyle;
 }
