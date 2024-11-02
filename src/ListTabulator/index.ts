@@ -534,6 +534,11 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
+     * Prevent Editor.js backspace handling
+     */
+    event.stopPropagation();
+
+    /**
      * First item of the list should become paragraph on backspace
      */
     if (currentItem.parentNode === this.listWrapper && currentItem.previousElementSibling === null) {
@@ -541,11 +546,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
        * If current item is first item of the list, then we need to merge first item content with previous block
        */
       this.getOutOfListFromFirstItem();
-
-      /**
-       * Prevent Editor.js backspace handling
-       */
-      event.stopPropagation();
 
       return;
     }
