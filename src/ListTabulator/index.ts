@@ -1064,6 +1064,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       newBlock = this.api.blocks.insert();
     }
 
+    currentItem?.remove();
     this.api.caret.setToBlock(newBlock, 'start');
   }
 
