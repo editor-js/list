@@ -652,6 +652,13 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     const currentItemChildrenList = getChildItems(item);
 
     /**
+     * Get current list block index
+     */
+    const currentBlock = this.block;
+
+    const currentBlockIndex = this.api.blocks.getCurrentBlockIndex();
+
+    /**
      * First child item should be unshifted because separated list should start
      * with item with first nesting level
      */
@@ -668,11 +675,11 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
-     * If item is first item of the list, we should just remove the item
+     * If item is first item of the list, we should just get out of the list
      * It means, that we would not split on two lists, if one of them would be empty
      */
     if (item.previousElementSibling === null && item.parentNode === this.listWrapper) {
-      this.api.blocks.delete();
+      this.getOutOfList(currentBlockIndex);
 
       return;
     }
@@ -701,13 +708,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     const newListContent = this.save(newListWrapper);
 
     newListContent.start = this.data.style == 'ordered' ? 1 : undefined;
-
-    /**
-     * Get current list block index
-     */
-    const currentBlock = this.block;
-
-    const currentBlockIndex = this.api.blocks.getCurrentBlockIndex();
 
     /**
      * Insert separated list with trailing items
