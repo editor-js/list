@@ -80,9 +80,8 @@ This params are supported in Ordered List and Checklist
 
 ![](assets/ordered_toolbox_demo.jpg)
 
-- You can choose the number for list to start from.
+- You can choose the number for list to start with.
 - You can choose type of the counters.
-
 
 ## Default Output data
 
@@ -90,8 +89,6 @@ This params are supported in Ordered List and Checklist
 | ----- | --------- | ---------------------------------------- |
 | style | `string`  | type of a list: `ordered` or `unordered` |
 | items | `Item[]`  | the array of list's items                |
-
-This is outputData o
 
 Object `ItemMeta` for Checklist:
 
