@@ -479,12 +479,12 @@ export default class ListTabulator<Renderer extends ListRenderer> {
          * If current item is first and last item of the list, then empty list should be deleted after deletion of the item
          */
         if (isFirstItem) {
-          this.getOutOfList(currentBlockIndex, true);
+          this.covertItemToDefaultBlock(currentBlockIndex, true);
         } else {
           /**
            * If there are other items in the list, just remove current item and get out of the list
            */
-          this.getOutOfList();
+          this.covertItemToDefaultBlock();
         }
 
         return;
@@ -544,7 +544,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       /**
        * If current item is first item of the list, then we need to merge first item content with previous block
        */
-      this.getOutOfListFromFirstItem();
+      this.covertFirstItemToDefaultBlock();
 
       return;
     }
@@ -681,7 +681,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * It means, that we would not split on two lists, if one of them would be empty
      */
     if (item.previousElementSibling === null && item.parentNode === this.listWrapper) {
-      this.getOutOfList(currentBlockIndex);
+      this.covertItemToDefaultBlock(currentBlockIndex);
 
       return;
     }
@@ -719,7 +719,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Insert paragraph
      */
-    this.getOutOfList(currentBlockIndex + 1);
+    this.covertItemToDefaultBlock(currentBlockIndex + 1);
 
     /**
      * Remove temporary new list wrapper used for content save
@@ -1043,25 +1043,25 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
   /**
    * Get out from List Tool by Enter on the empty last item
-   * @param index - optional parameter represents index, where would be inseted default block
-   * @param removeBlock - optional parameter, that represents condition, if List should be removed
+   * @param newBloxkIndex - optional parameter represents index, where would be inseted default block
+   * @param removeList - optional parameter, that represents condition, if List should be removed
    */
-  private getOutOfList(index?: number, removeBlock?: boolean): void {
+  private covertItemToDefaultBlock(newBloxkIndex?: number, removeList?: boolean): void {
     let newBlock;
 
     const currentItem = this.currentItem;
 
     const currentItemContent = currentItem !== null ? this.renderer.getItemContent(currentItem) : '';
 
-    if (removeBlock === true) {
+    if (removeList === true) {
       this.api.blocks.delete();
     }
 
     /**
      * Check that index have passed
      */
-    if (index !== undefined) {
-      newBlock = this.api.blocks.insert(undefined, { text: currentItemContent }, undefined, index);
+    if (newBloxkIndex !== undefined) {
+      newBlock = this.api.blocks.insert(undefined, { text: currentItemContent }, undefined, newBloxkIndex);
     } else {
       newBlock = this.api.blocks.insert();
     }
@@ -1075,7 +1075,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * This method could be called when backspace button pressed at start of the first item of the list
    * First item of the list would be converted to the paragraph and first item children would be unshifted
    */
-  private getOutOfListFromFirstItem(): void {
+  private covertFirstItemToDefaultBlock(): void {
     const currentItem = this.currentItem;
 
     if (currentItem === null) {
@@ -1116,7 +1116,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      */
     const removeBlock = currentItemSiblings === null;
 
-    this.getOutOfList(currentBlockIndex, removeBlock);
+    this.covertItemToDefaultBlock(currentBlockIndex, removeBlock);
   }
 
   /**
