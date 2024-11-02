@@ -10,14 +10,14 @@ Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 
 ## Features
 
-- 🤩 part of [Editor.js](https://editorjs.io/) ecosystem.
-- 📂 supports nesting.
-- 🔥 supports `ordered` and `unordered` lists.
-- 🔢 customizable start number.
-- 🏛️ customizable counter type (e.g. `lower-roman`).
-- 🪜 max nesting level configuration.
-- ✅ supports `checklist`.
-- 📝 Nested List is compatible with [List](https://github.com/editor-js/list).
+- 🤩 Part of [Editor.js](https://editorjs.io/) ecosystem.
+- 📂 Nesting.
+- 🔥 Ordered and Unordered lists.
+- ✅ Checklists.
+- 🔢 Customizable start number.
+- 🏛️ Customizable counter type (e.g. `lower-roman`).
+- 🪜 Max nesting level configuration.
+- 📝 Compatible with [List](https://github.com/editor-js/list) and [Checklist](https://github.com/editor-js/checklist).
 
 ## Installation
 
