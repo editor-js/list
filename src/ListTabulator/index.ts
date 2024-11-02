@@ -479,7 +479,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
          * If current item is first and last item of the list, then empty list should be deleted after deletion of the item
          */
         if (isFirstItem) {
-          console.log('wrong index');
           this.getOutOfList(currentBlockIndex, true);
         } else {
           /**
