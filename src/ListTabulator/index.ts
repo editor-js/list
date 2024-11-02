@@ -466,13 +466,26 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const isEmpty = this.renderer?.getItemContent(currentItem).trim().length === 0;
     const isFirstLevelItem = currentItem.parentNode === this.listWrapper;
+    const isFirstItem = currentItem.previousElementSibling === null;
 
     /**
      * On Enter in the last empty item, get out of list
      */
     if (isFirstLevelItem && isEmpty) {
       if (isLastItem(currentItem) && !itemHasSublist(currentItem)) {
-        this.getOutOfList();
+        console.log('getOut of the list would be called');
+
+        /**
+         * If current item is first and last item of the list, then empty list should be deleted after deletion of the item
+         */
+        if (isFirstItem) {
+          this.getOutOfList(undefined, true);
+        } else {
+          /**
+           * If there are other items in the list, just remove current item and get out of the list
+           */
+          this.getOutOfList();
+        }
 
         return;
       } else {
@@ -512,21 +525,27 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
-     * Check that current item is not first item of the list
-     * Otherwise Editor.js should handle merge
-     */
-    if (currentItem.parentNode !== this.listWrapper || currentItem.previousElementSibling !== null) {
-      /**
-       * Prevent Editor.js backspace handling
-       */
-      event.stopPropagation();
-    }
-
-    /**
      * Caret is not at start of the item
      * Then backspace button should remove letter as usual
      */
     if (!isCaretAtStartOfInput(currentItem)) {
+      return;
+    }
+
+    /**
+     * First item of the list should become paragraph on backspace
+     */
+    if (currentItem.parentNode === this.listWrapper && currentItem.previousElementSibling === null) {
+      /**
+       * If current item is first item of the list, then we need to merge first item content with previous block
+       */
+      this.getOutOfListFromFirstItem();
+
+      /**
+       * Prevent Editor.js backspace handling
+       */
+      event.stopPropagation();
+
       return;
     }
 
@@ -648,6 +667,20 @@ export default class ListTabulator<Renderer extends ListRenderer> {
        * Then we should set caret to the actual current item
        */
       focusItem(item, false);
+    }
+
+    console.log('split list', item, item.previousElementSibling, item.parentNode);
+
+    /**
+     * If item is first item of the list, we should just remove the item
+     * It means, that we would not split on two lists, if one of them would be empty
+     */
+    if (item.previousElementSibling === null && item.parentNode === this.listWrapper) {
+      console.log('remove item');
+
+      this.api.blocks.delete();
+
+      return;
     }
 
     /**
@@ -1015,21 +1048,78 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Get out from List Tool by Enter on the empty last item
    * @param index - optional parameter represents index, where would be inseted default block
+   * @param removeBlock - optional parameter, that represents condition, if List should be removed
    */
-  private getOutOfList(index?: number): void {
+  private getOutOfList(index?: number, removeBlock?: boolean): void {
     let newBlock;
 
+    const currentItem = this.currentItem;
+
+    const currentItemContent = currentItem !== null ? this.renderer.getItemContent(currentItem) : '';
+
+    if (removeBlock === true) {
+      this.api.blocks.delete();
+    }
+
     /**
-     * Check that index passed
+     * Check that index have passed
      */
     if (index !== undefined) {
-      newBlock = this.api.blocks.insert(undefined, undefined, undefined, index);
+      newBlock = this.api.blocks.insert(undefined, { text: currentItemContent }, undefined, index);
     } else {
       newBlock = this.api.blocks.insert();
     }
 
-    this.currentItem?.remove();
-    this.api.caret.setToBlock(newBlock);
+    this.api.caret.setToBlock(newBlock, 'start');
+  }
+
+  /**
+   * Get out of List from first item
+   * This method could be called when backspace button pressed at start of the first item of the list
+   * First item of the list would be converted to the paragraph and first item children would be unshifted
+   */
+  private getOutOfListFromFirstItem(): void {
+    const currentItem = this.currentItem;
+
+    if (currentItem === null) {
+      return;
+    }
+
+    const currentItemChildren = getChildItems(currentItem);
+
+    /**
+     * Check that current item have at least one child
+     * If current item have no children, we can guarantee,
+     * that after deletion of the first item of the list, children would not be removed
+     */
+    if (currentItemChildren.length !== 0) {
+      const firstChildItem = currentItemChildren[0];
+
+      /**
+       * Unshift first child item, to guarantee, that after deletion of the first item
+       * list will start with first level of nesting
+       */
+      this.unshiftItem(firstChildItem);
+
+      /**
+       * Set focus back to the current item after unshifting child
+       */
+      focusItem(currentItem);
+    }
+
+    /**
+     * Get all first level items of the list
+     */
+    const currentItemSiblings = getSiblings(currentItem);
+
+    const currentBlockIndex = this.api.blocks.getCurrentBlockIndex();
+
+    /**
+     * If current item has no siblings, than List is empty, and it should be deleted
+     */
+    const removeBlock = currentItemSiblings === null;
+
+    this.getOutOfList(currentBlockIndex, removeBlock);
   }
 
   /**
