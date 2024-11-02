@@ -479,12 +479,12 @@ export default class ListTabulator<Renderer extends ListRenderer> {
          * If current item is first and last item of the list, then empty list should be deleted after deletion of the item
          */
         if (isFirstItem) {
-          this.covertItemToDefaultBlock(currentBlockIndex, true);
+          this.convertItemToDefaultBlock(currentBlockIndex, true);
         } else {
           /**
            * If there are other items in the list, just remove current item and get out of the list
            */
-          this.covertItemToDefaultBlock();
+          this.convertItemToDefaultBlock();
         }
 
         return;
@@ -544,7 +544,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       /**
        * If current item is first item of the list, then we need to merge first item content with previous block
        */
-      this.covertFirstItemToDefaultBlock();
+      this.convertFirstItemToDefaultBlock();
 
       return;
     }
@@ -681,7 +681,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * It means, that we would not split on two lists, if one of them would be empty
      */
     if (item.previousElementSibling === null && item.parentNode === this.listWrapper) {
-      this.covertItemToDefaultBlock(currentBlockIndex);
+      this.convertItemToDefaultBlock(currentBlockIndex);
 
       return;
     }
@@ -719,7 +719,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Insert paragraph
      */
-    this.covertItemToDefaultBlock(currentBlockIndex + 1);
+    this.convertItemToDefaultBlock(currentBlockIndex + 1);
 
     /**
      * Remove temporary new list wrapper used for content save
@@ -1042,11 +1042,11 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
-   * Get out from List Tool by Enter on the empty last item
+   * Convert current item to default block with passed index
    * @param newBloxkIndex - optional parameter represents index, where would be inseted default block
    * @param removeList - optional parameter, that represents condition, if List should be removed
    */
-  private covertItemToDefaultBlock(newBloxkIndex?: number, removeList?: boolean): void {
+  private convertItemToDefaultBlock(newBloxkIndex?: number, removeList?: boolean): void {
     let newBlock;
 
     const currentItem = this.currentItem;
@@ -1071,11 +1071,11 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
-   * Get out of List from first item
+   * Convert first item of the list to default block
    * This method could be called when backspace button pressed at start of the first item of the list
    * First item of the list would be converted to the paragraph and first item children would be unshifted
    */
-  private covertFirstItemToDefaultBlock(): void {
+  private convertFirstItemToDefaultBlock(): void {
     const currentItem = this.currentItem;
 
     if (currentItem === null) {
@@ -1114,9 +1114,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * If current item has no siblings, than List is empty, and it should be deleted
      */
-    const removeBlock = currentItemSiblings === null;
+    const removeList = currentItemSiblings === null;
 
-    this.covertItemToDefaultBlock(currentBlockIndex, removeBlock);
+    this.convertItemToDefaultBlock(currentBlockIndex, removeList);
   }
 
   /**
