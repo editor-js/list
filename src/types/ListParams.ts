@@ -19,11 +19,6 @@ export interface ListData {
    */
   items: ListItem[];
   /**
-   * Max level of the nesting in list
-   * If nesting is not needed, it could be set to 1
-   */
-  maxLevel?: number;
-  /**
    * Start property used only in ordered list
    */
   start?: number;
@@ -76,4 +71,9 @@ export interface NestedListConfig {
    * default is unordered
    */
   defaultStyle?: ListDataStyle;
+  /**
+   * Max level of the nesting in list
+   * If nesting is not needed, it could be set to 1
+   */
+  maxLevel?: number;
 }

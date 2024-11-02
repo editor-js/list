@@ -959,13 +959,13 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Check that maxLevel specified in config
      */
-    if (this.data.maxLevel !== undefined) {
+    if (this.config?.maxLevel !== undefined) {
       const currentItemLevel = this.currentItemLevel;
 
       /**
        * Check that current item is not in the maximum nesting level
        */
-      if (currentItemLevel !== null && currentItemLevel === this.data.maxLevel) {
+      if (currentItemLevel !== null && currentItemLevel === this.config.maxLevel) {
         return;
       }
     }
