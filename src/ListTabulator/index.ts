@@ -473,8 +473,6 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      */
     if (isFirstLevelItem && isEmpty) {
       if (isLastItem(currentItem) && !itemHasSublist(currentItem)) {
-        console.log('getOut of the list would be called');
-
         /**
          * If current item is first and last item of the list, then empty list should be deleted after deletion of the item
          */
@@ -669,15 +667,11 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       focusItem(item, false);
     }
 
-    console.log('split list', item, item.previousElementSibling, item.parentNode);
-
     /**
      * If item is first item of the list, we should just remove the item
      * It means, that we would not split on two lists, if one of them would be empty
      */
     if (item.previousElementSibling === null && item.parentNode === this.listWrapper) {
-      console.log('remove item');
-
       this.api.blocks.delete();
 
       return;
