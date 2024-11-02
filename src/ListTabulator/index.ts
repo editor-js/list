@@ -468,6 +468,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     const isFirstLevelItem = currentItem.parentNode === this.listWrapper;
     const isFirstItem = currentItem.previousElementSibling === null;
 
+    const currentBlockIndex = this.api.blocks.getCurrentBlockIndex();
+
     /**
      * On Enter in the last empty item, get out of list
      */
@@ -477,7 +479,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
          * If current item is first and last item of the list, then empty list should be deleted after deletion of the item
          */
         if (isFirstItem) {
-          this.getOutOfList(undefined, true);
+          console.log('wrong index');
+          this.getOutOfList(currentBlockIndex, true);
         } else {
           /**
            * If there are other items in the list, just remove current item and get out of the list
