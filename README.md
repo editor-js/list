@@ -8,6 +8,17 @@ Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 
 ![](assets/example.gif)
 
+## Features
+
+- 🤩 Part of [Editor.js](https://editorjs.io/) ecosystem.
+- 📂 Nesting.
+- 🔥 Ordered and Unordered lists.
+- ✅ Checklists.
+- 🔢 Customizable start number.
+- 🏛️ Customizable counter type (e.g. `lower-roman`).
+- 🪜 Max nesting level configuration.
+- 📝 Compatible with [List](https://github.com/editor-js/list) and [Checklist](https://github.com/editor-js/checklist).
+
 ## Installation
 
 Get the package
@@ -51,58 +62,109 @@ var editor = EditorJS({
 
 | Field        | Type     | Description                                                    |
 |--------------|----------|----------------------------------------------------------------|
-| defaultStyle | `string` | default list style: `ordered` or `unordered`, default is `unordered` |
-
-## Tool's settings
-
-![](assets/bf5a42e4-1350-499d-a728-493b0fcaeda4.jpg)
-
-You can choose list`s type.
+| defaultStyle | `string` | default list style: `ordered`, `unordered` or `checklist`, default is `unordered` |
+| maxLevel     | `number` | maximum level of the list nesting, could be set to `1` to disable nesting, unlimited by default |
 
 ## Output data
 
-| Field | Type      | Description                              |
-| ----- | --------- | ---------------------------------------- |
-| style | `string`  | type of a list: `ordered` or `unordered` |
-| items | `Item[]`  | the array of list's items                |
+| Field             | Type      |  Description                                                                                                              | List type                           |
+| ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| style             | `string`  |  list will be rendered with this style: `ordered`, `unordered` or `checklist`, default is `defaultStyle` from tool config | `ordered`, `unordered`, `checklist` |
+| start             | `number`  |  list will start with this number, default is `1`                                                                         | `ordered`                           |
+| counterType       | `number`  |  type of the counters: `numeric`, `lower-roman`, `upper-roman`, `lower-alpha`, `upper-alpha`, default is `numeric`        | `ordered`                           |
+| items             | `Item[]`  |  the array of list's items                                                                                                | `ordered`, `unordered`, `checklist` |
 
 Object `Item`:
 
+| Field   | Type       | Description                 |
+| ------- | ---------- | --------------------------- |
+| content | `string`   | item's string content       |
+| meta    | `ItemMeta` | meta information about item |
+| items   | `Item[]`   | the array of list's items   |
+
+Object `ItemMeta` for Checklist:
+
 | Field   | Type      | Description               |
 | ------- | --------- | ------------------------- |
-| content | `string`  | item's string content     |
-| items   | `Item[]`  | the array of list's items |
+| checked | `boolean` | state of the checkbox     |
+
+Object `ItemMeta` for Ordered and Unordered lists would be empty.
 
 
+## Example of the content for `Unordered List`
 ```json
 {
-    "type" : "list",
-    "data" : {
-        "style" : "unordered",
-        "items" : [
-            {
-              "content": "Apples",
-              "items": [
-                {
-                  "content": "Red",
-                  "items": []
-                },
-                {
-                  "content": "Green",
-                  "items": []
-                },
-              ]
-            },
-            {
-              "content": "Bananas",
-              "items": [
-                {
-                  "content": "Yellow",
-                  "items": []
-                },
-              ]
-            },
+  "type" : "list",
+  "data" : {
+    "style": "unordered",
+    "maxLevel": 1,
+    "items": [
+      {
+        "content": "Apples",
+        "meta": {},
+        "items": [
+          {
+            "content": "Red",
+            "meta": {},
+            "items": []
+          },
         ]
-    }
+      },
+    ]
+  }
+},
+```
+
+## Example of the content for `Ordered List`
+```json
+{
+  "type" : "list",
+  "data" : {
+    "style": "ordered",
+    "start": 2,
+    "counterType": "upper-roman",
+    "maxLevel": 4,
+    "items" : [
+      {
+        "content": "Apples",
+        "meta": {},
+        "items": [
+          {
+            "content": "Red",
+            "meta": {},
+            "items": []
+          },
+        ]
+      },
+    ]
+  }
+},
+```
+
+## Example of the content for `Checklist`
+```json
+{
+  "type" : "list",
+  "data" : {
+    "style": "checklist",
+    "maxLevel": 4,
+    "items" : [
+      {
+        "content": "Apples",
+        "meta": {
+          "checked": false
+        },
+        "items": [
+          {
+            "content": "Red",
+            "meta": {
+              "checked": true
+            },
+            "items": []
+          },
+        ]
+      },
+    ]
+  }
 },
 ```
