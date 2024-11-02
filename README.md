@@ -10,12 +10,11 @@ Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 
 ## Features
 
-📝 Nested List is compatible with [List](https://github.com/editor-js/list) data format.
-🔢 `start` attribute for list to start with
-🏛️ `counterType` attribute, that represents type of the list counters (e.g. `lower-roman`)
-🪜 `maxLevel` config param, that represents maximum level of nesting
-💌 `ordered list`, `checklist` and `unordered list` could be converted to each other
-✅ `checklist` exports data with check states
+- 🔢 `start` customizable start number.
+- 🏛️ `counterType` customizable counter type (e.g. `lower-roman`).
+- 🪜 `maxLevel` max nesting level configuration.
+- ✅ `checklist` exports data with check states.
+- 📝 Nested List is compatible with [List](https://github.com/editor-js/list).
 
 ## Installation
 
