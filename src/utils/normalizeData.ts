@@ -15,8 +15,6 @@ function instanceOfListData(data: ListData | OldListData | OldChecklistData): da
  * @returns true if data is related to the Checklist tool, false otherwise
  */
 function instanceOfChecklistData(data: ListData | OldListData | OldChecklistData): data is OldChecklistData {
-  console.log('check for checklist');
-
   return (
     typeof data.items[0] !== 'string'
     && 'text' in data.items[0]
@@ -48,8 +46,6 @@ export default function normalizeData(data: ListData | OldListData | OldChecklis
       items: normalizedDataItems,
     };
   } else if (instanceOfChecklistData(data)) {
-    console.log('data normaizedd');
-
     data.items.forEach((item) => {
       normalizedDataItems.push({
         content: item.text,
