@@ -1,17 +1,17 @@
 import type { OldListData, ListData, ListItem, OldChecklistData } from '../types/ListParams';
 
 /**
- * Method that checks if data is related to the List Tool
- * @param data - data of the List or NestedList tool
+ * Method that checks if data is result of the Old list tool save mtehod
+ * @param data - data of the OldList, Checklist or NestedList tool
  * @returns true if data related to the List tool, false otherwise
  */
-function instanceOfListData(data: ListData | OldListData | OldChecklistData): data is OldListData {
+function instanceOfOldListData(data: ListData | OldListData | OldChecklistData): data is OldListData {
   return (typeof data.items[0] === 'string');
 }
 
 /**
- * Method that checks if data is related to the Checklist tool
- * @param data - data of the Checklist of NestedList tool
+ * Method that checks if data is result of the Old checklist tool save method
+ * @param data - data of the Checklist, OldList or NestedList tool
  * @returns true if data is related to the Checklist tool, false otherwise
  */
 function instanceOfChecklistData(data: ListData | OldListData | OldChecklistData): data is OldChecklistData {
@@ -32,7 +32,7 @@ function instanceOfChecklistData(data: ListData | OldListData | OldChecklistData
 export default function normalizeData(data: ListData | OldListData | OldChecklistData): ListData {
   const normalizedDataItems: ListItem[] = [];
 
-  if (instanceOfListData(data)) {
+  if (instanceOfOldListData(data)) {
     data.items.forEach((item) => {
       normalizedDataItems.push({
         content: item,
