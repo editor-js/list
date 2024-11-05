@@ -43,6 +43,30 @@ export interface OldListData {
 }
 
 /**
+ * Interface that represents old checklist data format
+ */
+export interface OldChecklistData {
+  /**
+   * Checklist items
+   */
+  items: OldChecklistItem[];
+}
+
+/**
+ * Interface that represents old checklist item format
+ */
+interface OldChecklistItem {
+  /**
+   * Text of the checklist item
+   */
+  text: string;
+  /**
+   * Checked state of the checklist item
+   */
+  checked: boolean;
+}
+
+/**
  * List item within the output data
  */
 export interface ListItem {
