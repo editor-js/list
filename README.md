@@ -2,14 +2,6 @@
 
 # Editorjs List Tool
 
-Multi-leveled lists for the [Editor.js](https://editorjs.io).
-
-Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
-
-![](assets/example.gif)
-
-## Features
-
 - 🤩 Part of [Editor.js](https://editorjs.io/) ecosystem.
 - 📂 Nesting.
 - 🔥 Ordered and Unordered lists.
@@ -18,6 +10,11 @@ Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 - 🏛️ Customizable counter type (e.g. `lower-roman`).
 - 🪜 Max nesting level configuration.
 - 📝 Compatible with [List](https://github.com/editor-js/list) and [Checklist](https://github.com/editor-js/checklist).
+
+
+![](assets/example.gif)
+
+Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 
 ## Installation
 
@@ -67,12 +64,11 @@ var editor = EditorJS({
 
 ## Output data
 
-| Field             | Type      |  Description                                                                                                              | List type                           |
-| ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| style             | `string`  |  list will be rendered with this style: `ordered`, `unordered` or `checklist`, default is `defaultStyle` from tool config | `ordered`, `unordered`, `checklist` |
-| start             | `number`  |  list will start with this number, default is `1`                                                                         | `ordered`                           |
-| counterType       | `number`  |  type of the counters: `numeric`, `lower-roman`, `upper-roman`, `lower-alpha`, `upper-alpha`, default is `numeric`        | `ordered`                           |
-| items             | `Item[]`  |  the array of list's items                                                                                                | `ordered`, `unordered`, `checklist` |
+| Field             | Type      |  Description                                                                                                              |
+| ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------- |
+| style             | `string`  |  list will be rendered with this style: `ordered`, `unordered` or `checklist`, default is `defaultStyle` from tool config |
+| meta              | `ItemMeta`|  Item meta based on the list style                                                                                         |
+| items             | `Item[]`  |  the array of list's items                                                                                                |
 
 Object `Item`:
 
@@ -88,7 +84,15 @@ Object `ItemMeta` for Checklist:
 | ------- | --------- | ------------------------- |
 | checked | `boolean` | state of the checkbox     |
 
-Object `ItemMeta` for Ordered and Unordered lists would be empty.
+Object `ItemMeta` for Ordered list
+
+| Field   | Type      | Description               |
+| ------- | --------- | ------------------------- |
+| start   | `number`  | number for list to start with, default is 1 |
+| counterType | `string`  | counter type for list, it could be `numeric`, `lower-roman`, `upper-roman`, `lower-alpha`, `upper-alpha`, default is `numeric` |
+
+
+Object `ItemMeta` for Unordered list would be empty.
 
 
 ## Example of the content for `Unordered List`
@@ -120,8 +124,10 @@ Object `ItemMeta` for Ordered and Unordered lists would be empty.
   "type" : "list",
   "data" : {
     "style": "ordered",
-    "start": 2,
-    "counterType": "upper-roman",
+    "meta": {
+      "start": 2,
+      "counterType": "upper-roman",
+    },
     "items" : [
       {
         "content": "Apples",
