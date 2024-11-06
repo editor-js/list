@@ -1,6 +1,6 @@
 import type { OrderedListItemMeta } from '../types/ItemMeta';
 import type { NestedListConfig } from '../types/ListParams';
-import * as Dom from '@editorjs/dom';
+import { isEmpty, make } from '@editorjs/dom';
 import { DefaultListCssClasses } from './ListRenderer';
 import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
 import { CssPrefix } from '../styles/CssPrefix';
@@ -61,9 +61,9 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
      * Check if it's root level
      */
     if (isRoot === true) {
-      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.wrapper, OrderedListRenderer.CSS.orderedList]) as HTMLOListElement;
+      wrapperElement = make('ol', [OrderedListRenderer.CSS.wrapper, OrderedListRenderer.CSS.orderedList]) as HTMLOListElement;
     } else {
-      wrapperElement = Dom.make('ol', [OrderedListRenderer.CSS.orderedList, OrderedListRenderer.CSS.itemChildren]) as HTMLOListElement;
+      wrapperElement = make('ol', [OrderedListRenderer.CSS.orderedList, OrderedListRenderer.CSS.itemChildren]) as HTMLOListElement;
     }
 
     return wrapperElement;
@@ -76,8 +76,8 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
    * @returns - created html list item element
    */
   public renderItem(content: string, _meta: OrderedListItemMeta): HTMLLIElement {
-    const itemWrapper = Dom.make('li', OrderedListRenderer.CSS.item);
-    const itemContent = Dom.make('div', OrderedListRenderer.CSS.itemContent, {
+    const itemWrapper = make('li', OrderedListRenderer.CSS.item);
+    const itemContent = make('div', OrderedListRenderer.CSS.itemContent, {
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
@@ -99,7 +99,7 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
       return '';
     }
 
-    if (Dom.isEmpty(contentNode)) {
+    if (isEmpty(contentNode)) {
       return '';
     }
 

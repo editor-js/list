@@ -1,6 +1,6 @@
 import type { UnorderedListItemMeta } from '../types/ItemMeta';
 import type { NestedListConfig } from '../types/ListParams';
-import * as Dom from '@editorjs/dom';
+import { make, isEmpty } from '@editorjs/dom';
 import { DefaultListCssClasses } from './ListRenderer';
 import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
 import { CssPrefix } from '../styles/CssPrefix';
@@ -61,9 +61,9 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
      * Check if it's root level
      */
     if (isRoot === true) {
-      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.wrapper, UnorderedListRenderer.CSS.unorderedList]) as HTMLUListElement;
+      wrapperElement = make('ul', [UnorderedListRenderer.CSS.wrapper, UnorderedListRenderer.CSS.unorderedList]) as HTMLUListElement;
     } else {
-      wrapperElement = Dom.make('ul', [UnorderedListRenderer.CSS.unorderedList, UnorderedListRenderer.CSS.itemChildren]) as HTMLUListElement;
+      wrapperElement = make('ul', [UnorderedListRenderer.CSS.unorderedList, UnorderedListRenderer.CSS.itemChildren]) as HTMLUListElement;
     }
 
     return wrapperElement;
@@ -76,8 +76,8 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
    * @returns - created html list item element
    */
   public renderItem(content: string, _meta: UnorderedListItemMeta): HTMLLIElement {
-    const itemWrapper = Dom.make('li', UnorderedListRenderer.CSS.item);
-    const itemContent = Dom.make('div', UnorderedListRenderer.CSS.itemContent, {
+    const itemWrapper = make('li', UnorderedListRenderer.CSS.item);
+    const itemContent = make('div', UnorderedListRenderer.CSS.itemContent, {
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
@@ -99,7 +99,7 @@ export class UnorderedListRenderer implements ListRendererInterface<UnorderedLis
       return '';
     }
 
-    if (Dom.isEmpty(contentNode)) {
+    if (isEmpty(contentNode)) {
       return '';
     }
 
