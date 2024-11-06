@@ -67,12 +67,11 @@ var editor = EditorJS({
 
 ## Output data
 
-| Field             | Type      |  Description                                                                                                              | List type                           |
-| ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| style             | `string`  |  list will be rendered with this style: `ordered`, `unordered` or `checklist`, default is `defaultStyle` from tool config | `ordered`, `unordered`, `checklist` |
-| start             | `number`  |  list will start with this number, default is `1`                                                                         | `ordered`                           |
-| counterType       | `number`  |  type of the counters: `numeric`, `lower-roman`, `upper-roman`, `lower-alpha`, `upper-alpha`, default is `numeric`        | `ordered`                           |
-| items             | `Item[]`  |  the array of list's items                                                                                                | `ordered`, `unordered`, `checklist` |
+| Field             | Type      |  Description                                                                                                              |
+| ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------- |
+| style             | `string`  |  list will be rendered with this style: `ordered`, `unordered` or `checklist`, default is `defaultStyle` from tool config |
+| meta              | `ItemMeta`|  Item meta based on the list type                                                                                         |
+| items             | `Item[]`  |  the array of list's items                                                                                                |
 
 Object `Item`:
 
@@ -120,8 +119,10 @@ Object `ItemMeta` for Ordered and Unordered lists would be empty.
   "type" : "list",
   "data" : {
     "style": "ordered",
-    "start": 2,
-    "counterType": "upper-roman",
+    "meta": {
+      "start": 2,
+      "counterType": "upper-roman",
+    },
     "items" : [
       {
         "content": "Apples",
