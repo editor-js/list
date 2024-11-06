@@ -13,8 +13,8 @@ export default {
     lib: {
       // eslint-disable-next-line no-undef
       entry: path.resolve(__dirname, 'src', 'index.ts'),
-      name: 'NestedList',
-      fileName: 'nested-list',
+      name: 'EditorjsList',
+      fileName: 'editorjs-list',
     },
   },
   define: {

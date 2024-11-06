@@ -5,7 +5,7 @@ import type {
   ToolConfig
 } from '@editorjs/editorjs/types/tools';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
-import type { NestedListConfig, ListData, ListDataStyle, ListItem, OldListData } from './types/ListParams';
+import type { ListConfig, ListData, ListDataStyle, ListItem, OldListData } from './types/ListParams';
 import ListTabulator from './ListTabulator';
 import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
 import type { ListRenderer } from './types/ListRenderer';
@@ -22,14 +22,14 @@ import normalizeData from './utils/normalizeData';
 import type { PasteEvent } from './types';
 
 /**
- * Constructor Params for Nested List Tool, use to pass initial data and settings
+ * Constructor Params for Editorjs List Tool, use to pass initial data and settings
  */
-export type ListParams = BlockToolConstructorOptions<ListData | OldListData, NestedListConfig>;
+export type ListParams = BlockToolConstructorOptions<ListData | OldListData, ListConfig>;
 
 /**
  * Default class of the component used in editor
  */
-export default class NestedList {
+export default class EditorjsList {
   /**
    * Notify core that read-only mode is supported
    */
@@ -101,11 +101,11 @@ export default class NestedList {
      * @param content - contents string
      * @returns - list data formed from contents string
      */
-    import: (content: string, config: ToolConfig<NestedListConfig>) => ListData;
+    import: (content: string, config: ToolConfig<ListConfig>) => ListData;
   } {
     return {
       export: (data) => {
-        return NestedList.joinRecursive(data);
+        return EditorjsList.joinRecursive(data);
       },
       import: (content, config) => {
         return {
@@ -154,19 +154,19 @@ export default class NestedList {
   private api: API;
 
   /**
-   * Is NestedList Tool read-only
+   * Is Ediotrjs List Tool read-only
    */
   private readOnly: boolean;
 
   /**
    * Tool's configuration
    */
-  private config: NestedListConfig | undefined;
+  private config: ListConfig | undefined;
 
   /**
    * Default list style formes as passed default list style from config or 'ordered' as default
    */
-  private defaultListStyle?: NestedListConfig['defaultStyle'];
+  private defaultListStyle?: ListConfig['defaultStyle'];
 
   /**
    * Tool's data
@@ -231,7 +231,7 @@ export default class NestedList {
    */
   private static joinRecursive(data: ListData | ListItem): string {
     return data.items
-      .map(item => `${item.content} ${NestedList.joinRecursive(item)}`)
+      .map(item => `${item.content} ${EditorjsList.joinRecursive(item)}`)
       .join('');
   }
 
@@ -356,7 +356,6 @@ export default class NestedList {
   /**
    * On paste callback that is fired from Editor.
    * @param event - event with pasted data
-   * @todo - refactor and move to nested list instance
    */
   public onPaste(event: PasteEvent): void {
     const { tagName: tag } = event.detail.data;
@@ -376,7 +375,6 @@ export default class NestedList {
   /**
    * Handle UL, OL and LI tags paste and returns List data
    * @param element - html element that contains whole list
-   * @todo - refactor and move to nested list instance
    */
   public pasteHandler(element: PasteEvent['detail']['data']): ListData {
     const data = this.list!.pasteHandler(element);

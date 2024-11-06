@@ -33,7 +33,7 @@ const css = {
 
 /**
  * Method that renders html element for popover start with item
- * @param inputCallback - callback method that could change nested list attributes on input
+ * @param inputCallback - callback method that could change list attributes on input
  * @param inputOptions - options used in input rendering
  * @param inputOptions.value - input will be rendered with this value inside
  * @param inputOptions.placeholder - placeholder, that will be displayed in input

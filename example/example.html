@@ -59,7 +59,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script><!-- Image -->
   <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script><!-- Delimiter -->
 <!--  <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>&lt;!&ndash; List &ndash;&gt;-->
-  <script src="../dist/nested-list.js"></script><!-- Nested List -->
+  <script src="../dist/editorjs-list.js"></script><!-- Editorjs List -->
   <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script><!-- Checklist -->
   <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script><!-- Quote -->
   <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script><!-- Code -->
@@ -120,8 +120,8 @@
          */
         image: SimpleImage,
 
-        nestedList: {
-          class: NestedList,
+        List: {
+          class: List,
           inlineToolbar: true,
           shortcut: 'CMD+SHIFT+L'
         },
@@ -189,7 +189,7 @@
       data: {
         blocks: [
           {
-            type : 'nestedList',
+            type : 'List',
             data : {
               items : [
                 {
