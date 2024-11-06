@@ -89,10 +89,10 @@ Object `ItemMeta` for Ordered list
 | Field   | Type      | Description               |
 | ------- | --------- | ------------------------- |
 | start   | `number`  | number for list to start with, default is 1 |
-| counter | `string`  | counter type for list, it could be `numeric`, `lower-roman`, `upper-roman`, `lower-alpha`, `upper-alpha`, default is `numeric` |
+| counterType | `string`  | counter type for list, it could be `numeric`, `lower-roman`, `upper-roman`, `lower-alpha`, `upper-alpha`, default is `numeric` |
 
 
-Object `ItemMeta` for Ordered and Unordered lists would be empty.
+Object `ItemMeta` for Unordered list would be empty.
 
 
 ## Example of the content for `Unordered List`
