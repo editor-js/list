@@ -46,7 +46,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
   protected config?: ListConfig;
 
   /**
-   * Is NestedList Tool read-only option
+   * Is Editorjs List Tool read-only option
    */
   private readOnly: boolean;
 

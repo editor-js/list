@@ -97,7 +97,6 @@ Object `ItemMeta` for Ordered and Unordered lists would be empty.
   "type" : "list",
   "data" : {
     "style": "unordered",
-    "maxLevel": 1,
     "items": [
       {
         "content": "Apples",
@@ -123,7 +122,6 @@ Object `ItemMeta` for Ordered and Unordered lists would be empty.
     "style": "ordered",
     "start": 2,
     "counterType": "upper-roman",
-    "maxLevel": 4,
     "items" : [
       {
         "content": "Apples",
@@ -147,7 +145,6 @@ Object `ItemMeta` for Ordered and Unordered lists would be empty.
   "type" : "list",
   "data" : {
     "style": "checklist",
-    "maxLevel": 4,
     "items" : [
       {
         "content": "Apples",
