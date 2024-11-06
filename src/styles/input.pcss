@@ -7,6 +7,15 @@
   grid-template-columns: auto auto 1fr;
   grid-template-rows: auto;
 
+  &--invalid {
+    background: #FFECED;
+    border: 1px solid #E13F3F;
+  }
+
+  &--invalid &__input {
+    color: #E13F3F;
+  }
+
   &__input {
     font-size: 14px;
     outline: none;
@@ -18,10 +27,6 @@
     padding: 0;
     line-height: 22px;
     min-width: calc(100% - var(--toolbox-buttons-size) - var(--icon-margin-right));
-
-    &--invalid {
-      background: red;
-    }
 
     &::placeholder {
        color: var(--grayText);

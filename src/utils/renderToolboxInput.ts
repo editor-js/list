@@ -28,7 +28,7 @@ interface InputOptions {
 const css = {
   wrapper: `${CssPrefix}-start-with-field`,
   input: `${CssPrefix}-start-with-field__input`,
-  inputInvalid: `${CssPrefix}-start-with-field__input--invalid`,
+  startWithElementWrapperInvalid: `${CssPrefix}-start-with-field--invalid`,
 };
 
 /**
@@ -80,15 +80,15 @@ export function renderToolboxInput(inputCallback: (index: string) => void,
     /**
      * If input is invalid and classlist does not contain invalid class, add it
      */
-    if (!validInput && !input.classList.contains(css.inputInvalid)) {
-      input.classList.add(css.inputInvalid);
+    if (!validInput && !startWithElementWrapper.classList.contains(css.startWithElementWrapperInvalid)) {
+      startWithElementWrapper.classList.add(css.startWithElementWrapperInvalid);
     }
 
     /**
      * If input is valid and classlist contains invalid class, remove it
      */
-    if (validInput && input.classList.contains(css.inputInvalid)) {
-      input.classList.remove(css.inputInvalid);
+    if (validInput && startWithElementWrapper.classList.contains(css.startWithElementWrapperInvalid)) {
+      startWithElementWrapper.classList.remove(css.startWithElementWrapperInvalid);
     }
 
     /**
