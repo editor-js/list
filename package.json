@@ -7,7 +7,7 @@
     "editor.js",
     "editorjs"
   ],
-  "description": "Editorjs List Tool for EditorJS",
+  "description": "List Tool for EditorJS",
   "repository": "https://github.com/editor-js/list.git",
   "author": "CodeX <team@codex.so>",
   "license": "MIT",
