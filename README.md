@@ -2,14 +2,6 @@
 
 # Editorjs List Tool
 
-Multi-leveled lists for the [Editor.js](https://editorjs.io).
-
-Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
-
-![](assets/example.gif)
-
-## Features
-
 - 🤩 Part of [Editor.js](https://editorjs.io/) ecosystem.
 - 📂 Nesting.
 - 🔥 Ordered and Unordered lists.
@@ -18,6 +10,11 @@ Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 - 🏛️ Customizable counter type (e.g. `lower-roman`).
 - 🪜 Max nesting level configuration.
 - 📝 Compatible with [List](https://github.com/editor-js/list) and [Checklist](https://github.com/editor-js/checklist).
+
+
+![](assets/example.gif)
+
+Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 
 ## Installation
 
@@ -86,6 +83,14 @@ Object `ItemMeta` for Checklist:
 | Field   | Type      | Description               |
 | ------- | --------- | ------------------------- |
 | checked | `boolean` | state of the checkbox     |
+
+Object `ItemMeta` for Ordered list
+
+| Field   | Type      | Description               |
+| ------- | --------- | ------------------------- |
+| start   | `number`  | number for list to start with, default is 1 |
+| counter | `string`  | counter type for list, it could be `numeric`, `lower-roman`, `upper-roman`, `lower-alpha`, `upper-alpha`, default is `numeric` |
+
 
 Object `ItemMeta` for Ordered and Unordered lists would be empty.
 
