@@ -2,7 +2,7 @@ import type { OldListData, ListData, ListItem, OldChecklistData } from '../types
 
 /**
  * Method that checks if data is result of the Old list tool save mtehod
- * @param data - data of the OldList, Checklist or NestedList tool
+ * @param data - data of the OldList, Checklist or Editorjs List tool
  * @returns true if data related to the List tool, false otherwise
  */
 function instanceOfOldListData(data: ListData | OldListData | OldChecklistData): data is OldListData {
@@ -11,7 +11,7 @@ function instanceOfOldListData(data: ListData | OldListData | OldChecklistData):
 
 /**
  * Method that checks if data is result of the Old checklist tool save method
- * @param data - data of the Checklist, OldList or NestedList tool
+ * @param data - data of the Checklist, OldList or Editorjs List tool
  * @returns true if data is related to the Checklist tool, false otherwise
  */
 function instanceOfChecklistData(data: ListData | OldListData | OldChecklistData): data is OldChecklistData {
@@ -27,7 +27,7 @@ function instanceOfChecklistData(data: ListData | OldListData | OldChecklistData
 /**
  * Method that checks if passed data is related to the legacy format and normalizes it
  * @param data - data to be checked
- * @returns - normalized data, ready to be used by Nested List tool
+ * @returns - normalized data, ready to be used by Editorjs List tool
  */
 export default function normalizeData(data: ListData | OldListData | OldChecklistData): ListData {
   const normalizedDataItems: ListItem[] = [];

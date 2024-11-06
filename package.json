@@ -1,25 +1,25 @@
 {
-  "name": "@editorjs/nested-list",
-  "version": "1.4.3",
+  "name": "@editorjs/list",
+  "version": "2.0.0",
   "keywords": [
     "codex editor",
-    "nested-list",
+    "list",
     "editor.js",
     "editorjs"
   ],
-  "description": "Nested list Tool for EditorJS",
-  "repository": "https://github.com/editor-js/nested-list.git",
+  "description": "List Tool for EditorJS",
+  "repository": "https://github.com/editor-js/list.git",
   "author": "CodeX <team@codex.so>",
   "license": "MIT",
   "files": [
     "dist"
   ],
-  "main": "./dist/nested-list.umd.js",
-  "module": "./dist/nested-list.mjs",
+  "main": "./dist/editorjs-list.umd.js",
+  "module": "./dist/editorjs-list.mjs",
   "exports": {
     ".": {
-      "import": "./dist/nested-list.mjs",
-      "require": "./dist/nested-list.umd.js",
+      "import": "./dist/editorjs-list.mjs",
+      "require": "./dist/editorjs-list.umd.js",
       "types": "./dist/index.d.ts"
     }
   },

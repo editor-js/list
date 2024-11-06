@@ -14,17 +14,17 @@ export const DefaultListCssClasses = {
  */
 export interface ListCssClasses {
   /**
-   * CSS class of the whole nested list wrapper
+   * CSS class of the whole list wrapper
    */
   wrapper: string;
 
   /**
-   * CSS class of the nested list item
+   * CSS class of the list item
    */
   item: string;
 
   /**
-   * CSS class of the nested list item content element
+   * CSS class of the list item content element
    */
   itemContent: string;
 

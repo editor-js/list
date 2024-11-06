@@ -7,7 +7,7 @@ import type { OlCounterType } from './OlCounterType';
 export type ListDataStyle = 'ordered' | 'unordered' | 'checklist';
 
 /**
- * Interface that represents data of the Nested List tool
+ * Interface that represents data of the List tool
  */
 export interface ListData {
   /**
@@ -89,7 +89,7 @@ export interface ListItem {
 /**
  * Tool's configuration
  */
-export interface NestedListConfig {
+export interface ListConfig {
   /**
    * default list style: ordered or unordered
    * default is unordered

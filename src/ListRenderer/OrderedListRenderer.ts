@@ -1,5 +1,5 @@
 import type { OrderedListItemMeta } from '../types/ItemMeta';
-import type { NestedListConfig } from '../types/ListParams';
+import type { ListConfig } from '../types/ListParams';
 import { isEmpty, make } from '@editorjs/dom';
 import { DefaultListCssClasses } from './ListRenderer';
 import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
@@ -22,10 +22,10 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
   /**
    * Tool's configuration
    */
-  protected config?: NestedListConfig;
+  protected config?: ListConfig;
 
   /**
-   * Is NestedList Tool read-only option
+   * Is Editorjs List Tool read-only option
    */
   private readOnly: boolean;
 
@@ -44,7 +44,7 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
    * @param readonly - read-only mode flag
    * @param config - user config for Tool
    */
-  constructor(readonly: boolean, config?: NestedListConfig) {
+  constructor(readonly: boolean, config?: ListConfig) {
     this.config = config;
     this.readOnly = readonly;
   }

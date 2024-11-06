@@ -27,7 +27,7 @@ export default [
    * Redefine language oprions and some of the rules of the CodeX eslint config for typescript config
    */
   {
-    name: 'editorjs-nested-list',
+    name: 'editorjs-list',
     ignores: ['vite.config.js', 'eslint.config.mjs', 'postcss.config.js', '**/json-preview.js'],
     plugins: {
       '@typescript-eslint': TsPlugin,

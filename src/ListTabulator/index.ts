@@ -1,6 +1,6 @@
 import { OrderedListRenderer } from '../ListRenderer/OrderedListRenderer';
 import { UnorderedListRenderer } from '../ListRenderer/UnorderedListRenderer';
-import type { NestedListConfig, ListData, ListDataStyle } from '../types/ListParams';
+import type { ListConfig, ListData, ListDataStyle } from '../types/ListParams';
 import type { ListItem } from '../types/ListParams';
 import type { ItemElement, ItemChildWrapperElement } from '../types/Elements';
 import { isHtmlElement } from '../utils/type-guards';
@@ -31,14 +31,14 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   private api: API;
 
   /**
-   * Is NestedList Tool read-only option
+   * Is Editorjs List Tool read-only option
    */
   private readOnly: boolean;
 
   /**
    * Tool's configuration
    */
-  private config?: NestedListConfig;
+  private config?: ListConfig;
 
   /**
    * Full content of the list
@@ -138,7 +138,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
-   * Function that is responsible for rendering nested list with contents
+   * Function that is responsible for rendering list with contents
    * @returns Filled with content wrapper element of the list
    */
   public render(): ItemChildWrapperElement {
@@ -252,7 +252,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * On paste sanitzation config. Allow only tags that are allowed in the Tool.
    * @returns - config that determines tags supposted by paste handler
-   * @todo - refactor and move to nested list instance
+   * @todo - refactor and move to list instance
    */
   public static get pasteConfig(): PasteConfig {
     return {
@@ -340,7 +340,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * On paste callback that is fired from Editor.
    * @param event - event with pasted data
-   * @todo - refactor and move to nested list instance
+   * @todo - refactor and move to list instance
    */
   public onPaste(event: PasteEvent): void {
     const list = event.detail.data;
@@ -358,7 +358,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   /**
    * Handle UL, OL and LI tags paste and returns List data
    * @param element - html element that contains whole list
-   * @todo - refactor and move to nested list instance
+   * @todo - refactor and move to list instance
    */
   public pasteHandler(element: PasteEvent['detail']['data']): ListData {
     const { tagName: tag } = element;

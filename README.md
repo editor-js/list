@@ -1,6 +1,6 @@
 ![](https://badgen.net/badge/Editor.js/v2.19.2/blue)
 
-# Nested List Tool for Editor.js
+# Editorjs List Tool
 
 Multi-leveled lists for the [Editor.js](https://editorjs.io).
 
@@ -24,31 +24,31 @@ Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 Get the package
 
 ```shell
-yarn add @editorjs/nested-list
+yarn add @editorjs/list
 ```
 
 Include module at your application
 
 ```javascript
-import NestedList from '@editorjs/nested-list';
+import List from '@editorjs/list';
 ```
 
-Optionally, you can load this tool from CDN [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/nested-list@latest)
+Optionally, you can load this tool from CDN [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/list@latest)
 
 ## Usage
 
-Add the NestedList Tool to the `tools` property of the Editor.js initial config.
+Add the List Tool to the `tools` property of the Editor.js initial config.
 
 ```javascript
 import EditorJS from '@editorjs/editorjs';
-import NestedList from '@editorjs/nested-list';
+import List from '@editorjs/list';
 
 var editor = EditorJS({
   // ...
   tools: {
     ...
     list: {
-      class: NestedList,
+      class: List,
       inlineToolbar: true,
       config: {
         defaultStyle: 'unordered'
