@@ -20,6 +20,7 @@ import './styles/input.pcss';
 import stripNumbers from './utils/stripNumbers';
 import normalizeData from './utils/normalizeData';
 import type { PasteEvent } from './types';
+import type { OrderedListItemMeta } from './types/ItemMeta';
 
 /**
  * Constructor Params for Editorjs List Tool, use to pass initial data and settings
@@ -109,6 +110,7 @@ export default class EditorjsList {
       },
       import: (content, config) => {
         return {
+          meta: {},
           items: [
             {
               content,
@@ -209,6 +211,7 @@ export default class EditorjsList {
 
     const initialData = {
       style: this.defaultListStyle,
+      meta: {},
       items: [],
     };
 
@@ -217,8 +220,8 @@ export default class EditorjsList {
     /**
      * Assign default value of the property for the ordered list
      */
-    if (this.listStyle === 'ordered' && this.data.counterType === undefined) {
-      this.data.counterType = 'numeric';
+    if (this.listStyle === 'ordered' && (this.data.meta as OrderedListItemMeta).counterType === undefined) {
+      (this.data.meta as OrderedListItemMeta).counterType = 'numeric';
     }
 
     this.changeTabulatorByStyle();
@@ -302,7 +305,7 @@ export default class EditorjsList {
       const startWithElement = renderToolboxInput(
         (index: string) => this.changeStartWith(Number(index)),
         {
-          value: String(this.data.start ?? 1),
+          value: String((this.data.meta as OrderedListItemMeta).start ?? 1),
           placeholder: '',
           attributes: {
             required: 'true',
@@ -339,7 +342,7 @@ export default class EditorjsList {
       OlCounterTypesMap.forEach((_, counterType: string) => {
         orderedListCountersTunes.children.items!.push({
           title: this.api.i18n.t(counterType),
-          isActive: this.data.counterType === OlCounterTypesMap.get(counterType),
+          isActive: (this.data.meta as OrderedListItemMeta).counterType === OlCounterTypesMap.get(counterType),
           closeOnActivate: true,
           onActivate: () => {
             this.changeCounters(OlCounterTypesMap.get(counterType) as OlCounterType);
@@ -389,7 +392,7 @@ export default class EditorjsList {
   private changeCounters(counterType: OlCounterType): void {
     this.list?.changeCounters(counterType);
 
-    this.data.counterType = counterType;
+    (this.data.meta as OrderedListItemMeta).counterType = counterType;
   }
 
   /**
@@ -399,7 +402,7 @@ export default class EditorjsList {
   private changeStartWith(index: number): void {
     this.list?.changeStartWith(index);
 
-    this.data.start = index;
+    (this.data.meta as OrderedListItemMeta).start = index;
   }
 
   /**

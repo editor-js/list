@@ -9,7 +9,7 @@ import { DefaultListCssClasses } from '../ListRenderer';
 import type { PasteEvent } from '../types';
 import type { API, BlockAPI, PasteConfig } from '@editorjs/editorjs';
 import type { ListParams } from '..';
-import type { ChecklistItemMeta } from '../types/ItemMeta';
+import type { ChecklistItemMeta, ItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from '../types/ItemMeta';
 import type { ListRenderer } from '../types/ListRenderer';
 import { getSiblings } from '../utils/getSiblings';
 import { getChildItems } from '../utils/getChildItems';
@@ -188,15 +188,15 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Set start property value from initial data
      */
-    if (this.data.start !== undefined) {
-      this.changeStartWith(this.data.start);
+    if ((this.data.meta as OrderedListItemMeta).start !== undefined) {
+      this.changeStartWith((this.data.meta as OrderedListItemMeta).start!);
     }
 
     /**
      * Set counterType value from initial data
      */
-    if (this.data.counterType !== undefined) {
-      this.changeCounters(this.data.counterType);
+    if ((this.data.meta as OrderedListItemMeta).counterType !== undefined) {
+      this.changeCounters((this.data.meta as OrderedListItemMeta).counterType!);
     }
 
     return this.listWrapper;
@@ -235,14 +235,14 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     let dataToSave: ListData = {
       style: this.data.style,
+      meta: {} as ItemMeta,
       items: composedListItems,
     };
 
     if (this.data.style === 'ordered') {
-      dataToSave = {
-        start: this.data.start,
-        counterType: this.data.counterType,
-        ...dataToSave,
+      dataToSave.meta = {
+        start: (this.data.meta as OrderedListItemMeta).start,
+        counterType: (this.data.meta as OrderedListItemMeta).counterType,
       };
     }
 
@@ -379,6 +379,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const data: ListData = {
       style,
+      meta: {} as ItemMeta,
       items: [],
     };
 
@@ -386,8 +387,8 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      * Set default ordered list atributes if style is ordered
      */
     if (style === 'ordered') {
-      data.counterType = 'numeric';
-      data.start = 1;
+      (this.data.meta as OrderedListItemMeta).counterType = 'numeric';
+      (this.data.meta as OrderedListItemMeta).start = 1;
     }
 
     // get pasted items from the html.
@@ -424,7 +425,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   public changeStartWith(index: number): void {
     this.listWrapper!.style.setProperty('counter-reset', `item ${index - 1}`);
 
-    this.data.start = index;
+    (this.data.meta as OrderedListItemMeta).start = index;
   }
 
   /**
@@ -434,7 +435,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   public changeCounters(counterType: OlCounterType): void {
     this.listWrapper!.style.setProperty('--list-counter-type', counterType);
 
-    this.data.counterType = counterType;
+    (this.data.meta as OrderedListItemMeta).counterType = counterType;
   }
 
   /**
@@ -709,7 +710,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     const newListContent = this.save(newListWrapper);
 
-    newListContent.start = this.data.style == 'ordered' ? 1 : undefined;
+    (newListContent.meta as OrderedListItemMeta).start = this.data.style == 'ordered' ? 1 : undefined;
 
     /**
      * Insert separated list with trailing items
@@ -1130,10 +1131,10 @@ export default class ListTabulator<Renderer extends ListRenderer> {
 
     switch (true) {
       case this.renderer instanceof OrderedListRenderer:
-        return this.renderer.renderItem(itemContent, itemMeta);
+        return this.renderer.renderItem(itemContent, itemMeta as OrderedListItemMeta);
 
       case this.renderer instanceof UnorderedListRenderer:
-        return this.renderer.renderItem(itemContent, itemMeta);
+        return this.renderer.renderItem(itemContent, itemMeta as UnorderedListItemMeta);
 
       default:
         return this.renderer.renderItem(itemContent, itemMeta as ChecklistItemMeta);

@@ -24,7 +24,7 @@ export default {
 
   server: {
     port: 3303,
-    open: true,
+    open: './playground/index.html',
   },
   plugins: [cssInjectedByJsPlugin(), dts()],
 };

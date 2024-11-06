@@ -1,5 +1,4 @@
-import type { ChecklistItemMeta, OrderedListItemMeta, UnorderedListItemMeta } from './ItemMeta';
-import type { OlCounterType } from './OlCounterType';
+import type { ItemMeta } from './ItemMeta';
 
 /**
  * list style to make list as ordered or unordered
@@ -9,24 +8,12 @@ export type ListDataStyle = 'ordered' | 'unordered' | 'checklist';
 /**
  * Interface that represents data of the List tool
  */
-export interface ListData {
+export type ListData = Omit<ListItem, 'content'> & {
   /**
-   * list type 'ordered' or 'unordered' or 'checklist'
+   * Style of the list tool
    */
   style: ListDataStyle;
-  /**
-   * list of first-level elements
-   */
-  items: ListItem[];
-  /**
-   * Start property used only in ordered list
-   */
-  start?: number;
-  /**
-   * Counters type used only in ordered list
-   */
-  counterType?: OlCounterType;
-}
+};
 
 /**
  * Interface that represents data of the List tool
@@ -78,7 +65,7 @@ export interface ListItem {
   /**
    * Meta information of each list item
    */
-  meta: OrderedListItemMeta | UnorderedListItemMeta | ChecklistItemMeta;
+  meta: ItemMeta;
 
   /**
    * sublist items

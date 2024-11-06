@@ -43,6 +43,7 @@ export default function normalizeData(data: ListData | OldListData | OldChecklis
 
     return {
       style: data.style,
+      meta: {},
       items: normalizedDataItems,
     };
   } else if (instanceOfChecklistData(data)) {
@@ -58,6 +59,7 @@ export default function normalizeData(data: ListData | OldListData | OldChecklis
 
     return {
       style: 'checklist',
+      meta: {},
       items: normalizedDataItems,
     };
   } else {
