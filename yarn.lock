@@ -40,19 +40,12 @@
   dependencies:
     "@editorjs/dom" "^1.0.0"
 
-"@editorjs/caret@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@editorjs/caret/-/caret-1.0.2.tgz#8d7c90503caaff553d973968bb24c4ffe5d9a993"
-  integrity sha512-V1tmvNhTOLAHiJhZRtL26iKe0bs6tH+yWg6FO/v+ydsYbw16y4tMMDLhrgIcYppKmi7tt3t14prdrI1kUNPYcQ==
+"@editorjs/caret@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@editorjs/caret/-/caret-1.0.3.tgz#1a622d2d8ec117a724ed782e21b7c5a74c3c1401"
+  integrity sha512-VmgwQJZgL/LQjk049JunzRV1YCa0vDi+BNEpbDmr5cp3lGZllq9QQFO1eI71ZPzvFVn3vvhb+eOif4sAEyGgbw==
   dependencies:
-    "@editorjs/dom" "^1.0.0"
-
-"@editorjs/dom@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@editorjs/dom/-/dom-0.0.7.tgz#790ff250dbe10d055c87f3dd599a6e01b7c2ea6c"
-  integrity sha512-dJH20v58MtTE7U8iYwvWBpPgeqm2dn8DDfovWlp7+bWKEe2q1g0PT/5sxVZT5wPIPWEE73K2EnTqB/3XTuV/rQ==
-  dependencies:
-    "@editorjs/helpers" "^0.0.7"
+    "@editorjs/dom" "^1.0.1"
 
 "@editorjs/dom@^1.0.0":
   version "1.0.0"
@@ -61,6 +54,13 @@
   dependencies:
     "@editorjs/helpers" "^1.0.0"
 
+"@editorjs/dom@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@editorjs/dom/-/dom-1.0.1.tgz#ace66e79096101a9767d29907468f8eb07e73693"
+  integrity sha512-yLO+86MYOIUr1Jl7SQw23SYT84ggv6aJW0EIRsI3NTHYgnQzmK7Bt2n5ZFupQlB0GJqmKqA5tCue3NKQb+o7Pw==
+  dependencies:
+    "@editorjs/helpers" "^1.0.1"
+
 "@editorjs/editorjs@^2.31.0-rc.2":
   version "2.31.0-rc.2"
   resolved "https://registry.yarnpkg.com/@editorjs/editorjs/-/editorjs-2.31.0-rc.2.tgz#887852655f288a2b7f0d966962d4a1d041da07e4"
@@ -68,15 +68,15 @@
   dependencies:
     "@editorjs/caret" "^1.0.1"
 
-"@editorjs/helpers@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@editorjs/helpers/-/helpers-0.0.7.tgz#2156ec7b60a133d1e1ff87c50eb09b95b0a40ce0"
-  integrity sha512-jMFbtfWKip6mSS1Pyhr1ShyOfPKfxg1Z2ESRExyXJrwjWnPF7Xqipzsig8R6ZfJDXVnvhRcKNwQcHGQZuYMjkA==
-
 "@editorjs/helpers@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@editorjs/helpers/-/helpers-1.0.0.tgz#4b0e0868e51e2772a73212f4aac5aff553725894"
   integrity sha512-ih4yCm+x+7X9XCn1zxfNous2LQX8ZYMyTHMLdgbyjBf0Opf8GdLxVjdzSjkA+0mUp1tUe3JgWW3FTisYcSnbQA==
+
+"@editorjs/helpers@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@editorjs/helpers/-/helpers-1.0.1.tgz#e96f7d485c15f563e69c37bd82282c148e0187cc"
+  integrity sha512-Lmr8ImoQvoROXtzhsIJsA1ZtXzH46DmE6O8hMjn9/AvQq62UfjREjn+Ewi6KxjIZMay2PsgDEbLlsVyNJGEaxw==
 
 "@es-joy/jsdoccomment@~0.46.0":
   version "0.46.0"

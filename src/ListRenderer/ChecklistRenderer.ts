@@ -1,7 +1,7 @@
 import { IconCheck } from '@codexteam/icons';
 import type { ChecklistItemMeta } from '../types/ItemMeta';
 import type { NestedListConfig } from '../types/ListParams';
-import * as Dom from '@editorjs/dom';
+import { isEmpty, make } from '@editorjs/dom';
 import { DefaultListCssClasses } from './ListRenderer';
 import type { ListCssClasses, ListRendererInterface } from './ListRenderer';
 import { CssPrefix } from '../styles/CssPrefix';
@@ -86,7 +86,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
      * Check if it's root level
      */
     if (isRoot === true) {
-      wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.wrapper, CheckListRenderer.CSS.checklist]) as HTMLUListElement;
+      wrapperElement = make('ul', [CheckListRenderer.CSS.wrapper, CheckListRenderer.CSS.checklist]) as HTMLUListElement;
 
       /**
        * Delegate clicks from wrapper to items
@@ -103,7 +103,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
         }
       });
     } else {
-      wrapperElement = Dom.make('ul', [CheckListRenderer.CSS.checklist, CheckListRenderer.CSS.itemChildren]) as HTMLUListElement;
+      wrapperElement = make('ul', [CheckListRenderer.CSS.checklist, CheckListRenderer.CSS.itemChildren]) as HTMLUListElement;
     }
 
     return wrapperElement;
@@ -116,14 +116,14 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
    * @returns - created html list item element
    */
   public renderItem(content: string, meta: ChecklistItemMeta): HTMLLIElement {
-    const itemWrapper = Dom.make('li', [CheckListRenderer.CSS.item, CheckListRenderer.CSS.item]);
-    const itemContent = Dom.make('div', CheckListRenderer.CSS.itemContent, {
+    const itemWrapper = make('li', [CheckListRenderer.CSS.item, CheckListRenderer.CSS.item]);
+    const itemContent = make('div', CheckListRenderer.CSS.itemContent, {
       innerHTML: content,
       contentEditable: (!this.readOnly).toString(),
     });
 
-    const checkbox = Dom.make('span', CheckListRenderer.CSS.checkbox);
-    const checkboxContainer = Dom.make('div', CheckListRenderer.CSS.checkboxContainer);
+    const checkbox = make('span', CheckListRenderer.CSS.checkbox);
+    const checkboxContainer = make('div', CheckListRenderer.CSS.checkboxContainer);
 
     if (meta.checked === true) {
       checkboxContainer.classList.add(CheckListRenderer.CSS.itemChecked);
@@ -150,7 +150,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
       return '';
     }
 
-    if (Dom.isEmpty(contentNode)) {
+    if (isEmpty(contentNode)) {
       return '';
     }
 
