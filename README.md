@@ -67,7 +67,7 @@ var editor = EditorJS({
 | Field             | Type      |  Description                                                                                                              |
 | ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------- |
 | style             | `string`  |  list will be rendered with this style: `ordered`, `unordered` or `checklist`, default is `defaultStyle` from tool config |
-| meta              | `ItemMeta`|  Item meta based on the list type                                                                                         |
+| meta              | `ItemMeta`|  Item meta based on the list style                                                                                         |
 | items             | `Item[]`  |  the array of list's items                                                                                                |
 
 Object `Item`:
