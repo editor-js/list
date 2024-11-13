@@ -1,7 +1,9 @@
+// eslint-disable-next-line no-undef
 module.exports = {
-    plugins: [
-      require('postcss-nested-ancestors'),
-      require('postcss-nested'),
-    ],
-  };
-  
+  plugins: [
+    // eslint-disable-next-line no-undef
+    require('postcss-nested-ancestors'),
+    // eslint-disable-next-line no-undef
+    require('postcss-nested'),
+  ],
+};

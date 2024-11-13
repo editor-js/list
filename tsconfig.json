@@ -11,8 +11,8 @@
     "outDir": "./dist",
     "declaration": true,
     "declarationDir": "./dist/types",
-    "isolatedModules": true
+    "isolatedModules": true,
   },
   "include": ["src"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "exclude": ["node_modules"]
 }
