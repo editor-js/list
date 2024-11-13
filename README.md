@@ -11,8 +11,7 @@
 - 🪜 Max nesting level configuration.
 - 📝 Compatible with [List](https://github.com/editor-js/list) and [Checklist](https://github.com/editor-js/checklist).
 
-
-![](assets/example.gif)
+![](assets/demo.gif)
 
 Use `Tab` and `Shift+Tab` keys to create or remove sublist with a padding.
 
