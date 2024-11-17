@@ -70,7 +70,7 @@ export class OrderedListRenderer implements ListRendererInterface<OrderedListIte
   }
 
   /**
-   * Redners list item element
+   * Renders list item element
    * @param content - content used in list item rendering
    * @param _meta - meta of the list item unused in rendering of the ordered list
    * @returns - created html list item element
