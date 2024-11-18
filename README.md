@@ -2,6 +2,8 @@
 
 # Editorjs List Tool
 
+![](assets/readme_image.png)
+
 - 🤩 Part of [Editor.js](https://editorjs.io/) ecosystem.
 - 📂 Nesting.
 - 🔥 Ordered and Unordered lists.
@@ -26,7 +28,7 @@ yarn add @editorjs/list
 Include module at your application
 
 ```javascript
-import List from '@editorjs/list';
+import EditorjsList from '@editorjs/list';
 ```
 
 Optionally, you can load this tool from CDN [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/list@latest)
@@ -37,14 +39,14 @@ Add the List Tool to the `tools` property of the Editor.js initial config.
 
 ```javascript
 import EditorJS from '@editorjs/editorjs';
-import List from '@editorjs/list';
+import EditorjsList from '@editorjs/list';
 
 var editor = EditorJS({
   // ...
   tools: {
     ...
     list: {
-      class: List,
+      class: EditorjsList,
       inlineToolbar: true,
       config: {
         defaultStyle: 'unordered'
@@ -53,6 +55,8 @@ var editor = EditorJS({
   },
 });
 ```
+> [!IMPORTANT]
+> Note that in List 2.0 class name changed from `List` to `EditorjsList`.
 
 ## Config Params
 
