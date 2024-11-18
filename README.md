@@ -31,7 +31,7 @@ Include module at your application
 import EditorjsList from '@editorjs/list';
 ```
 
-Optionally, you can load this tool from CDN [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/list@latest)
+Optionally, you can load this tool from CDN [JsDelivr CDN](https://cdn.jsdelivr.net/npm/@editorjs/list@2)
 
 ## Usage
 
