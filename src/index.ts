@@ -5,12 +5,13 @@ import type {
   ToolConfig
 } from '@editorjs/editorjs/types/tools';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
+import { IconUpperAlpha, IconStartWith } from './styles/icons/index.js';
 import type { ListConfig, ListData, ListDataStyle, ListItem, OldListData } from './types/ListParams';
 import ListTabulator from './ListTabulator';
 import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
 import type { ListRenderer } from './types/ListRenderer';
 import { renderToolboxInput } from './utils/renderToolboxInput';
-import { type OlCounterType, OlCounterTypesMap } from './types/OlCounterType';
+import { OlCounterIconsMap, type OlCounterType, OlCounterTypesMap } from './types/OlCounterType';
 
 /**
  * Build styles
@@ -316,6 +317,7 @@ export default class EditorjsList {
       const orderedListTunes: MenuConfigItem[] = [
         {
           label: this.api.i18n.t('Start with'),
+          icon: IconStartWith,
           children: {
             items: [
               {
@@ -330,6 +332,7 @@ export default class EditorjsList {
 
       const orderedListCountersTunes: MenuConfigItem = {
         label: this.api.i18n.t('Counters type'),
+        icon: IconUpperAlpha,
         children: {
           items: [],
         },
@@ -342,6 +345,7 @@ export default class EditorjsList {
       OlCounterTypesMap.forEach((_, counterType: string) => {
         orderedListCountersTunes.children.items!.push({
           title: this.api.i18n.t(counterType),
+          icon: OlCounterIconsMap.get(counterType),
           isActive: (this.data.meta as OrderedListItemMeta).counterType === OlCounterTypesMap.get(counterType),
           closeOnActivate: true,
           onActivate: () => {
@@ -349,8 +353,8 @@ export default class EditorjsList {
           },
         });
       });
-
-      defaultTunes.push(...orderedListTunes, orderedListCountersTunes);
+      // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
+      defaultTunes.push({ type: 'separator' }, ...orderedListTunes, orderedListCountersTunes);
     }
 
     return defaultTunes;
