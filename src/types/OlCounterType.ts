@@ -33,9 +33,28 @@ export const OlCounterTypesMap = new Map<string, string>([
 ]);
 
 export const OlCounterIconsMap = new Map<string, string>([
+  /**
+   * Value that represents Icon for Numeric counter type
+   */
   ['Numeric', IconNumber],
+
+  /**
+   * Value that represents Icon for Lower Roman counter type
+   */
   ['Lower Roman', IconLowerRoman],
+
+  /**
+   * Value that represents Icon for Upper Roman counter type
+   */
   ['Upper Roman', IconUpperRoman],
+
+  /**
+   * Value that represents Icon for Lower Alpha counter type
+   */
   ['Lower Alpha', IconLowerAlpha],
+
+  /**
+   * Value that represents Icon for Upper Alpha counter type
+   */
   ['Upper Alpha', IconUpperAlpha],
 ]);
