@@ -5,7 +5,7 @@ import type {
   ToolConfig
 } from '@editorjs/editorjs/types/tools';
 import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
-import { IconUpperAlpha, IconStartWith } from './styles/icons/index.js';
+import { IconStartWith } from './styles/icons/index.js';
 import type { ListConfig, ListData, ListDataStyle, ListItem, OldListData } from './types/ListParams';
 import ListTabulator from './ListTabulator';
 import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
@@ -331,8 +331,8 @@ export default class EditorjsList {
       ];
 
       const orderedListCountersTunes: MenuConfigItem = {
-        label: this.api.i18n.t('Counters type'),
-        icon: IconUpperAlpha,
+        label: this.api.i18n.t('Counter type'),
+        icon: OlCounterIconsMap.get((this.data.meta as OrderedListItemMeta).counterType!),
         children: {
           items: [],
         },
@@ -341,11 +341,10 @@ export default class EditorjsList {
       /**
        * For each counter type in OlCounterType create toolbox item
        */
-
       OlCounterTypesMap.forEach((_, counterType: string) => {
         orderedListCountersTunes.children.items!.push({
           title: this.api.i18n.t(counterType),
-          icon: OlCounterIconsMap.get(counterType),
+          icon: OlCounterIconsMap.get(OlCounterTypesMap.get(counterType)!),
           isActive: (this.data.meta as OrderedListItemMeta).counterType === OlCounterTypesMap.get(counterType),
           closeOnActivate: true,
           onActivate: () => {
