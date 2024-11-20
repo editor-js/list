@@ -3,7 +3,7 @@ import { IconNumber, IconLowerRoman, IconUpperRoman, IconLowerAlpha, IconUpperAl
 export type OlCounterType = 'numeric' | 'upper-roman' | 'lower-roman' | 'upper-alpha' | 'lower-alpha';
 
 /**
- * Enum that represents all of the supported styles of the counters for ordered list
+ * Map that represents all of the supported styles of the counters for ordered list
  */
 export const OlCounterTypesMap = new Map<string, string>([
   /**
@@ -32,6 +32,9 @@ export const OlCounterTypesMap = new Map<string, string>([
   ['Upper Alpha', 'upper-alpha'],
 ]);
 
+/**
+ * Map that represents relation between supported counter types and theirs icons to be displayed in toolbox
+ */
 export const OlCounterIconsMap = new Map<string, string>([
   /**
    * Value that represents Icon for Numeric counter type
