@@ -89,7 +89,7 @@ export interface ListConfig {
   maxLevel?: number;
 
   /**
-   * List types allowed to be displayed
+   * List styles allowed to be displayed
    */
-  displayedEntries?: ListDataStyle[];
+  styles?: ListDataStyle[];
 }

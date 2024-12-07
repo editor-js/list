@@ -52,7 +52,7 @@ export default class EditorjsList implements BlockTool {
    * title - title to show in toolbox
    */
   public static get toolbox(): ToolboxConfig {
-    const entries = [
+    const defaultSettings = [
       {
         icon: IconListBulleted,
         title: 'Unordered List',
@@ -76,9 +76,9 @@ export default class EditorjsList implements BlockTool {
       },
     ];
 
-    return this.displayedEntries ? entries.filter(
-      ele => this.displayedEntries?.includes(ele.data.style as ListDataStyle)
-    ) : entries;
+    return EditorjsList.styles ? defaultSettings.filter(
+      ele => EditorjsList.styles?.includes(ele.data.style as ListDataStyle)
+    ) : defaultSettings;
   }
 
   /**
@@ -176,9 +176,9 @@ export default class EditorjsList implements BlockTool {
   private defaultListStyle?: ListConfig['defaultStyle'];
 
   /**
-   *
+   * List Styles allowed to be displayed
    */
-  private static displayedEntries?: ListDataStyle[];
+  private static styles?: ListDataStyle[];
 
   /**
    * Tool's data
@@ -219,7 +219,7 @@ export default class EditorjsList implements BlockTool {
      */
     this.defaultListStyle = this.config?.defaultStyle || 'unordered';
 
-    EditorjsList.displayedEntries = this.config?.displayedEntries;
+    EditorjsList.styles = this.config?.styles;
 
     const initialData = {
       style: this.defaultListStyle,
@@ -283,7 +283,7 @@ export default class EditorjsList implements BlockTool {
    * @returns array of tune configs
    */
   public renderSettings(): MenuConfigItem[] {
-    const defaultTunes: MenuConfigItem[] = [
+    let defaultTunes: MenuConfigItem[] = [
       {
         title: this.api.i18n.t('Unordered'),
         icon: IconListBulleted,
@@ -313,18 +313,15 @@ export default class EditorjsList implements BlockTool {
       },
     ];
 
-    if (EditorjsList.displayedEntries){
-      if (this.listStyle === 'ordered') this.addAdditionalTunes(defaultTunes);
-    } else if (this.listStyle === 'ordered') this.addAdditionalTunes(defaultTunes);
+    if (EditorjsList.styles) {
+      defaultTunes = defaultTunes.filter(
+        tune => (('title' in tune) && EditorjsList.styles?.includes(tune.title!.toLowerCase() as ListDataStyle))
+      )
+    }
 
-    return EditorjsList.displayedEntries ? defaultTunes.filter(
-      tune => {
-          if ('title' in tune) {
-            if(tune.title === 'Start with' || tune.title === 'Counter type') return true;
-            else return EditorjsList.displayedEntries?.includes(tune.title!.toLowerCase() as ListDataStyle);
-          } else if (('type' in tune) && tune.type === 'separator') return true;
-        }
-    ) : defaultTunes;
+    if (this.listStyle === 'ordered') this.addAdditionalTunes(defaultTunes);
+
+    return defaultTunes;
   }
 
   /**
