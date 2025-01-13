@@ -359,7 +359,7 @@ export default class EditorjsList {
         }
 
         orderedListCountersTunes.children.items!.push({
-          title: this.api.i18n.t(counterTypeValue),
+          title: this.api.i18n.t(counterType),
           icon: OlCounterIconsMap.get(counterTypeValue),
           isActive: (this.data.meta as OrderedListItemMeta).counterType === OlCounterTypesMap.get(counterType),
           closeOnActivate: true,
