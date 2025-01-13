@@ -431,39 +431,39 @@ export default class EditorjsList {
     switch (this.listStyle) {
       case 'ordered':
         this.list = new ListTabulator<OrderedListRenderer>({
-            data: this.data,
-            readOnly: this.readOnly,
-            api: this.api,
-            config: this.config,
-            block: this.block,
-          },
-          new OrderedListRenderer(this.readOnly, this.config)
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        new OrderedListRenderer(this.readOnly, this.config)
         );
 
         break;
 
       case 'unordered':
         this.list = new ListTabulator<UnorderedListRenderer>({
-            data: this.data,
-            readOnly: this.readOnly,
-            api: this.api,
-            config: this.config,
-            block: this.block,
-          },
-          new UnorderedListRenderer(this.readOnly, this.config)
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        new UnorderedListRenderer(this.readOnly, this.config)
         );
 
         break;
 
       case 'checklist':
         this.list = new ListTabulator<CheckListRenderer>({
-            data: this.data,
-            readOnly: this.readOnly,
-            api: this.api,
-            config: this.config,
-            block: this.block,
-          },
-          new CheckListRenderer(this.readOnly, this.config)
+          data: this.data,
+          readOnly: this.readOnly,
+          api: this.api,
+          config: this.config,
+          block: this.block,
+        },
+        new CheckListRenderer(this.readOnly, this.config)
         );
 
         break;
