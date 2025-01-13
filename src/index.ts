@@ -172,6 +172,11 @@ export default class EditorjsList {
   private defaultListStyle?: ListConfig['defaultStyle'];
 
   /**
+   * Default Counter type of the ordered list
+   */
+  private defaultCounterTypes: OlCounterType[];
+
+  /**
    * Tool's data
    */
   private data: ListData;
@@ -209,6 +214,11 @@ export default class EditorjsList {
      * Set the default list style from the config or presetted 'unordered'.
      */
     this.defaultListStyle = this.config?.defaultStyle || 'unordered';
+
+    /**
+     * Set the default counter types for the ordered list
+     */
+    this.defaultCounterTypes = this.config?.counterTypes || ['numeric', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha'];
 
     const initialData = {
       style: this.defaultListStyle,
@@ -342,9 +352,15 @@ export default class EditorjsList {
        * For each counter type in OlCounterType create toolbox item
        */
       OlCounterTypesMap.forEach((_, counterType: string) => {
+        const counterTypeValue = OlCounterTypesMap.get(counterType)! as OlCounterType;
+
+        if (!this.defaultCounterTypes.includes(counterTypeValue)) {
+          return;
+        }
+
         orderedListCountersTunes.children.items!.push({
-          title: this.api.i18n.t(counterType),
-          icon: OlCounterIconsMap.get(OlCounterTypesMap.get(counterType)!),
+          title: this.api.i18n.t(counterTypeValue),
+          icon: OlCounterIconsMap.get(counterTypeValue),
           isActive: (this.data.meta as OrderedListItemMeta).counterType === OlCounterTypesMap.get(counterType),
           closeOnActivate: true,
           onActivate: () => {
@@ -415,39 +431,39 @@ export default class EditorjsList {
     switch (this.listStyle) {
       case 'ordered':
         this.list = new ListTabulator<OrderedListRenderer>({
-          data: this.data,
-          readOnly: this.readOnly,
-          api: this.api,
-          config: this.config,
-          block: this.block,
-        },
-        new OrderedListRenderer(this.readOnly, this.config)
+            data: this.data,
+            readOnly: this.readOnly,
+            api: this.api,
+            config: this.config,
+            block: this.block,
+          },
+          new OrderedListRenderer(this.readOnly, this.config)
         );
 
         break;
 
       case 'unordered':
         this.list = new ListTabulator<UnorderedListRenderer>({
-          data: this.data,
-          readOnly: this.readOnly,
-          api: this.api,
-          config: this.config,
-          block: this.block,
-        },
-        new UnorderedListRenderer(this.readOnly, this.config)
+            data: this.data,
+            readOnly: this.readOnly,
+            api: this.api,
+            config: this.config,
+            block: this.block,
+          },
+          new UnorderedListRenderer(this.readOnly, this.config)
         );
 
         break;
 
       case 'checklist':
         this.list = new ListTabulator<CheckListRenderer>({
-          data: this.data,
-          readOnly: this.readOnly,
-          api: this.api,
-          config: this.config,
-          block: this.block,
-        },
-        new CheckListRenderer(this.readOnly, this.config)
+            data: this.data,
+            readOnly: this.readOnly,
+            api: this.api,
+            config: this.config,
+            block: this.block,
+          },
+          new CheckListRenderer(this.readOnly, this.config)
         );
 
         break;
