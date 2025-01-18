@@ -64,6 +64,7 @@ var editor = EditorJS({
 |--------------|----------|----------------------------------------------------------------|
 | defaultStyle | `string` | default list style: `ordered`, `unordered` or `checklist`, default is `unordered` |
 | maxLevel     | `number` | maximum level of the list nesting, could be set to `1` to disable nesting, unlimited by default |
+| styles     | `listStyle[]` | List styles allowed to be displayed `ordered`, `unordered` or `checklist` |
 
 ## Output data
 

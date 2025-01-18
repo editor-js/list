@@ -92,4 +92,9 @@ export interface ListConfig {
    * If nesting is not needed, it could be set to 1
    */
   maxLevel?: number;
+
+  /**
+   * List styles allowed to be displayed
+   */
+  styles?: ListDataStyle[];
 }

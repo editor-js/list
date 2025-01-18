@@ -1,4 +1,4 @@
-import type { API, BlockAPI, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
+import type { API, BlockAPI, PasteConfig, ToolboxConfig, BlockTool } from '@editorjs/editorjs';
 import type {
   BlockToolConstructorOptions,
   MenuConfigItem,
@@ -31,7 +31,7 @@ export type ListParams = BlockToolConstructorOptions<ListData | OldListData, Lis
 /**
  * Default class of the component used in editor
  */
-export default class EditorjsList {
+export default class EditorjsList implements BlockTool {
   /**
    * Notify core that read-only mode is supported
    */
@@ -52,7 +52,7 @@ export default class EditorjsList {
    * title - title to show in toolbox
    */
   public static get toolbox(): ToolboxConfig {
-    return [
+    const defaultSettings = [
       {
         icon: IconListBulleted,
         title: 'Unordered List',
@@ -75,6 +75,10 @@ export default class EditorjsList {
         },
       },
     ];
+
+    return EditorjsList.styles ? defaultSettings.filter(
+      ele => EditorjsList.styles?.includes(ele.data.style as ListDataStyle)
+    ) : defaultSettings;
   }
 
   /**
@@ -172,6 +176,11 @@ export default class EditorjsList {
   private defaultListStyle?: ListConfig['defaultStyle'];
 
   /**
+   * List Styles allowed to be displayed
+   */
+  private static styles?: ListDataStyle[];
+
+  /**
    * Tool's data
    */
   private data: ListData;
@@ -209,6 +218,8 @@ export default class EditorjsList {
      * Set the default list style from the config or presetted 'unordered'.
      */
     this.defaultListStyle = this.config?.defaultStyle || 'unordered';
+
+    EditorjsList.styles = this.config?.styles;
 
     const initialData = {
       style: this.defaultListStyle,
@@ -272,9 +283,9 @@ export default class EditorjsList {
    * @returns array of tune configs
    */
   public renderSettings(): MenuConfigItem[] {
-    const defaultTunes: MenuConfigItem[] = [
+    let defaultTunes: MenuConfigItem[] = [
       {
-        label: this.api.i18n.t('Unordered'),
+        title: this.api.i18n.t('Unordered'),
         icon: IconListBulleted,
         closeOnActivate: true,
         isActive: this.listStyle == 'unordered',
@@ -283,7 +294,7 @@ export default class EditorjsList {
         },
       },
       {
-        label: this.api.i18n.t('Ordered'),
+        title: this.api.i18n.t('Ordered'),
         icon: IconListNumbered,
         closeOnActivate: true,
         isActive: this.listStyle == 'ordered',
@@ -292,7 +303,7 @@ export default class EditorjsList {
         },
       },
       {
-        label: this.api.i18n.t('Checklist'),
+        title: this.api.i18n.t('Checklist'),
         icon: IconChecklist,
         closeOnActivate: true,
         isActive: this.listStyle == 'checklist',
@@ -302,59 +313,13 @@ export default class EditorjsList {
       },
     ];
 
-    if (this.listStyle === 'ordered') {
-      const startWithElement = renderToolboxInput(
-        (index: string) => this.changeStartWith(Number(index)),
-        {
-          value: String((this.data.meta as OrderedListItemMeta).start ?? 1),
-          placeholder: '',
-          attributes: {
-            required: 'true',
-          },
-          sanitize: input => stripNumbers(input),
-        });
-
-      const orderedListTunes: MenuConfigItem[] = [
-        {
-          label: this.api.i18n.t('Start with'),
-          icon: IconStartWith,
-          children: {
-            items: [
-              {
-                element: startWithElement,
-                // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-                type: 'html',
-              },
-            ],
-          },
-        },
-      ];
-
-      const orderedListCountersTunes: MenuConfigItem = {
-        label: this.api.i18n.t('Counter type'),
-        icon: OlCounterIconsMap.get((this.data.meta as OrderedListItemMeta).counterType!),
-        children: {
-          items: [],
-        },
-      };
-
-      /**
-       * For each counter type in OlCounterType create toolbox item
-       */
-      OlCounterTypesMap.forEach((_, counterType: string) => {
-        orderedListCountersTunes.children.items!.push({
-          title: this.api.i18n.t(counterType),
-          icon: OlCounterIconsMap.get(OlCounterTypesMap.get(counterType)!),
-          isActive: (this.data.meta as OrderedListItemMeta).counterType === OlCounterTypesMap.get(counterType),
-          closeOnActivate: true,
-          onActivate: () => {
-            this.changeCounters(OlCounterTypesMap.get(counterType) as OlCounterType);
-          },
-        });
-      });
-      // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-      defaultTunes.push({ type: 'separator' }, ...orderedListTunes, orderedListCountersTunes);
+    if (EditorjsList.styles) {
+      defaultTunes = defaultTunes.filter(
+        tune => (('title' in tune) && EditorjsList.styles?.includes(tune.title!.toLowerCase() as ListDataStyle))
+      )
     }
+
+    if (this.listStyle === 'ordered') this.addAdditionalTunes(defaultTunes);
 
     return defaultTunes;
   }
@@ -452,5 +417,63 @@ export default class EditorjsList {
 
         break;
     }
+  }
+
+  /**
+   * Add additional tunes for ordered list
+   * @param defaultTunes - default tunes list
+   */
+  private addAdditionalTunes(defaultTunes: MenuConfigItem[]): void {
+    const startWithElement = renderToolboxInput(
+      (index: string) => this.changeStartWith(Number(index)),
+      {
+        value: String((this.data.meta as OrderedListItemMeta).start ?? 1),
+        placeholder: '',
+        attributes: {
+          required: 'true',
+        },
+        sanitize: input => stripNumbers(input),
+      });
+
+    const orderedListTunes: MenuConfigItem[] = [
+      {
+        title: this.api.i18n.t('Start with'),
+        icon: IconStartWith,
+        children: {
+          items: [
+            {
+              element: startWithElement,
+              // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
+              type: 'html',
+            },
+          ],
+        },
+      },
+    ];
+
+    const orderedListCountersTunes: MenuConfigItem = {
+      title: this.api.i18n.t('Counter type'),
+      icon: OlCounterIconsMap.get((this.data.meta as OrderedListItemMeta).counterType!),
+      children: {
+        items: [],
+      },
+    };
+
+    /**
+     * For each counter type in OlCounterType create toolbox item
+     */
+    OlCounterTypesMap.forEach((_, counterType: string) => {
+      orderedListCountersTunes.children.items!.push({
+        title: this.api.i18n.t(counterType),
+        icon: OlCounterIconsMap.get(OlCounterTypesMap.get(counterType)!),
+        isActive: (this.data.meta as OrderedListItemMeta).counterType === OlCounterTypesMap.get(counterType),
+        closeOnActivate: true,
+        onActivate: () => {
+          this.changeCounters(OlCounterTypesMap.get(counterType) as OlCounterType);
+        },
+      });
+    });
+    // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
+    defaultTunes.push({ type: 'separator' }, ...orderedListTunes, orderedListCountersTunes);
   }
 }
