@@ -188,14 +188,14 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     /**
      * Set start property value from initial data
      */
-    if ('start' in this.data.meta && this.data.meta.start !== undefined) {
+    if (this.data.meta && 'start' in this.data.meta && this.data.meta.start !== undefined) {
       this.changeStartWith(this.data.meta.start);
     }
 
     /**
      * Set counterType value from initial data
      */
-    if ('counterType' in this.data.meta && this.data.meta.counterType !== undefined) {
+    if (this.data.meta && 'counterType' in this.data.meta && this.data.meta.counterType !== undefined) {
       this.changeCounters(this.data.meta.counterType);
     }
 
