@@ -534,10 +534,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
-     * Caret is at start of input in case of delete selection
-     * Then backspace should be handled as usual
+     * If backspace is pressed with selection, it should be handled as usual
      */
-    if ((isCaretAtStartOfInput(currentItem) && window.getSelection()?.isCollapsed === false)) {
+    if (window.getSelection()?.isCollapsed === false) {
       return;
     }
 
