@@ -167,7 +167,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         (event) => {
           switch (event.key) {
             case 'Enter':
-              this.enterPressed(event);
+              if (!event.shiftKey) {
+                this.enterPressed(event);
+              }
               break;
             case 'Backspace':
               this.backspace(event);
