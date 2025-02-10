@@ -1,27 +1,24 @@
+import { IconListBulleted, IconListNumbered } from '@codexteam/icons';
 import type { API, BlockAPI, PasteConfig, ToolboxConfig } from '@editorjs/editorjs';
 import type {
   BlockToolConstructorOptions,
   MenuConfigItem,
   ToolConfig
 } from '@editorjs/editorjs/types/tools';
-import { IconListBulleted, IconListNumbered, IconChecklist } from '@codexteam/icons';
-import { IconStartWith } from './styles/icons/index.js';
-import type { ListConfig, ListData, ListDataStyle, ListItem, OldListData } from './types/ListParams';
+import { OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
 import ListTabulator from './ListTabulator';
-import { CheckListRenderer, OrderedListRenderer, UnorderedListRenderer } from './ListRenderer';
+import type { ListConfig, ListData, ListDataStyle, ListItem, OldListData } from './types/ListParams';
 import type { ListRenderer } from './types/ListRenderer';
-import { renderToolboxInput } from './utils/renderToolboxInput';
-import { OlCounterIconsMap, type OlCounterType, OlCounterTypesMap } from './types/OlCounterType';
+import { type OlCounterType } from './types/OlCounterType';
 
 /**
  * Build styles
  */
-import './styles/list.pcss';
 import './styles/input.pcss';
-import stripNumbers from './utils/stripNumbers';
-import normalizeData from './utils/normalizeData';
+import './styles/list.pcss';
 import type { PasteEvent } from './types';
 import type { OrderedListItemMeta } from './types/ItemMeta';
+import normalizeData from './utils/normalizeData';
 
 /**
  * Constructor Params for Editorjs List Tool, use to pass initial data and settings
@@ -65,13 +62,6 @@ export default class EditorjsList {
         title: 'Ordered List',
         data: {
           style: 'ordered',
-        },
-      },
-      {
-        icon: IconChecklist,
-        title: 'Checklist',
-        data: {
-          style: 'checklist',
         },
       },
     ];
@@ -291,70 +281,7 @@ export default class EditorjsList {
           this.listStyle = 'ordered';
         },
       },
-      {
-        label: this.api.i18n.t('Checklist'),
-        icon: IconChecklist,
-        closeOnActivate: true,
-        isActive: this.listStyle == 'checklist',
-        onActivate: () => {
-          this.listStyle = 'checklist';
-        },
-      },
     ];
-
-    if (this.listStyle === 'ordered') {
-      const startWithElement = renderToolboxInput(
-        (index: string) => this.changeStartWith(Number(index)),
-        {
-          value: String((this.data.meta as OrderedListItemMeta).start ?? 1),
-          placeholder: '',
-          attributes: {
-            required: 'true',
-          },
-          sanitize: input => stripNumbers(input),
-        });
-
-      const orderedListTunes: MenuConfigItem[] = [
-        {
-          label: this.api.i18n.t('Start with'),
-          icon: IconStartWith,
-          children: {
-            items: [
-              {
-                element: startWithElement,
-                // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-                type: 'html',
-              },
-            ],
-          },
-        },
-      ];
-
-      const orderedListCountersTunes: MenuConfigItem = {
-        label: this.api.i18n.t('Counter type'),
-        icon: OlCounterIconsMap.get((this.data.meta as OrderedListItemMeta).counterType!),
-        children: {
-          items: [],
-        },
-      };
-
-      /**
-       * For each counter type in OlCounterType create toolbox item
-       */
-      OlCounterTypesMap.forEach((_, counterType: string) => {
-        orderedListCountersTunes.children.items!.push({
-          title: this.api.i18n.t(counterType),
-          icon: OlCounterIconsMap.get(OlCounterTypesMap.get(counterType)!),
-          isActive: (this.data.meta as OrderedListItemMeta).counterType === OlCounterTypesMap.get(counterType),
-          closeOnActivate: true,
-          onActivate: () => {
-            this.changeCounters(OlCounterTypesMap.get(counterType) as OlCounterType);
-          },
-        });
-      });
-      // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-      defaultTunes.push({ type: 'separator' }, ...orderedListTunes, orderedListCountersTunes);
-    }
 
     return defaultTunes;
   }
@@ -435,19 +362,6 @@ export default class EditorjsList {
           block: this.block,
         },
         new UnorderedListRenderer(this.readOnly, this.config)
-        );
-
-        break;
-
-      case 'checklist':
-        this.list = new ListTabulator<CheckListRenderer>({
-          data: this.data,
-          readOnly: this.readOnly,
-          api: this.api,
-          config: this.config,
-          block: this.block,
-        },
-        new CheckListRenderer(this.readOnly, this.config)
         );
 
         break;
