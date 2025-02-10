@@ -31,6 +31,11 @@ export interface OldListData {
 }
 
 /**
+ * Type that represents data of the List tool
+ */
+export type OldNestedListData = Omit<ListData, 'meta'>;
+
+/**
  * Interface that represents old checklist data format
  */
 export interface OldChecklistData {
