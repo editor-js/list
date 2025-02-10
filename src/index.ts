@@ -368,8 +368,16 @@ export default class EditorjsList {
           },
         });
       });
+
+      /**
+       * Dont show Counter type tune if there is no valid counter types
+       */
+      if (orderedListCountersTunes.children.items!.length > 0) {
+        orderedListTunes.push(orderedListCountersTunes);
+      }
+
       // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-      defaultTunes.push({ type: 'separator' }, ...orderedListTunes, orderedListCountersTunes);
+      defaultTunes.push({ type: 'separator' }, ...orderedListTunes);
     }
 
     return defaultTunes;
