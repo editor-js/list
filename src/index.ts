@@ -218,7 +218,7 @@ export default class EditorjsList {
     /**
      * Set the default counter types for the ordered list
      */
-    this.defaultCounterTypes = this.config?.counterTypes || ['numeric', 'upper-roman', 'lower-roman', 'upper-alpha', 'lower-alpha'];
+    this.defaultCounterTypes = (this.config as ListConfig).counterTypes || Array.from(OlCounterTypesMap.values()) as OlCounterType[];
 
     const initialData = {
       style: this.defaultListStyle,
@@ -372,7 +372,7 @@ export default class EditorjsList {
       /**
        * Dont show Counter type tune if there is no valid counter types
        */
-      if (orderedListCountersTunes.children.items!.length > 0) {
+      if (orderedListCountersTunes.children.items!.length > 1) {
         orderedListTunes.push(orderedListCountersTunes);
       }
 
