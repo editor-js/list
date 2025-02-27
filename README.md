@@ -97,6 +97,35 @@ Object `ItemMeta` for Ordered list
 
 Object `ItemMeta` for Unordered list would be empty.
 
+## Localisation
+If you want to use your language for toolbox items, you can pass i18n dictionary to the editorjs instance below the tools `block`:
+```javascript
+i18n: { 
+  messages: {
+    "toolNames": {
+      "Ordered List": "Nummerierte Liste",
+      "Unordered List": "Unnummeriert Liste",
+      "Checklist": "Checkliste",
+    },
+    "tools": {
+      "List": {
+        'Unordered': 'Unnummeriert',
+        'Ordered': 'Nummerierte',
+        'Checklist': 'Checkliste',
+      }
+    },
+  },
+},
+```
+
+### Other supported keys for `tools.List`
+- `Start with`
+- `Counter type`
+- `Numeric`
+- `Lower Roman`
+- `Upper Roman`
+- `Lower Alpha`
+- `Upper Alpha`
 
 ## Example of the content for `Unordered List`
 ```json
