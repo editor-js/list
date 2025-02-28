@@ -1,4 +1,5 @@
 import type { ItemMeta } from './ItemMeta';
+import type { OlCounterType } from './OlCounterType';
 
 /**
  * list style to make list as ordered or unordered
@@ -92,4 +93,10 @@ export interface ListConfig {
    * If nesting is not needed, it could be set to 1
    */
   maxLevel?: number;
+  /**
+   * Specifies which counter types should be shown in the ordered list style selector.
+   * @example ['numeric', 'upper-roman'] // Shows selector with these two options
+   * @default undefined // All counter types are available when not specified
+   */
+  counterTypes?: OlCounterType[];
 }
