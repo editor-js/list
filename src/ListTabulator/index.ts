@@ -536,6 +536,13 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     }
 
     /**
+     * If backspace is pressed with selection, it should be handled as usual
+     */
+    if (window.getSelection()?.isCollapsed === false) {
+      return;
+    }
+
+    /**
      * Prevent Editor.js backspace handling
      */
     event.stopPropagation();

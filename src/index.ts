@@ -172,6 +172,11 @@ export default class EditorjsList {
   private defaultListStyle?: ListConfig['defaultStyle'];
 
   /**
+   * Default Counter type of the ordered list
+   */
+  private defaultCounterTypes: OlCounterType[];
+
+  /**
    * Tool's data
    */
   private data: ListData;
@@ -209,6 +214,11 @@ export default class EditorjsList {
      * Set the default list style from the config or presetted 'unordered'.
      */
     this.defaultListStyle = this.config?.defaultStyle || 'unordered';
+
+    /**
+     * Set the default counter types for the ordered list
+     */
+    this.defaultCounterTypes = (this.config as ListConfig).counterTypes || Array.from(OlCounterTypesMap.values()) as OlCounterType[];
 
     const initialData = {
       style: this.defaultListStyle,
@@ -342,9 +352,15 @@ export default class EditorjsList {
        * For each counter type in OlCounterType create toolbox item
        */
       OlCounterTypesMap.forEach((_, counterType: string) => {
+        const counterTypeValue = OlCounterTypesMap.get(counterType)! as OlCounterType;
+
+        if (!this.defaultCounterTypes.includes(counterTypeValue)) {
+          return;
+        }
+
         orderedListCountersTunes.children.items!.push({
           title: this.api.i18n.t(counterType),
-          icon: OlCounterIconsMap.get(OlCounterTypesMap.get(counterType)!),
+          icon: OlCounterIconsMap.get(counterTypeValue),
           isActive: (this.data.meta as OrderedListItemMeta).counterType === OlCounterTypesMap.get(counterType),
           closeOnActivate: true,
           onActivate: () => {
@@ -352,8 +368,16 @@ export default class EditorjsList {
           },
         });
       });
+
+      /**
+       * Dont show Counter type tune if there is no valid counter types
+       */
+      if (orderedListCountersTunes.children.items!.length > 1) {
+        orderedListTunes.push(orderedListCountersTunes);
+      }
+
       // @ts-expect-error ts(2820) can not use PopoverItem enum from editor.js types
-      defaultTunes.push({ type: 'separator' }, ...orderedListTunes, orderedListCountersTunes);
+      defaultTunes.push({ type: 'separator' }, ...orderedListTunes);
     }
 
     return defaultTunes;

@@ -64,6 +64,7 @@ var editor = EditorJS({
 |--------------|----------|----------------------------------------------------------------|
 | defaultStyle | `string` | default list style: `ordered`, `unordered` or `checklist`, default is `unordered` |
 | maxLevel     | `number` | maximum level of the list nesting, could be set to `1` to disable nesting, unlimited by default |
+| counterTypes | `string[]` | specifies which counter types should be shown in the ordered list style, could be set to `['numeric','upper-roman']`, default is `undefined` which shows all counter types |
 
 ## Output data
 
@@ -97,6 +98,35 @@ Object `ItemMeta` for Ordered list
 
 Object `ItemMeta` for Unordered list would be empty.
 
+## Localisation
+If you want to use your language for toolbox items, you can pass i18n dictionary to the editorjs instance below the tools `block`:
+```javascript
+i18n: { 
+  messages: {
+    "toolNames": {
+      "Ordered List": "Nummerierte Liste",
+      "Unordered List": "Unnummeriert Liste",
+      "Checklist": "Checkliste",
+    },
+    "tools": {
+      "List": {
+        'Unordered': 'Unnummeriert',
+        'Ordered': 'Nummerierte',
+        'Checklist': 'Checkliste',
+      }
+    },
+  },
+},
+```
+
+### Other supported keys for `tools.List`
+- `Start with`
+- `Counter type`
+- `Numeric`
+- `Lower Roman`
+- `Upper Roman`
+- `Lower Alpha`
+- `Upper Alpha`
 
 ## Example of the content for `Unordered List`
 ```json
