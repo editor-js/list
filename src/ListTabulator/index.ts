@@ -401,9 +401,18 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         const subItemsWrapper = child.querySelector(`:scope > ${tagToSearch}`);
         // get subitems.
         const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
+
         // get text content of the li element.
-        const childElement = subItems.length > 0 ? child?.firstElementChild : child;
-        const content = childElement?.innerHTML ?? '';
+        let content = child.innerHTML;
+
+        if (subItemsWrapper) {
+          // Get Copy of Child and remove any nested OL or UL tags from the content
+          const childCopy = child.cloneNode(true) as HTMLElement;
+
+          childCopy.querySelector(`:scope > ${tagToSearch}`)?.remove();
+
+          content = childCopy.innerHTML;
+        }
 
         return {
           content,
