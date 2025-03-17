@@ -402,7 +402,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         // get subitems.
         const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
         // get text content of the li element.
-        const content = child.innerHTML ?? '';
+        const content = child?.firstChild?.textContent ?? '';
 
         return {
           content,
