@@ -78,7 +78,9 @@
        * Wrapper of Editor
        */
       holder: 'editorjs',
-
+      sanitizer: {
+        br: false,
+      },
       /**
        * Common Inline Toolbar settings
        * - if true (or not specified), the order from 'tool' property will be used
@@ -98,6 +100,9 @@
           class: List,
           inlineToolbar: true,
           shortcut: 'CMD+SHIFT+L',
+          sanitizer: {
+            br: false,
+          },
           config: {
             defaultStyle: 'checklist',
             maxLevel: 4,
@@ -107,7 +112,7 @@
       /**
        * Example of the lacalisation dictionary
        */
-      i18n: { 
+      i18n: {
         messages: {
           "toolNames": {
             "Ordered List": "Nummerierte Liste",
