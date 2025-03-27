@@ -167,7 +167,11 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         (event) => {
           switch (event.key) {
             case 'Enter':
-              this.enterPressed(event);
+              if (event.shiftKey) {
+                this.enterBreakPressed(event);
+              } else {
+                this.enterPressed(event);
+              }
               break;
             case 'Backspace':
               this.backspace(event);
@@ -406,7 +410,7 @@ export default class ListTabulator<Renderer extends ListRenderer> {
         const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
 
         // get text content of the li element.
-        let content = child.innerHTML;
+        let content = child.innerHTML.trim();
 
         if (subItemsWrapper) {
           // Get Copy of Child and remove any nested OL or UL tags from the content
@@ -526,6 +530,50 @@ export default class ListTabulator<Renderer extends ListRenderer> {
       this.splitItem(currentItem);
     }
   }
+
+
+  /**
+   * Handles Enter break keypress
+   * @param event - keydown
+   */
+  private enterBreakPressed(event: KeyboardEvent): void {
+    const currentItem = this.currentItem;
+    /**
+     * Prevent editor.js behaviour
+     */
+    event.stopPropagation();
+
+    /**
+     * Prevent browser behaviour
+     */
+    event.preventDefault();
+
+    /**
+     * Prevent duplicated event in Chinese, Japanese and Korean languages
+     */
+    if (event.isComposing) {
+      return;
+    }
+    if (currentItem === null) {
+      return;
+    }
+
+    const isEmpty = this.renderer?.getItemContent(currentItem).trim().length === 0;
+
+    /**
+     * On Enter in the last empty item, get out of list
+     */
+    if (isEmpty) {
+
+      return;
+    } else {
+      /**
+       * If current item is not empty than split current item
+       */
+      this.insertLineBreakAtCaret(currentItem);
+    }
+  }
+
 
   /**
    * Handle backspace
@@ -1169,6 +1217,41 @@ export default class ListTabulator<Renderer extends ListRenderer> {
      */
     targetItem.remove();
   }
+
+  private insertLineBreakAtCaret(currentItem: ItemElement): void {
+    const [currentNode, offset] = getCaretNodeAndOffset();
+
+    if (currentNode === null) {
+      return;
+    }
+
+    const currentItemContent = getItemContentElement(currentItem);
+
+    if (currentItemContent === null) {
+      return;
+    }
+
+    const br = document.createElement('br');
+
+    const range = document.createRange();
+    const selection = window.getSelection();
+
+    range.setStart(currentNode, offset);
+    range.setEnd(currentNode, offset);
+    range.insertNode(br);
+
+    // Posun kurzor za <br>
+    range.setStartAfter(br);
+    range.setEndAfter(br);
+    const zwsp = document.createTextNode("\u200B");
+    br.after(zwsp);
+    range.setStartAfter(zwsp);
+    range.setEndAfter(zwsp);
+
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }
+
   /**
    * Add indentation to current item
    * @param event - keydown
