@@ -265,7 +265,6 @@ export default class EditorjsList {
    */
   public save(): ListData {
     this.data = this.list!.save();
-
     return this.data;
   }
 

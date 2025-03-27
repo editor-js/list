@@ -4,7 +4,7 @@ import type { ListConfig, ListData, ListDataStyle } from '../types/ListParams';
 import type { ListItem } from '../types/ListParams';
 import type { ItemElement, ItemChildWrapperElement } from '../types/Elements';
 import { isHtmlElement } from '../utils/type-guards';
-import { getContenteditableSlice, getCaretNodeAndOffset, isCaretAtStartOfInput } from '@editorjs/caret';
+import { getContenteditableSlice, getCaretNodeAndOffset, isCaretAtStartOfInput, isCaretAtEndOfInput } from '@editorjs/caret';
 import { DefaultListCssClasses } from '../ListRenderer';
 import type { PasteEvent } from '../types';
 import type { API, BlockAPI, PasteConfig } from '@editorjs/editorjs';
@@ -171,6 +171,9 @@ export default class ListTabulator<Renderer extends ListRenderer> {
               break;
             case 'Backspace':
               this.backspace(event);
+              break;
+            case 'Delete':
+              this.delete(event);
               break;
             case 'Tab':
               if (event.shiftKey) {
@@ -576,6 +579,45 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
+   * Handle delete
+   * @param event - keydown
+   */
+  private delete(event: KeyboardEvent): void {
+    const currentItem = this.currentItem;
+
+    if (currentItem === null) {
+      return;
+    }
+
+    /**
+     * Caret is not at end of the item
+     * Then delete button should remove letter as usual
+     */
+    if (!isCaretAtEndOfInput(currentItem)) {
+      return;
+    }
+
+    /**
+     * If backspace is pressed with selection, it should be handled as usual
+     */
+    if (window.getSelection()?.isCollapsed === false) {
+      return;
+    }
+
+    /**
+     * Prevent Editor.js backspace handling
+     */
+    event.stopPropagation();
+
+    /**
+     * Prevent default backspace behaviour
+     */
+    event.preventDefault();
+
+    this.mergeItemWithCurrent(currentItem);
+  }
+
+  /**
    * Reduce indentation for current item
    * @param event - keydown
    */
@@ -952,6 +994,181 @@ export default class ListTabulator<Renderer extends ListRenderer> {
     item.remove();
   }
 
+  /**
+   * Method that is used for merging current item with current one
+   * Content of the current item would be appended to the current item
+   * Current item children would not change nesting level
+   * @param item - current item html element
+   */
+  private mergeItemWithCurrent(item: ItemElement): void {
+    console.log(item)
+    const nextItem = item.nextElementSibling;
+    const currentItemParentNode = item.parentNode;
+
+    /**
+     * Check that parent node of the current element exists
+     */
+    if (currentItemParentNode === null) {
+      return;
+    }
+    if (!isHtmlElement(currentItemParentNode)) {
+      return;
+    }
+
+    let parentItem = currentItemParentNode.closest<ItemElement>(`.${DefaultListCssClasses.item}`);
+
+    if (parentItem === null) {
+      parentItem = item;
+    }
+
+    const nextParentItem = parentItem?.nextElementSibling;
+
+    if (nextParentItem === undefined) {
+      return;
+    }
+
+    /**
+     * Check that current item has any next siblings to be merged with
+     */
+    if (!nextItem && !nextParentItem) {
+      return;
+    }
+
+    /**
+     * Make sure previousItem is an HTMLElement
+     */
+    if (nextItem && !isHtmlElement(nextItem)) {
+      return;
+    }
+
+    /**
+     * Make sure previousItem is an HTMLElement
+     */
+    if (nextParentItem && !isHtmlElement(nextParentItem)) {
+      return;
+    }
+
+    /**
+     * Lets compute the item which will be merged with current item text
+     */
+    let targetItem: ItemElement | null;
+
+    /**
+     * If there is a next item then we get a deepest item in its sublists
+     *
+     * Otherwise we will use the parent item
+     */
+    if (nextItem) {
+      /**
+       * Get list of all levels children of the next item
+       */
+      const childrenOfNextItem = getChildItems(nextItem, false);
+
+      /**
+       * Target item would be deepest child of the next item or next item itself
+       */
+      if (childrenOfNextItem.length !== 0 && childrenOfNextItem.length !== 0) {
+        targetItem = childrenOfNextItem[childrenOfNextItem.length - 1];
+      } else {
+        targetItem = nextItem;
+      }
+    } else {
+      targetItem = nextParentItem;
+    }
+
+
+    /**
+     * Get the target item content element
+     */
+    if (!targetItem) {
+      return;
+    }
+
+    /**
+     * Set caret to the end of the target item
+     */
+    focusItem(item, false);
+
+    /**
+     * Get next item content
+     */
+    const nextItemContent = this.renderer.getItemContent(targetItem);
+
+    /**
+     * Get target item content element
+     */
+    const targetItemContentElement = getItemContentElement(item);
+
+    /**
+     * Set a new place for caret
+     */
+    if (targetItemContentElement === null) {
+      return;
+    }
+
+    /**
+     * Update target item content by merging with current item html content
+     */
+    targetItemContentElement.insertAdjacentHTML('beforeend', nextItemContent);
+    /**
+     * Get child list of the currentItem
+     */
+    const nextItemChildrenList = getChildItems(targetItem);
+    const currentItemChildrenList = getChildItems(parentItem);
+
+    /**
+     * If item has no children, just remove item
+     * Else children of the item should be prepended to the target item child list
+     */
+    if (nextItemChildrenList.length === 0) {
+      /**
+       * Remove current item element
+       */
+      targetItem.remove();
+
+      /**
+       * If target item has empty child wrapper after merge, we need to remove child wrapper
+       * This case could be reached if the only child item of the target was merged with target
+       */
+      removeChildWrapperIfEmpty(targetItem);
+
+      return;
+    }
+
+    /**
+     * Get target for child list of the currentItem
+     * Note that previous item and parent item could not be null at the same time
+     * This case is checked before
+     */
+    const targetForChildItems = nextItem ? nextItem : parentItem!;
+
+    const targetChildWrapper = getItemChildWrapper(targetForChildItems) ?? this.renderer.renderWrapper(false);
+
+    /**
+     * Add child current item children to the target childWrapper
+     */
+    if (nextItem) {
+      nextItemChildrenList.forEach((childItem) => {
+        targetChildWrapper.appendChild(childItem);
+      });
+    } else {
+      nextItemChildrenList.forEach((childItem) => {
+        targetChildWrapper.append(childItem);
+      });
+    }
+
+    /**
+     * If we created new wrapper, then append childWrapper to the target item
+     */
+    if (getItemChildWrapper(targetForChildItems) === null) {
+      item.appendChild(targetChildWrapper);
+    }
+
+    /**
+     * Remove current item element
+     */
+    targetItem.remove();
+  }
   /**
    * Add indentation to current item
    * @param event - keydown
