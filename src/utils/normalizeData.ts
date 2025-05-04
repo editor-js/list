@@ -78,6 +78,6 @@ export default function normalizeData(data: ListData | OldListData | OldChecklis
       items: data.items,
     };
   } else {
-    return data;
+    return structuredClone(data);
   }
 };
