@@ -45,7 +45,7 @@ var editor = EditorJS({
   // ...
   tools: {
     ...
-    list: {
+    List: {
       class: EditorjsList,
       inlineToolbar: true,
       config: {
