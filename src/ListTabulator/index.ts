@@ -358,66 +358,69 @@ export default class ListTabulator<Renderer extends ListRenderer> {
   }
 
   /**
+   * Parse list element and returns list of list items
+   * @param element - list element
+   * @returns list of list items
+   * */
+  private parseListElement(element: HTMLElement): ListItem[] {
+    const items: ListItem[] = [];
+    const liElements = Array.from(element.children).filter(
+      (child) => child.tagName === 'LI'
+    ) as HTMLElement[];
+
+    for (const li of liElements) {
+      let content = '';
+      let meta = {};
+      const childNodes = Array.from(li.childNodes);
+      let nestedList: HTMLElement | null = null;
+
+      // for each li child node...
+      for (const node of childNodes) {
+        // check if the node is a nested (ol or ul) list..
+        if (
+          node.nodeType === Node.ELEMENT_NODE &&
+          (node as HTMLElement).tagName.match(/^(UL|OL)$/)
+        ) {
+          // if so, flag it as a nestedList and stop looping over the other li child nodes
+          nestedList = node as HTMLElement;
+          break;
+        }
+
+        // NOTE: the following will make sure comments and fragment nodes are ignored
+        // make sure to add any HTML element to the content to be rendered as HTML, for (i.e, <b>, <a>, etc.)
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          content += (node as HTMLElement).outerHTML;
+        } else if (node.nodeType === Node.TEXT_NODE) {
+          // if the node is a text node, add its text content to the content string
+          content += node.textContent;
+        }
+      }
+
+      // if there is a nested list that was found earlier, parse it recursively.
+      const children = nestedList ? this.parseListElement(nestedList) : [];
+
+      // once all children are processed, push the output to item array using the ListItem format
+      items.push({
+        content: content.trim(),
+        meta,
+        items: children,
+      });
+    }
+
+    return items;
+  }
+
+  /**
    * Handle UL, OL and LI tags paste and returns List data
    * @param element - html element that contains whole list
    * @todo - refactor and move to list instance
    */
-  public pasteHandler(element: PasteEvent['detail']['data']): ListData {
-    const { tagName: tag } = element;
-    let style: ListDataStyle = 'unordered';
-    let tagToSearch: string;
-
-    // set list style and tag to search.
-    switch (tag) {
-      case 'OL':
-        style = 'ordered';
-        tagToSearch = 'ol';
-        break;
-      case 'UL':
-      case 'LI':
-        style = 'unordered';
-        tagToSearch = 'ul';
-    }
-
-    const data: ListData = {
-      style,
-      meta: {} as ItemMeta,
-      items: [],
+  public pasteHandler(element: HTMLElement): ListData {
+    return {
+      style: element.tagName === 'OL' ? 'ordered' : 'unordered',
+      meta: {},
+      items: this.parseListElement(element),
     };
-
-    /**
-     * Set default ordered list atributes if style is ordered
-     */
-    if (style === 'ordered') {
-      (this.data.meta as OrderedListItemMeta).counterType = 'numeric';
-      (this.data.meta as OrderedListItemMeta).start = 1;
-    }
-
-    // get pasted items from the html.
-    const getPastedItems = (parent: Element): ListItem[] => {
-      // get first level li elements.
-      const children = Array.from(parent.querySelectorAll(`:scope > li`));
-
-      return children.map((child) => {
-        // get subitems if they exist.
-        const subItemsWrapper = child.querySelector(`:scope > ${tagToSearch}`);
-        // get subitems.
-        const subItems = subItemsWrapper ? getPastedItems(subItemsWrapper) : [];
-        // get text content of the li element.
-        const content = child.innerHTML ?? '';
-
-        return {
-          content,
-          meta: {},
-          items: subItems,
-        };
-      });
-    };
-
-    // get pasted items.
-    data.items = getPastedItems(element);
-
-    return data;
   }
 
   /**
