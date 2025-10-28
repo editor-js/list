@@ -98,7 +98,10 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
           const checkbox = target.closest(`.${CheckListRenderer.CSS.checkboxContainer}`);
 
           if (checkbox && checkbox.contains(target)) {
-            this.toggleCheckbox(checkbox);
+            // Only toggle checkbox if not in read-only mode
+            if (!this.readOnly) {
+              this.toggleCheckbox(checkbox);
+            }
           }
         }
       });
