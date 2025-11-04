@@ -416,9 +416,18 @@ export default class ListTabulator<Renderer extends ListRenderer> {
    * @todo - refactor and move to list instance
    */
   public pasteHandler(element: HTMLElement): ListData {
+    const { tagName: tag } = element;
+    const meta: ItemMeta = {};
+
+    switch (tag) {
+      case 'OL':
+        (meta as OrderedListItemMeta).counterType = 'numeric';
+        (meta as OrderedListItemMeta).start = 1;
+        break;
+    }
     return {
       style: element.tagName === 'OL' ? 'ordered' : 'unordered',
-      meta: {},
+      meta,
       items: this.parseListElement(element),
     };
   }
