@@ -34,6 +34,11 @@ interface ChecklistCssClasses extends ListCssClasses {
    * CSS class of the checkbox container
    */
   checkboxContainer: string;
+
+  /**
+   * CSS class for disabled checkbox check
+   */
+  checkboxCheckDisabled: string;
 }
 
 /**
@@ -61,6 +66,7 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
       noHover: `${CssPrefix}__checkbox--no-hover`,
       checkbox: `${CssPrefix}__checkbox-check`,
       checkboxContainer: `${CssPrefix}__checkbox`,
+      checkboxCheckDisabled: `${CssPrefix}__checkbox-check--disabled`,
     };
   }
 
@@ -127,6 +133,11 @@ export class CheckListRenderer implements ListRendererInterface<ChecklistItemMet
 
     if (meta.checked === true) {
       checkboxContainer.classList.add(CheckListRenderer.CSS.itemChecked);
+    }
+
+    // Disable checkbox interaction in read-only mode
+    if (this.readOnly) {
+      checkboxContainer.classList.add(CheckListRenderer.CSS.checkboxCheckDisabled);
     }
 
     checkbox.innerHTML = IconCheck;
