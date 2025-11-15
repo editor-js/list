@@ -399,7 +399,16 @@ export default class EditorjsList {
         this.listStyle = 'unordered';
     }
 
-    this.list!.onPaste(event);
+    // update the data first with the formatted list data from the paste handler
+    this.data = this.list!.pasteHandler(event.detail.data);
+
+    // then make sure that the instance is re-instantiated to hold the new data with the new styles
+    this.changeTabulatorByStyle();
+
+    // create a replace the new rendered list element with the current one.
+    const newListElement = this.list!.render();
+    this.listElement?.replaceWith(newListElement);
+    this.listElement = newListElement;
   }
 
   /**
