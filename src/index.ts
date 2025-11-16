@@ -52,7 +52,7 @@ export default class EditorjsList {
    * title - title to show in toolbox
    */
   public static get toolbox(): ToolboxConfig {
-    return [
+    const defaultToolbox = [
       {
         icon: IconListBulleted,
         title: 'Unordered List',
@@ -75,6 +75,12 @@ export default class EditorjsList {
         },
       },
     ];
+
+    return EditorjsList.styles
+      ? defaultToolbox.filter(
+        tool => EditorjsList.styles?.includes(tool.data.style as ListDataStyle)
+      )
+      : defaultToolbox;
   }
 
   /**
@@ -152,6 +158,11 @@ export default class EditorjsList {
   }
 
   /**
+   * Styles allowed to be used in list
+   */
+  private static styles?: ListDataStyle[];
+
+  /**
    * The Editor.js API
    */
   private api: API;
@@ -214,6 +225,11 @@ export default class EditorjsList {
      * Set the default list style from the config or presetted 'unordered'.
      */
     this.defaultListStyle = this.config?.defaultStyle || 'unordered';
+
+    /**
+     * Set the style's list from the config
+     */
+    EditorjsList.styles = this.config?.styles;
 
     /**
      * Set the default counter types for the ordered list
@@ -284,7 +300,7 @@ export default class EditorjsList {
   public renderSettings(): MenuConfigItem[] {
     const defaultTunes: MenuConfigItem[] = [
       {
-        label: this.api.i18n.t('Unordered'),
+        title: this.api.i18n.t('Unordered'),
         icon: IconListBulleted,
         closeOnActivate: true,
         isActive: this.listStyle == 'unordered',
@@ -293,7 +309,7 @@ export default class EditorjsList {
         },
       },
       {
-        label: this.api.i18n.t('Ordered'),
+        title: this.api.i18n.t('Ordered'),
         icon: IconListNumbered,
         closeOnActivate: true,
         isActive: this.listStyle == 'ordered',
@@ -302,7 +318,7 @@ export default class EditorjsList {
         },
       },
       {
-        label: this.api.i18n.t('Checklist'),
+        title: this.api.i18n.t('Checklist'),
         icon: IconChecklist,
         closeOnActivate: true,
         isActive: this.listStyle == 'checklist',
@@ -310,7 +326,14 @@ export default class EditorjsList {
           this.listStyle = 'checklist';
         },
       },
-    ];
+    ].filter((tune) => {
+      // If no styles config, keep all
+      if (!EditorjsList?.styles) {
+        return true;
+      };
+
+      return (EditorjsList?.styles.includes(tune.title.toLowerCase() as ListDataStyle));
+    });
 
     if (this.listStyle === 'ordered') {
       const startWithElement = renderToolboxInput(
