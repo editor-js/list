@@ -65,6 +65,7 @@ var editor = EditorJS({
 | defaultStyle | `string` | default list style: `ordered`, `unordered` or `checklist`, default is `unordered` |
 | maxLevel     | `number` | maximum level of the list nesting, could be set to `1` to disable nesting, unlimited by default |
 | counterTypes | `string[]` | specifies which counter types should be shown in the ordered list style, could be set to `['numeric','upper-roman']`, default is `undefined` which shows all counter types |
+| styles       | `string[]` | allows to specify which list styles user can choose from: `ordered`, `unordered` or `checklist`. For example, set to `['ordered','unordered']` to hide checklist option. By default all three styles are available |
 
 ## Output data
 
