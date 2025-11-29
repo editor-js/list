@@ -99,4 +99,8 @@ export interface ListConfig {
    * @default undefined // All counter types are available when not specified
    */
   counterTypes?: OlCounterType[];
+  /**
+   * Styles allowed to be used in list
+   */
+  styles?: ListDataStyle[];
 }

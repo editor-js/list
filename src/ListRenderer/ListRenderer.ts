@@ -40,27 +40,27 @@ export interface ListCssClasses {
 export interface ListRendererInterface<ItemMeta> {
   /**
    * Renders wrapper for list
-   * @param isRoot - boolean variable that represents level of the wrappre (root or childList)
+   * @param isRoot - boolean variable that represents level of the wrapper (root or childList)
    * @returns - created html ul element
    */
   renderWrapper: (isRoot: boolean) => HTMLElement;
 
   /**
-   * Redners list item element
+   * Renders list item element
    * @param content - content of the list item
    * @returns - created html list item element
    */
   renderItem: (content: string, meta: ItemMeta) => HTMLElement;
 
   /**
-   * Return the item content
+   * Returns the item content
    * @param {Element} item - item wrapper (<li>)
    * @returns {string}
    */
   getItemContent: (item: Element) => string;
 
   /**
-   * Return meta object of certain element
+   * Returns meta object of certain element
    * @param {Element} item - item of the list to get meta from
    * @returns {ItemMeta} Item meta object
    */
