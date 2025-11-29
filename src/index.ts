@@ -22,6 +22,7 @@ import stripNumbers from './utils/stripNumbers';
 import normalizeData from './utils/normalizeData';
 import type { PasteEvent } from './types';
 import type { OrderedListItemMeta } from './types/ItemMeta';
+import validateConfig from './utils/validateConfig';
 
 /**
  * Constructor Params for Editorjs List Tool, use to pass initial data and settings
@@ -220,6 +221,11 @@ export default class EditorjsList {
     this.readOnly = readOnly;
     this.config = config;
     this.block = block;
+
+    /**
+     * Validate user configuration
+     */
+    validateConfig(this.config);
 
     /**
      * Set the default list style from the config or presetted 'unordered'.
